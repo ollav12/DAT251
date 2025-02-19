@@ -24,6 +24,10 @@ dependencies {
 	
     implementation("com.google.maps:google-maps-services:2.2.0")
     implementation("org.slf4j:slf4j-simple:1.7.25")
+
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.security:spring-security-crypto")
+
 }
 
 tasks.withType<Test> {
