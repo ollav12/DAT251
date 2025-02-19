@@ -32,5 +32,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.Dat251Application"
+    mainClass = "org.example.demo.Dat251Application"
 }
