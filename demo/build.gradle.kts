@@ -28,6 +28,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.security:spring-security-crypto")
 
+	implementation("org.postgresql:postgresql")
 }
 
 tasks.withType<Test> {
