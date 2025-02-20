@@ -61,5 +61,12 @@ form {
   flex-direction: column;
   gap: 1rem;
   max-width: 300px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+h1{
+  text-align: center;
+  margin-top: 2rem;
 }
 </style>
