@@ -21,11 +21,12 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <style scoped>
 nav {
-  display: block;
-  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
   font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  width: 100%;
+  margin-top: 2rem
 }
 
 nav a.router-link-exact-active {
@@ -37,7 +38,6 @@ nav a.router-link-exact-active:hover {
 }
 
 nav a {
-  display: inline-block;
   padding: 0 1rem;
   border-left: 1px solid var(--color-border);
 }
@@ -48,12 +48,23 @@ nav a:first-of-type {
 
 @media (min-width: 1024px) {
   nav {
-    text-align: left;
-    margin-left: -1rem;
     font-size: 1rem;
-
     padding: 1rem 0;
     margin-top: 1rem;
+    text-align: left;
+    margin-left: 0;
   }
 }
+
+header {
+  text-align: center;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 1rem;
+}
+
 </style>
