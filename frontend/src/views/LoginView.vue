@@ -9,7 +9,18 @@ export default {
   methods: {
     async handleSubmit(event: Event) {
       event.preventDefault()
-      throw new Error('Not implemented')
+      try {
+        const response = await fetch('http://localhost:8080/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: this.username, password: this.password })
+        });
+        if (!response.ok) { throw new Error('Login failed'); }
+        const data = await response.json();
+        console.log('Login success:', data);
+      } catch (error) {
+        console.error('Error during login:', error);
+      }
     },
   },
 }

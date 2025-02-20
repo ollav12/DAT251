@@ -12,27 +12,28 @@ export default {
   methods: {
     async handleSubmit(e: Event) {
       e.preventDefault()
-      throw new Error('Not implemented')
-      // try {
-      //   const response = await fetch('/api/signup', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       username: this.username,
-      //       email: this.email,
-      //       password: this.password,
-      //     }),
-      //   })
-      //   if (!response.ok) {
-      //     throw new Error('Signup failed')
-      //   }
-      //   const data = await response.json()
-      //   console.log('Signup successful:', data)
-      // } catch (error) {
-      //   console.error('Error during signup:', error)
-      // }
+      try {
+        const response = await fetch('http://localhost:8080/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: this.firstName,
+            lastName: this.lastName,
+            username: this.username,
+            email: this.email,
+            password: this.password
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        console.log('Signup success:', data.message);
+      } catch (error) {
+        console.error('Error during signup:', error);
+      }
     },
   },
 }

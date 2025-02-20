@@ -2,13 +2,14 @@ package com.example.demo.Controller;
 
 import com.example.demo.Model.User;
 import com.example.demo.Service.UserServiceImpl;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final UserServiceImpl userService;
@@ -18,14 +19,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
+    public ResponseEntity<Map<String, String> > register(@RequestBody User user) {
         userService.registerUser(user);
-        return "User registered successfully";
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
         userService.loginUser(user.getUsername(), user.getPassword());
-        return "User logged in successfully";
+        return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
     }
 }
