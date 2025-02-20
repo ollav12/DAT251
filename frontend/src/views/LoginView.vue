@@ -2,7 +2,7 @@
 export default {
   data() {
     return {
-      email: '',
+      username: '',
       password: '',
     }
   },
@@ -18,7 +18,7 @@ export default {
 <template>
   <h1>Login</h1>
   <form @submit.prevent="handleSubmit">
-    <input type="email" v-model="email" placeholder="Email" required />
+    <input type="username" v-model="username" placeholder="Username" required />
     <input type="password" v-model="password" placeholder="Password" required />
     <button type="submit">Login</button>
   </form>

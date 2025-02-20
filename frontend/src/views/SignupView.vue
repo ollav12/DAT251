@@ -2,6 +2,8 @@
 export default {
   data() {
     return {
+      firstName: '',
+      lastName: '',
       username: '',
       email: '',
       password: '',
@@ -38,6 +40,10 @@ export default {
 <template>
   <h1>Signup</h1>
   <form @submit="handleSubmit">
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" v-model="firstName" required />
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" v-model="lastName" required />
     <label for="username">Username:</label>
     <input type="text" id="username" v-model="username" required />
     <label for="email">Email:</label>
