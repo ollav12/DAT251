@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TransportationModeRepository extends JpaRepository <TransportationMode, Long> {
-    TransportationMode findByTransportationMode(String transportationMode);
+    //TransportationMode findByTransportationMode(String transportationMode);
 }

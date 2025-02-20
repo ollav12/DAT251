@@ -18,7 +18,7 @@ public class TripEstimationServiceImpl {
         this.restTemplate = restTemplate;
     }
 
-    public double estimateCO2(String origin, String destination, Long modeId) {
+  /*  public double estimateCO2(String origin, String destination, Long modeId) {
         TransportationMode mode = transportationModeRepository.findById(modeId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid mode id"));
 
@@ -33,5 +33,5 @@ public class TripEstimationServiceImpl {
 
         return distanceKM * mode.getCo2PerKilometer();
 
-    }
+    }*/
 }
