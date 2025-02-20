@@ -4,20 +4,30 @@ export default {
     return {
       username: '',
       password: '',
+      error: ''
     }
   },
   methods: {
     async handleSubmit(event: Event) {
       event.preventDefault()
+      this.error = ''
       try {
         const response = await fetch('http://localhost:8080/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: this.username, password: this.password })
+          body: JSON.stringify({
+            username: this.username,
+            password: this.password
+          })
         });
-        if (!response.ok) { throw new Error('Login failed'); }
+
         const data = await response.json();
-        console.log('Login success:', data);
+
+        if (!response.ok) {
+          this.error = data.error;
+          throw new Error(data.error);
+        }
+        console.log('Login success:', data.message);
       } catch (error) {
         console.error('Error during login:', error);
       }
@@ -29,6 +39,7 @@ export default {
 <template>
   <h1>Login</h1>
   <form @submit.prevent="handleSubmit">
+    <div v-if="error" style="color: red">{{ error }}</div>
     <input type="username" v-model="username" placeholder="Username" required />
     <input type="password" v-model="password" placeholder="Password" required />
     <button type="submit">Login</button>

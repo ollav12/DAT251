@@ -25,8 +25,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody User user) {
-        userService.loginUser(user.getUsername(), user.getPassword());
-        return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
+    public ResponseEntity<?> login(@RequestBody User user) {
+        try {
+            userService.loginUser(user.getUsername(), user.getPassword());
+            return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
     }
 }
