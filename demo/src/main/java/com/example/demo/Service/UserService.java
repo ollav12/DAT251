@@ -1,26 +1,35 @@
 package com.example.demo.Service;
 
 import com.example.demo.Model.User;
-import com.example.demo.Repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 
-@Service
-public class UserService {
+/**
+ * Service interface for managing user authentication operations.
+ * Provides methods for user registration and login functionality.
+ */
+public interface UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    /**
+     * Registers a new user in the system.
+     *
+     * @param user the user entity to be registered
+     * @return the registered user entity
+     * @throws IllegalStateException if a user with the same username already exists
+     */
+    User registerUser(User user);
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    /**
+     * Authenticates a user with the provided credentials.
+     *
+     * @param username the username of the user
+     * @param password the password of the user
+     * @return the authenticated user entity
+     * @throws NoSuchElementException if the user is not found
+     * @throws SecurityException if the password is invalid
+     */
+    User loginUser(String username, String password);
 
-    public User registerUser(User user) {
-        if(userRepository.findByUsername(user.getUsername()) != null) {
-            throw new RuntimeException("User already exists");
-        }
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return userRepository.saveUser(user);
-    }
+    List<User> getAllUsers();
 }

@@ -1,17 +1,18 @@
 package com.example.demo.Model;
 
+import jakarta.persistence.*;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
-//@Entity
-//@Table(name = "users")
+@Entity
+@Table(name = "users")
 public class User {
 
-    // @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String firstName;
     private String lastName;
-    // @Column(unique = true)
+    @Column(unique = true)
     private String username;
     private String email;
     private String password;
@@ -24,6 +25,10 @@ public class User {
         this.email = email;
         this.password = password;
         this.points = points;
+    }
+
+    public User() {
+
     }
 
     public String getFirstName() {

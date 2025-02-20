@@ -1,7 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.User;
-import com.example.demo.Service.UserService;
+import com.example.demo.Service.UserServiceImpl;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserServiceImpl userService) {
         this.userService = userService;
     }
 
@@ -25,7 +25,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String login(@RequestBody User user) {
-        // TODO: Implement login logic
+        userService.loginUser(user.getUsername(), user.getPassword());
         return "User logged in successfully";
     }
 }

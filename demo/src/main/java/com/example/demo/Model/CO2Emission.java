@@ -1,7 +1,13 @@
 package com.example.demo.Model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "co2emission")
 public class CO2Emission {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long Id;
     private double TotalEmission;
 
