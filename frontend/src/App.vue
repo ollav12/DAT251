@@ -4,7 +4,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <h1>Co₂mpass</h1>
+    <h1>CO₂mpass</h1>
     <p>Understand your carbon footprint</p>
     <div class="wrapper">
       <nav>
