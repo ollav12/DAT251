@@ -30,6 +30,7 @@ dependencies {
 
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.postgresql:postgresql")
+	implementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {
