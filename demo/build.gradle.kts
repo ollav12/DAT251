@@ -29,7 +29,7 @@ dependencies {
 	implementation("org.springframework.security:spring-security-crypto")
 
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.postgresql:postgresql")
+	//implementation("org.postgresql:postgresql:42.6.0")
 	implementation("com.h2database:h2")
 }
 
