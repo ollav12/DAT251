@@ -3,6 +3,7 @@ package com.example.demo.Controller;
 //import org.springframework.web.bind.annotation.CrossOrigin;
 import com.example.demo.Model.User;
 import com.example.demo.Service.UserServiceImpl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,13 +22,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{username}")
-    public String getUser(@PathVariable String username) {
-        return "Hello " + username;
-    }
-
     @GetMapping()
-    public List<User> getUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 }
