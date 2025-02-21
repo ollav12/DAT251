@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User registerUser(User user) {
-        if(userRepository.findByUsername(user.getUsername()) != null) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new IllegalStateException("User already exists");
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -32,10 +32,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public User loginUser(String username, String password) {
         User user = userRepository.findByUsername(username);
-        if(user == null) {
+        if (user == null) {
             throw new NoSuchElementException("User not found");
         }
-        if(!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new SecurityException("Invalid password");
         }
         return user;
@@ -45,4 +45,39 @@ public class UserServiceImpl implements UserService{
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User getUser(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+    }
+
+    @Override
+    public String deleteUser(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+        userRepository.delete(user);
+        return "User with id: " + id + " was successfully deleted";
+    }
+
+    @Override
+    public String updateUser(User updatedUser, long id) {
+        User exsistingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+
+        exsistingUser.setEmail(updatedUser.getEmail());
+        exsistingUser.setFirstName(updatedUser.getFirstName());
+        exsistingUser.setLastName(updatedUser.getLastName());
+        exsistingUser.setPoints(updatedUser.getPoints());
+        exsistingUser.setUsername(updatedUser.getUsername());
+
+        if (!bCryptPasswordEncoder.matches(updatedUser.getPassword(), exsistingUser.getPassword())) {
+            exsistingUser.setPassword(bCryptPasswordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        userRepository.save(exsistingUser);
+        return "User with id: " + id + "has been successfully updated";
+
+    }
+
 }
