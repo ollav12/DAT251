@@ -8,6 +8,7 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TravelMode;
+import jakarta.websocket.server.PathParam;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,24 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/transport")
 public class TransportController {
 
-    private final String googleMapsApiKey = "TODO";
+    private final String googleMapsApiKey = System.getenv(
+        "GOOGLE_MAPS_API_KEY"
+    );
 
     public TransportController() {}
 
     private class TripEstimateResults {
 
-        private Map<String, TripEstimate> tripEstimates;
+        private Map<String, TripEstimate> alternatives;
 
         public TripEstimateResults() {
-            this.tripEstimates = new HashMap<>();
+            this.alternatives = new HashMap<>();
         }
 
-        public void addEstimate(String mode, TripEstimate estimate) {
-            tripEstimates.put(mode, estimate);
+        public void addAlternative(String mode, TripEstimate estimate) {
+            alternatives.put(mode, estimate);
         }
 
-        public Map<String, TripEstimate> getEstimates() {
-            return tripEstimates;
+        public Map<String, TripEstimate> getAlternatives() {
+            return alternatives;
         }
     }
 
@@ -75,20 +78,20 @@ public class TransportController {
         value = "/tripestimate",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<TripEstimateResults> getAlternatives() {
+    public ResponseEntity<TripEstimateResults> getAlternatives(
+        @PathParam("origin") String origin,
+        @PathParam("destination") String destination
+    ) {
         GeoApiContext context = new GeoApiContext.Builder()
             .apiKey(this.googleMapsApiKey)
             .build();
 
-        String origin = "1600 Amphitheatre Parkway, Mountain View, CA";
-        String destination = "1 Infinite Loop, Cupertino, CA";
-
         // Call Directions API once per travel mode
         TravelMode[] modes = {
             TravelMode.DRIVING,
-            TravelMode.WALKING,
-            TravelMode.BICYCLING,
-            TravelMode.TRANSIT,
+            // TravelMode.WALKING,
+            // TravelMode.BICYCLING,
+            // TravelMode.TRANSIT,
         };
         TripEstimateResults results = new TripEstimateResults();
         for (TravelMode mode : modes) {
@@ -102,12 +105,21 @@ public class TransportController {
 
             DirectionsResult result;
             try {
+                System.out.println("Requesting directions for mode: " + mode);
                 result = request.await();
+                System.out.println("Received directions for mode: " + mode);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException("Failed to fetch directions", e);
             } finally {
                 context.shutdown();
+            }
+
+            if (result.routes.length == 0) {
+                System.out.println(
+                    "No route found between points: mode " + mode
+                );
+                continue;
             }
 
             TripEstimate bestRoute = null;
@@ -198,7 +210,7 @@ public class TransportController {
                 }
             }
 
-            results.addEstimate(mode.name().toLowerCase(), bestRoute);
+            results.addAlternative(mode.name().toLowerCase(), bestRoute);
         }
 
         return ResponseEntity.ok().body(results);
