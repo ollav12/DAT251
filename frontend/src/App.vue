@@ -1,25 +1,49 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import {ref} from 'vue';
+import { RouterLink } from 'vue-router';
+import LoginView from './views/LoginView.vue';
+import SignupView from './views/SignupView.vue';
+
+const isLoggedIn = ref(false);
+
+function handleLoginSuccess() {
+  isLoggedIn.value = true;
+}
+
+function handleSignupSuccess() {
+  isLoggedIn.value = true;
+}
+
 </script>
 
 <template>
   <header>
     <h1>CO₂mpass</h1>
     <p>Understand your carbon footprint</p>
+  </header>
+
+  <!-- Show login or register component when not logged in -->
+  <div v-if="!isLoggedIn">
+    <LoginView @login-success="handleLoginSuccess"/>
+    <SignupView @navigate-to-signup="handleSignupSuccess"/>
+  </div>
+  <div v-else>
     <div class="wrapper">
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/tripestimator">Trip estimator</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/signup">Sign up</RouterLink>
       </nav>
     </div>
-  </header>
-
-  <RouterView />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
+header {
+  text-align: center;
+  margin-top: 0.1rem;
+}
+
 nav {
   display: flex;
   justify-content: center;

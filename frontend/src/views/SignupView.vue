@@ -6,7 +6,7 @@ export default {
       lastName: '',
       username: '',
       email: '',
-      password: '',
+      password: ''
     }
   },
   methods: {
@@ -29,6 +29,8 @@ export default {
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
+        } else {
+        this.$emit('navigate-to-signup', data.user)
         }
         console.log('Signup success:', data.message);
       } catch (error) {
@@ -38,6 +40,7 @@ export default {
   },
 }
 </script>
+
 <template>
   <h1>Signup</h1>
   <form @submit="handleSubmit">
