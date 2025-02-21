@@ -1,0 +1,22 @@
+meta {
+  name: Register user
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:8080/register/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "username": "johndoe",
+    "email": "johndoe@example.com",
+    "password": "securePass123",
+    "points": 100
+  }
+}
