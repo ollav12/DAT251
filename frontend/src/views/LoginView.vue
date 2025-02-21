@@ -1,4 +1,5 @@
 <script lang="ts">
+import {useRouter} from "vue-router";
 
 export default {
   data() {
@@ -8,6 +9,12 @@ export default {
       error: '',
     }
   },
+
+  setup() {
+    const router = useRouter();
+    return { router };
+  },
+
   methods: {
     async handleSubmit(event: Event) {
       event.preventDefault()
@@ -35,6 +42,9 @@ export default {
         console.error('Error during login:', error)
       }
     },
+    navigateToSignup() {
+      this.$router.push({ name: 'signup' })
+    }
   },
 }
 </script>
@@ -55,7 +65,7 @@ export default {
       </div>
 
       <button class="register-button" type="submit">Login</button>
-      <button class="register-button" type="button">Register</button>
+      <button class="register-button" type="button" @click="navigateToSignup">Register</button>
     </form>
   </div>
 </template>

@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import {ref} from 'vue';
-import { RouterLink } from 'vue-router';
-import LoginView from './views/LoginView.vue';
-import SignupView from './views/SignupView.vue';
+import { useRouter } from 'vue-router';
+import {onMounted} from "vue";
 
-const isLoggedIn = ref(false);
+const router = useRouter();
 
-function handleLoginSuccess() {
-  isLoggedIn.value = true;
-}
-
-function handleSignupSuccess() {
-  isLoggedIn.value = true;
-}
+onMounted(() => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  if (!isLoggedIn) {
+    router.push('/login');
+  }
+});
 
 </script>
 
@@ -22,20 +19,12 @@ function handleSignupSuccess() {
     <p>Understand your carbon footprint</p>
   </header>
 
-  <!-- Show login or register component when not logged in -->
-  <div v-if="!isLoggedIn">
-    <LoginView @login-success="handleLoginSuccess"/>
-    <SignupView @navigate-to-signup="handleSignupSuccess"/>
-  </div>
-  <div v-else>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/tripestimator">Trip estimator</RouterLink>
-      </nav>
-    </div>
+  <nav>
+    <RouterLink to="/">Home</RouterLink>
+    <RouterLink to="/tripestimator">Trip estimator</RouterLink>
+  </nav>
+
     <RouterView />
-  </div>
 </template>
 
 <style scoped>
