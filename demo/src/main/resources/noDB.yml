@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb  # Midlertidig in-memory database
+    url: jdbc:h2:mem:testdb 
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
     hibernate:
-      ddl-auto: none  # Ikke gjør endringer i databasen
+      ddl-auto: none  
