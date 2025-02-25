@@ -43,7 +43,7 @@ class Dat251ApplicationTests {
 	}
 
 	@Test
-	void testGetUser() {
+	void testCreatingAndRetrievingUser() {
 		User user = createTestUser();
 
 		// Tests the POST createUser method
