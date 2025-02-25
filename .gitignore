@@ -3,3 +3,6 @@
 
 # direnv
 .envrc
+
+# zed editor
+.zed
