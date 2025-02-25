@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import com.example.demo.Model.User;
-import com.example.demo.Service.UserService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
@@ -24,9 +23,6 @@ import com.example.demo.Service.UserService;
 		"spring.jpa.hibernate.ddl-auto=create-drop"
 })
 class Dat251ApplicationTests {
-
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -47,24 +43,17 @@ class Dat251ApplicationTests {
 	}
 
 	@Test
-	void testRegisterUser() {
-		User user = createTestUser();
-
-		User registeredUser = userService.registerUser(user);
-		assertNotNull(registeredUser);
-		assertEquals("Test", registeredUser.getUsername());
-	}
-
-	@Test
 	void testGetUser() {
 		User user = createTestUser();
 
+		// Tests the POST createUser method
 		ResponseEntity<User> response = restTemplate.postForEntity("/users", user, User.class);
 		User registeredUser = response.getBody();
 		assertNotNull(registeredUser);
 		assertEquals("Test", registeredUser.getUsername());
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
+		// Tests the GET getUser(long id) method
 		ResponseEntity<User> getResponse = restTemplate.getForEntity("/users/" + registeredUser.getId(), User.class);
 		User retrievedUser = getResponse.getBody();
 		assertNotNull(retrievedUser);
