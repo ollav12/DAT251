@@ -1,5 +1,5 @@
 <script lang="ts">
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 
 export default {
   data() {
@@ -17,8 +17,8 @@ export default {
 
   methods: {
     async handleSubmit(event: Event) {
-      event.preventDefault()
-      this.error = ''
+      event.preventDefault();
+      this.error = '';
       try {
         const response = await fetch('http://localhost:8080/auth/login', {
           method: 'POST',
@@ -27,23 +27,24 @@ export default {
             username: this.username,
             password: this.password,
           }),
-        })
+        });
 
-        const data = await response.json()
+        const data = await response.json();
 
         if (!response.ok) {
-          this.error = data.error
-          throw new Error(data.error)
+          this.error = data.error;
+          throw new Error(data.error);
         } else {
-          this.$emit('login-success', data.user)
+          // Redirect directly after successful login
+          await this.router.push({name: 'home'});
         }
-        console.log('Login success:', data.message)
+        console.log('Login success:', data.message);
       } catch (error) {
-        console.error('Error during login:', error)
+        console.error('Error during login:', error);
       }
     },
     navigateToSignup() {
-      this.$router.push({ name: 'signup' })
+      this.router.push({ name: 'signup' });
     }
   },
 }
