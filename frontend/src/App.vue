@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import {onMounted} from "vue";
 
 const router = useRouter();
+const route = useRoute();
+
+const showLayout = computed(() => {
+  return !route.meta.hideLayout;
+});
 
 onMounted(() => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -19,12 +25,12 @@ onMounted(() => {
     <p>Understand your carbon footprint</p>
   </header>
 
-  <nav>
+  <nav v-if="showLayout">
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
   </nav>
 
-    <RouterView />
+  <RouterView />
 </template>
 
 <style scoped>
