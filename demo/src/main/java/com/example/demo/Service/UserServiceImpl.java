@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User registerUser(User user) {
-        if(userRepository.findByUsername(user.getUsername()) != null) {
+        if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new IllegalStateException("User already exists");
         }
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -32,10 +32,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public User loginUser(String username, String password) {
         User user = userRepository.findByUsername(username);
-        if(user == null) {
+        if (user == null) {
             throw new NoSuchElementException("User not found");
         }
-        if(!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new SecurityException("Invalid password");
         }
         return user;
