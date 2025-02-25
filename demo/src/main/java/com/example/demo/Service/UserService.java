@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
  * Service interface for managing user authentication operations.
  * Provides methods for user registration and login functionality.
  */
+
 public interface UserService {
 
     /**
@@ -27,9 +28,16 @@ public interface UserService {
      * @param password the password of the user
      * @return the authenticated user entity
      * @throws NoSuchElementException if the user is not found
-     * @throws SecurityException if the password is invalid
+     * @throws SecurityException      if the password is invalid
      */
     User loginUser(String username, String password);
 
     List<User> getAllUsers();
+
+    User getUser(long id);
+
+    String deleteUser(long id);
+
+    String updateUser(User user, long id);
+
 }

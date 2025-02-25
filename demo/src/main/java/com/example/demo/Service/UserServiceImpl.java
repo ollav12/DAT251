@@ -45,4 +45,39 @@ public class UserServiceImpl implements UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    @Override
+    public User getUser(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+    }
+
+    @Override
+    public String deleteUser(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+        userRepository.delete(user);
+        return "User with id: " + id + " was successfully deleted";
+    }
+
+    @Override
+    public String updateUser(User updatedUser, long id) {
+        User exsistingUser = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+
+        exsistingUser.setEmail(updatedUser.getEmail());
+        exsistingUser.setFirstName(updatedUser.getFirstName());
+        exsistingUser.setLastName(updatedUser.getLastName());
+        exsistingUser.setPoints(updatedUser.getPoints());
+        exsistingUser.setUsername(updatedUser.getUsername());
+
+        if (!bCryptPasswordEncoder.matches(updatedUser.getPassword(), exsistingUser.getPassword())) {
+            exsistingUser.setPassword(bCryptPasswordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        userRepository.save(exsistingUser);
+        return "User with id: " + id + "has been successfully updated";
+
+    }
+
 }

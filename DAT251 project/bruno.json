@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "DAT251 project",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

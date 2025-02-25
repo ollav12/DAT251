@@ -22,7 +22,7 @@ public class Trip {
     private String startAddress;
     private String endAddress;
     private Double distanceKM;
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
     private TransportationMode transportationMode;
     @Embedded
     private MoneySaved moneySaved;

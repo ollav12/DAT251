@@ -2,42 +2,52 @@
 export default {
   data() {
     return {
+      firstName: '',
+      lastName: '',
       username: '',
       email: '',
-      password: '',
+      password: ''
     }
   },
   methods: {
     async handleSubmit(e: Event) {
       e.preventDefault()
-      throw new Error('Not implemented')
-      // try {
-      //   const response = await fetch('/api/signup', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       username: this.username,
-      //       email: this.email,
-      //       password: this.password,
-      //     }),
-      //   })
-      //   if (!response.ok) {
-      //     throw new Error('Signup failed')
-      //   }
-      //   const data = await response.json()
-      //   console.log('Signup successful:', data)
-      // } catch (error) {
-      //   console.error('Error during signup:', error)
-      // }
+      try {
+        const response = await fetch('http://localhost:8080/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: this.firstName,
+            lastName: this.lastName,
+            username: this.username,
+            email: this.email,
+            password: this.password
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        } else {
+        this.$emit('navigate-to-signup', data.user)
+        }
+        console.log('Signup success:', data.message);
+      } catch (error) {
+        console.error('Error during signup:', error);
+      }
     },
   },
 }
 </script>
+
 <template>
   <h1>Signup</h1>
   <form @submit="handleSubmit">
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" v-model="firstName" required />
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" v-model="lastName" required />
     <label for="username">Username:</label>
     <input type="text" id="username" v-model="username" required />
     <label for="email">Email:</label>
@@ -54,5 +64,12 @@ form {
   flex-direction: column;
   gap: 1rem;
   max-width: 300px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+h1{
+  text-align: center;
+  margin-top: 2rem;
 }
 </style>
