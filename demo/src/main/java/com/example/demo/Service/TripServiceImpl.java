@@ -1,10 +1,10 @@
 package com.example.demo.Service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.example.demo.Model.Trip;
 import com.example.demo.Repository.TripRepository;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TripServiceImpl implements TripService {
@@ -34,4 +34,8 @@ public class TripServiceImpl implements TripService {
         }
     }
 
+    public List<Trip> getAllTrips() {
+        // TODO: filter trips by user
+        return tripRepository.findAll();
+    }
 }

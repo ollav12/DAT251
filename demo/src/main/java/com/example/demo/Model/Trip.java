@@ -2,8 +2,6 @@ package com.example.demo.Model;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,18 +15,30 @@ public class Trip {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @ManyToOne
     private User user;
+
     private String startAddress;
     private String endAddress;
     private Double distanceKM;
+
     @ManyToOne
     private TransportationMode transportationMode;
+
     @Embedded
     private MoneySaved moneySaved;
 
-    public Trip(User user, String startAddress, String endAddress, Double distanceKM,
-            TransportationMode transportationMode, MoneySaved moneySaved) {
+    public Trip() {}
+
+    public Trip(
+        User user,
+        String startAddress,
+        String endAddress,
+        Double distanceKM,
+        TransportationMode transportationMode,
+        MoneySaved moneySaved
+    ) {
         this.user = user;
         this.startAddress = startAddress;
         this.endAddress = endAddress;
