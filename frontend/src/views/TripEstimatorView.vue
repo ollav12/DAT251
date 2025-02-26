@@ -18,6 +18,7 @@ async function estimateTrip() {
       `http://localhost:8080/transport/tripestimate?origin=${encodeURIComponent(origin.value)}&destination=${encodeURIComponent(destination.value)}`,
     )
     const data = await response.json()
+    console.log(data)
     alternatives.value = data.alternatives
   } catch (error) {
     console.error(error)
