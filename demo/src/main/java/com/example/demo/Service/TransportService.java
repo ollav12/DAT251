@@ -7,6 +7,7 @@ import com.example.demo.Repository.UserRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
+import com.google.maps.errors.ZeroResultsException;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
@@ -117,7 +118,7 @@ public class TransportService {
         TravelMode[] modes = {
             TravelMode.WALKING,
             TravelMode.BICYCLING,
-            // TravelMode.TRANSIT,
+            TravelMode.TRANSIT,
             TravelMode.DRIVING,
         };
         for (TravelMode mode : modes) {
@@ -254,11 +255,13 @@ public class TransportService {
             // .transitMode(TransitMode.BUS, TransitMode.SUBWAY, TransitMode.RAIL)
             .mode(mode);
 
-        DirectionsResult result;
+        DirectionsResult result = null;
         try {
             System.out.println("Requesting directions for mode: " + mode);
             result = request.await();
             System.out.println("Received directions for mode: " + mode);
+        } catch (ZeroResultsException e) {
+            System.out.println("No results found for mode: " + mode);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to fetch directions", e);
