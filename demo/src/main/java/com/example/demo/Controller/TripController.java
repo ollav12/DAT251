@@ -1,9 +1,14 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Model.Trip;
+import com.example.demo.Model.User;
+import com.example.demo.Service.TransportService;
 //import com.example.demo.Service.MoneySavedImpl;
 import com.example.demo.Service.TripServiceImpl;
+import com.example.demo.Service.UserService;
+import jakarta.websocket.server.PathParam;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/trips")
 public class TripController {
 
-    private final TripServiceImpl tripService;
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private TransportService transportService;
+
+    @Autowired
+    private TripServiceImpl tripService;
 
     // private final MoneySavedImpl moneySavedService;
 
-    public TripController(TripServiceImpl tripService) {
-        this.tripService = tripService;
+    public TripController() {
         // this.moneySavedService = moneySavedService;
     }
 
@@ -34,10 +45,83 @@ public class TripController {
         return tripService.getTrip(tripid);
     }
 
-    @PostMapping("/register")
-    public String registerTrip(@RequestBody Trip trip) {
-        tripService.registerTrip(trip);
-        // moneySavedService.registerMoneySaved(trip.getMoneySaved());
-        return "Trip registered successfully";
+    public static class AddTripRequest {
+
+        private String origin;
+        private String destination;
+        private String mode;
+
+        public AddTripRequest() {}
+
+        public AddTripRequest(String origin, String destination, String mode) {
+            this.origin = origin;
+            this.destination = destination;
+            this.mode = mode;
+        }
+
+        public String getOrigin() {
+            return origin;
+        }
+
+        public void setOrigin(String origin) {
+            this.origin = origin;
+        }
+
+        public String getDestination() {
+            return destination;
+        }
+
+        public void setDestination(String destination) {
+            this.destination = destination;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public String toString() {
+            return (
+                "AddTripRequest{" +
+                "origin='" +
+                origin +
+                '\'' +
+                ", destination='" +
+                destination +
+                '\'' +
+                ", mode='" +
+                mode +
+                '\'' +
+                '}'
+            );
+        }
+    }
+
+    @PostMapping("")
+    public String addTrip(
+        @PathParam(value = "userId") Long userId,
+        @RequestBody AddTripRequest trip
+    ) {
+        // TODO: get user from credentials
+        User user = userService.getUser(userId);
+
+        System.out.println(
+            "Handling request for user: " +
+            user.getId() +
+            " with trip details: " +
+            trip.toString()
+        );
+
+        transportService.addTrip(
+            user,
+            trip.origin,
+            trip.destination,
+            trip.mode
+        );
+
+        return "{\"status\": \"success\"}";
     }
 }

@@ -1,5 +1,9 @@
 package com.example.demo.Service;
 
+import com.example.demo.Model.Trip;
+import com.example.demo.Model.User;
+import com.example.demo.Repository.TripRepository;
+import com.example.demo.Repository.UserRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -11,13 +15,53 @@ import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransportService {
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TripRepository tripRepository;
+
     public TransportService() {}
+
+    public void addTrip(
+        User user,
+        String origin,
+        String destination,
+        String selectedMode
+    ) {
+        // Get estimate for all alternative transport modes.
+        // We do this so that we can compare to calculate savings.
+        var results = getTripEstimate(origin, destination);
+
+        // TODO: we cannot compare costs between alternative modes yet
+        var alternatives = results.getAlternatives();
+        var estimate = alternatives.get(selectedMode);
+        var carEstimate = alternatives.get("driving");
+
+        var totalCO2eSaved =
+            carEstimate.getEmissionsCO2eKg() - estimate.getEmissionsCO2eKg();
+
+        Trip trip = new Trip(
+            user,
+            origin,
+            destination,
+            selectedMode,
+            estimate.getDistance(),
+            estimate.getDuration().getSeconds(),
+            estimate.getEmissionsCO2eKg(),
+            totalCO2eSaved
+        );
+
+        System.out.println("adding trip");
+        tripRepository.save(trip);
+    }
 
     public class TripEstimateResults {
 

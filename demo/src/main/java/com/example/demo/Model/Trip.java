@@ -19,36 +19,85 @@ public class Trip {
     @ManyToOne
     private User user;
 
-    private String startAddress;
-    private String endAddress;
-    private Double distanceKM;
+    private String origin;
+    private String destination;
 
+    private String travelMode;
+
+    private Double totalDistanceKm;
+    private Double totalDurationSeconds;
+    private Double totalEmissionsCO2eKg;
+    private Double savedEmissionsCO2eKg;
+
+    // TODO: only storing travel mode string for now
     @ManyToOne
     private TransportationMode transportationMode;
 
     @Embedded
     private MoneySaved moneySaved;
 
+    // TODO: we should store trip alternatives, only storing saved against worst alternative for now
+
     public Trip() {}
 
     public Trip(
         User user,
-        String startAddress,
-        String endAddress,
-        Double distanceKM,
-        TransportationMode transportationMode,
-        MoneySaved moneySaved
+        String origin,
+        String destination,
+        String travelMode,
+        double totalDistanceKm,
+        double totalDurationSeconds,
+        double totalEmissionsCO2eKg,
+        double savedEmissionsCO2eKg
     ) {
         this.user = user;
-        this.startAddress = startAddress;
-        this.endAddress = endAddress;
-        this.distanceKM = distanceKM;
-        this.transportationMode = transportationMode;
-        this.moneySaved = moneySaved;
+        this.origin = origin;
+        this.destination = destination;
+        this.travelMode = travelMode;
+        this.totalDistanceKm = totalDistanceKm;
+        this.totalDurationSeconds = totalDurationSeconds;
+        this.totalEmissionsCO2eKg = totalEmissionsCO2eKg;
+        this.savedEmissionsCO2eKg = savedEmissionsCO2eKg;
     }
 
     public User getUser() {
         return this.user;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public String getTravelMode() {
+        return travelMode;
+    }
+
+    public Double getTotalDistanceKm() {
+        return totalDistanceKm;
+    }
+
+    public Double getTotalDurationSeconds() {
+        return totalDurationSeconds;
+    }
+
+    public Double getTotalEmissionsCO2eKg() {
+        return totalEmissionsCO2eKg;
+    }
+
+    public Double getSavedEmissionsCO2eKg() {
+        return savedEmissionsCO2eKg;
+    }
+
+    public TransportationMode getTransportationMode() {
+        return transportationMode;
     }
 
     public MoneySaved getMoneySaved() {
