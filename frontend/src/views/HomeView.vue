@@ -13,6 +13,8 @@ type Trip = {
   savedEmissionsCO2eKg: number
 }
 
+const totalEmissionsCO2eKg = 3467
+
 const data = ref<Trip[]>([])
 const loading = ref(true)
 const error = ref<Error | null>(null)
@@ -39,7 +41,9 @@ async function fetchTrips() {
     loading.value = true
     const response = await fetch('http://localhost:8080/trips')
     data.value = await response.json()
+    console.log(data.value)
   } catch (e) {
+    console.error(e)
     error.value = e as Error
   } finally {
     loading.value = false
@@ -52,36 +56,105 @@ onMounted(() => {
 </script>
 
 <template>
-  <h2>3 458 kg CO2e emitted</h2>
+  <main v-if="loading">Loading...</main>
+  <main v-else-if="error">Error: {{ error.message }}</main>
+  <main>
+    <section class="stats">
+      <p class="emissions-display">
+        <span class="value">{{ totalEmissionsCO2eKg.toLocaleString('se-SE') }}</span
+        >{{ ' ' }}
+        <span class="unit"> kg CO2e</span>
+      </p>
+      <p>Total emitted</p>
+      <!-- money saved -->
+      <!-- emissions saved -->
+      <!-- trend -->
+    </section>
 
-  <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
-    <input name="origin" placeholder="Origin" required />
-    <input name="destination" placeholder="Destination" required />
-    <select name="mode" id="mode">
-      <option value="walking" selected>Walking</option>
-      <option value="bicycling">Bicycling</option>
-      <option value="transit">Transit</option>
-      <option value="driving">Driving</option>
-    </select>
-    <button type="submit">Add trip</button>
-  </form>
+    <section class="add-trip">
+      <h2>Add new trip</h2>
+      <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
+        <input name="origin" placeholder="Origin" required />
+        <input name="destination" placeholder="Destination" required />
+        <select name="mode" id="mode">
+          <option value="walking" selected>Walking</option>
+          <option value="bicycling">Bicycling</option>
+          <option value="transit">Transit</option>
+          <option value="driving">Driving</option>
+        </select>
+        <button type="submit">Add trip</button>
+      </form>
+      <!-- TODO: make it possible to estimate before adding -->
+    </section>
 
-  <div v-if="loading">Loading...</div>
-  <div v-else-if="error">Error: {{ error.message }}</div>
-  <div v-else>
-    <h3>Trips</h3>
-    <ul>
-      <li v-for="trip in data" :key="trip.id">
-        <p>From {{ trip.origin }}</p>
-        <p>To {{ trip.destination }}</p>
-        <p>Travel mode: {{ trip.travelMode }}</p>
-        <p>Distance {{ trip.totalDistanceKm }} meters</p>
-        <p>Duration {{ trip.totalDurationSeconds }} seconds</p>
-        <p>Emissions {{ trip.totalEmissionsCO2eKg }} kg CO2e</p>
-        <p>Saved emissions {{ trip.savedEmissionsCO2eKg }} kg CO2e</p>
+    <section class="recent-trips">
+      <h3>Recent trips</h3>
+      <ul v-if="data" class="trip-list">
+        <li v-for="trip in data" :key="trip.id" class="trip-item">
+          <p>{{ trip.origin }} to {{ trip.destination }}</p>
+          <p>Travel mode: {{ trip.travelMode }}</p>
+          <p>Distance {{ trip.totalDistanceKm }} meters</p>
+          <p>Duration {{ trip.totalDurationSeconds }} seconds</p>
+          <p>Emissions {{ trip.totalEmissionsCO2eKg }} kg CO2e</p>
+          <p>Saved emissions {{ trip.savedEmissionsCO2eKg }} kg CO2e</p>
 
-        <pre>All data: {{ JSON.stringify(trip) }}</pre>
-      </li>
-    </ul>
-  </div>
+          <!-- <pre class="code">All data: {{ JSON.stringify(trip) }}</pre> -->
+        </li>
+      </ul>
+      <div v-else>No trips found.</div>
+    </section>
+  </main>
 </template>
+
+<style scoped>
+main {
+  display: grid;
+  /* grid-template-rows: auto; */
+  max-width: 100%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.stats .value {
+  font-size: 3em;
+}
+
+.stats .unit {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.trip-list {
+  list-style-type: none;
+  padding: 0;
+  max-width: 100%;
+}
+
+.trip-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.code {
+  background-color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  overflow: auto;
+  max-width: 100%;
+}
+</style>
