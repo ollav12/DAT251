@@ -16,6 +16,12 @@ Before you begin, ensure you have the following installed on your machine:
 - [Gradle](https://gradle.org/install/)
 - [Node.js and npm](https://nodejs.org/) (version 14 or later)
 
+You also need a Google Maps API key set in an environment variable:
+
+```sh
+export GOOGLE_MAPS_API_KEY="<YOUR_API_KEY>"
+```
+
 ## Backend Setup
 
 1. Navigate to the `demo` directory:
