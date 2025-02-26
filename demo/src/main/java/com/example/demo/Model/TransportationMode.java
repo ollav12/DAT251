@@ -1,10 +1,16 @@
 package com.example.demo.Model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "transportation_mode")
 public class TransportationMode {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,10 +21,12 @@ public class TransportationMode {
     @Column(nullable = false)
     private double co2PerKilometer; // in grams of CO2 per kilometer
 
-    public TransportationMode() {
-    }
+    public TransportationMode() {}
 
-    public TransportationMode(String transportationModeName, double co2PerKilometer) {
+    public TransportationMode(
+        String transportationModeName,
+        double co2PerKilometer
+    ) {
         this.transportationModeName = transportationModeName;
         this.co2PerKilometer = co2PerKilometer;
     }
@@ -49,10 +57,16 @@ public class TransportationMode {
 
     @Override
     public String toString() {
-        return "TransportationMode{" +
-                "id=" + id +
-                ", modeName='" + transportationModeName + '\'' +
-                ", co2PerKilometer=" + co2PerKilometer +
-                '}';
+        return (
+            "TransportationMode{" +
+            "id=" +
+            id +
+            ", modeName='" +
+            transportationModeName +
+            '\'' +
+            ", co2PerKilometer=" +
+            co2PerKilometer +
+            '}'
+        );
     }
 }

@@ -5,7 +5,4 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/homepage")
-public class CO2TrackerController {
-
-
-}
+public class CO2TrackerController {}

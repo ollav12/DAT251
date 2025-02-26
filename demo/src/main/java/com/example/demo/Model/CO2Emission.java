@@ -9,10 +9,10 @@ public class CO2Emission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long Id;
+
     private double TotalEmission;
 
-    public CO2Emission() {
-    }
+    public CO2Emission() {}
 
     public CO2Emission(long Id, double TotalEmission) {
         this.Id = Id;
@@ -37,6 +37,13 @@ public class CO2Emission {
 
     @Override
     public String toString() {
-        return "CO2Emission{" + "Id=" + Id + ", TotalEmission=" + TotalEmission + '}';
+        return (
+            "CO2Emission{" +
+            "Id=" +
+            Id +
+            ", TotalEmission=" +
+            TotalEmission +
+            '}'
+        );
     }
 }

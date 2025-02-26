@@ -1,7 +1,6 @@
 package com.example.demo.Service;
 
 import com.example.demo.Model.User;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -11,7 +10,6 @@ import java.util.NoSuchElementException;
  */
 
 public interface UserService {
-
     /**
      * Registers a new user in the system.
      *
@@ -39,5 +37,4 @@ public interface UserService {
     String deleteUser(long id);
 
     String updateUser(User user, long id);
-
 }

@@ -2,10 +2,9 @@ package com.example.demo.Controller;
 
 import com.example.demo.Model.User;
 import com.example.demo.Service.UserServiceImpl;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,18 +18,26 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String> > register(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> register(
+        @RequestBody User user
+    ) {
         userService.registerUser(user);
-        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+        return ResponseEntity.ok(
+            Map.of("message", "User registered successfully")
+        );
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
             userService.loginUser(user.getUsername(), user.getPassword());
-            return ResponseEntity.ok(Map.of("message", "User logged in successfully"));
+            return ResponseEntity.ok(
+                Map.of("message", "User logged in successfully")
+            );
         } catch (Exception e) {
-            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(401).body(
+                Map.of("error", e.getMessage())
+            );
         }
     }
 }

@@ -2,11 +2,10 @@ package com.example.demo.Service;
 
 import com.example.demo.Model.User;
 import com.example.demo.Repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.NoSuchElementException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -15,7 +14,10 @@ public class UserServiceImpl implements UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(
+        UserRepository userRepository,
+        BCryptPasswordEncoder bCryptPasswordEncoder
+    ) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -48,22 +50,37 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+        return userRepository
+            .findById(id)
+            .orElseThrow(() ->
+                new NoSuchElementException(
+                    "User with id: " + id + " was not found"
+                )
+            );
     }
 
     @Override
     public String deleteUser(long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+        User user = userRepository
+            .findById(id)
+            .orElseThrow(() ->
+                new NoSuchElementException(
+                    "User with id: " + id + " was not found"
+                )
+            );
         userRepository.delete(user);
         return "User with id: " + id + " was successfully deleted";
     }
 
     @Override
     public String updateUser(User updatedUser, long id) {
-        User exsistingUser = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User with id: " + id + " was not found"));
+        User exsistingUser = userRepository
+            .findById(id)
+            .orElseThrow(() ->
+                new NoSuchElementException(
+                    "User with id: " + id + " was not found"
+                )
+            );
 
         exsistingUser.setEmail(updatedUser.getEmail());
         exsistingUser.setFirstName(updatedUser.getFirstName());
@@ -71,13 +88,18 @@ public class UserServiceImpl implements UserService {
         exsistingUser.setPoints(updatedUser.getPoints());
         exsistingUser.setUsername(updatedUser.getUsername());
 
-        if (!bCryptPasswordEncoder.matches(updatedUser.getPassword(), exsistingUser.getPassword())) {
-            exsistingUser.setPassword(bCryptPasswordEncoder.encode(updatedUser.getPassword()));
+        if (
+            !bCryptPasswordEncoder.matches(
+                updatedUser.getPassword(),
+                exsistingUser.getPassword()
+            )
+        ) {
+            exsistingUser.setPassword(
+                bCryptPasswordEncoder.encode(updatedUser.getPassword())
+            );
         }
 
         userRepository.save(exsistingUser);
         return "User with id: " + id + "has been successfully updated";
-
     }
-
 }
