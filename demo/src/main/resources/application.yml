@@ -1,3 +1,39 @@
 spring:
+  application:
+    name: DAT251
   profiles:
     active: nodb
+  mvc:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: "GET, POST, PUT, DELETE, OPTIONS"
+      allowed-headers: "*"
+      exposed-headers: "*"
+      # allow-credentials: true
+      # max-age: 3600
+
+  # PostgreSQL Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: username
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  # The H2 datasource settings are commented out since PostgreSQL is being used
+  # datasource:
+  #   url: jdbc:h2:mem:dcbapp
+  #   driverClassName: org.h2.Driver
+  #   username: sa
+  #   password: password
+  # jpa:
+  #   database-platform: org.hibernate.dialect.H2Dialect
+
+  # H2 Database
+  h2:
+    console:
+      enabled: true
