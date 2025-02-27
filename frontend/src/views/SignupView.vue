@@ -220,7 +220,7 @@ input {
   width: 100%;
   padding: 0.5rem;
   border-radius: 5px;
-  border: 2px solid #ccc; /* Standard grå border */
+  border: 2px solid #ccc;
   background-color: #ecf0f1;
   color: #1a1a1a;
   outline: none;

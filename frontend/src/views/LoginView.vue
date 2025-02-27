@@ -65,11 +65,6 @@ export default {
         <input type="username" v-model="username" placeholder="Username" required />
       </div>
 
-<!--      <div class="input-group">
-        <label for="password">Password</label>
-        <input type="password" v-model="password" placeholder="Password" required />
-      </div>-->
-
       <div class="input-group">
         <label for="password">Password:</label>
         <div class="password-wrapper">
@@ -103,8 +98,7 @@ h1 {
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   width: 300px;
-  margin: 0 auto;
-  margin-top: 2rem;
+  margin: 2rem auto 0;
 }
 
 .input-group {
