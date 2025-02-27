@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.model.Trip;
 import com.example.demo.model.User;
 import com.example.demo.repository.TripRepository;
-import com.example.demo.repository.UserRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -16,20 +15,17 @@ import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransportService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final TripRepository tripRepository;
 
-    @Autowired
-    private TripRepository tripRepository;
-
-    public TransportService() {}
+    public TransportService(TripRepository tripRepository) {
+        this.tripRepository = tripRepository;
+    }
 
     public record Statistics(
         // Trip
