@@ -15,7 +15,8 @@ export default defineComponent({
       errorLastName: '',
       errorUsername: '',
       errorEmail: '',
-      errorPassword: ''
+      errorPassword: '',
+      showPassword : false
     }
   },
 
@@ -25,6 +26,11 @@ export default defineComponent({
   },
 
   methods: {
+
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
+
     validateForm(): boolean {
       this.validateFirstName(this.firstName);
       this.validateLastName(this.lastName);
@@ -37,7 +43,6 @@ export default defineComponent({
         this.errorUsername ||
         this.errorEmail ||
         this.errorPassword);
-
     },
 
     validateFirstName(val: string) {
@@ -162,12 +167,29 @@ export default defineComponent({
                :class="{'input-valid': !errorEmail && email, 'input-invalid': errorEmail}"/>
         <small v-if="errorEmail" style="color: #dc3545;">{{ errorEmail }}</small>
       </div>
-      <div class="input-group">
+<!--      <div class="input-group">
         <label for="password">Password:</label>
         <input type="password" id="password" v-model="password" required
                :class="{'input-valid': !errorPassword && password, 'input-invalid': errorPassword}"/>
         <small v-if="errorPassword" style="color: #dc3545;">{{ errorPassword }}</small>
+      </div>-->
+      <div class="input-group">
+        <label for="password">Password:</label>
+        <div class="password-wrapper">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="password"
+            required
+            :class="{'input-valid': !errorPassword && password, 'input-invalid': errorPassword}"
+          />
+          <button type="button" class="toggle-password" @click="togglePasswordVisibility">
+            {{ showPassword ? '👁️' : '🙈' }}
+          </button>
+        </div>
+        <small v-if="errorPassword" style="color: #dc3545;">{{ errorPassword }}</small>
       </div>
+
       <button class="register-button" type="submit">Signup</button>
       <p v-if="errorMessage" style="color: #dc3545;">{{ errorMessage }}</p>
     </form>
@@ -241,10 +263,6 @@ button {
   margin-top: 1rem;
 }
 
-button:hover {
-  background-color: #16a085;
-}
-
 .register-button:hover {
   background-color: #47a365;
 }
@@ -256,5 +274,33 @@ button:hover {
 .input-invalid {
   border: 2px solid #dc3545;
 }
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 40px;
+}
+
+.toggle-password {
+  position: absolute;
+  left: 200px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0 10px;
+  margin: 0;
+}
+
+.toggle-password:hover {
+  backgroudn-color: transparent;
+}
+
 
 </style>
