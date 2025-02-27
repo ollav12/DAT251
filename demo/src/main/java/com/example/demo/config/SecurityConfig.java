@@ -1,4 +1,4 @@
-package com.example.demo.Config;
+package com.example.demo.config;
 
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
