@@ -145,34 +145,28 @@ export default defineComponent({
     <form @submit="handleSubmit">
       <div class="input-group">
         <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" v-model="firstName" required
+        <input type="text" id="firstName" v-model="firstName" required placeholder="First Name"
                :class="{'input-valid': !errorFirstName && firstName, 'input-invalid': errorFirstName}"/>
         <small v-if="errorFirstName" style="color: #dc3545;">{{ errorFirstName }}</small>
       </div>
       <div class="input-group">
         <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" v-model="lastName" required
+        <input type="text" id="lastName" v-model="lastName" required placeholder="Last Name"
                :class="{'input-valid': !errorLastName && lastName, 'input-invalid': errorLastName}"/>
         <small v-if="errorLastName" style="color: #dc3545;">{{ errorLastName }}</small>
       </div>
       <div class="input-group">
         <label for="username">Username:</label>
-        <input type="text" id="username" v-model="username" required
+        <input type="text" id="username" v-model="username" required placeholder="Username"
                :class="{'input-valid': !errorUsername && username, 'input-invalid': errorUsername}"/>
         <small v-if="errorUsername" style="color: #dc3545;">{{ errorUsername }}</small>
       </div>
       <div class="input-group">
         <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required
+        <input type="email" id="email" v-model="email" required placeholder="Email"
                :class="{'input-valid': !errorEmail && email, 'input-invalid': errorEmail}"/>
         <small v-if="errorEmail" style="color: #dc3545;">{{ errorEmail }}</small>
       </div>
-<!--      <div class="input-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required
-               :class="{'input-valid': !errorPassword && password, 'input-invalid': errorPassword}"/>
-        <small v-if="errorPassword" style="color: #dc3545;">{{ errorPassword }}</small>
-      </div>-->
       <div class="input-group">
         <label for="password">Password:</label>
         <div class="password-wrapper">
@@ -180,7 +174,7 @@ export default defineComponent({
             :type="showPassword ? 'text' : 'password'"
             id="password"
             v-model="password"
-            required
+            required placeholder="Password"
             :class="{'input-valid': !errorPassword && password, 'input-invalid': errorPassword}"
           />
           <button type="button" class="toggle-password" @click="togglePasswordVisibility">
@@ -203,8 +197,7 @@ export default defineComponent({
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   width: 300px;
-  margin: 0 auto;
-  margin-top: 2rem;
+  margin: 2rem auto 0;
 }
 
 h1 {
@@ -223,14 +216,6 @@ label {
   text-align: left;
 }
 
-/*input {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 5px;
-  border: none;
-  background-color: #ecf0f1;
-  color: #1a1a1a;
-}*/
 input {
   width: 100%;
   padding: 0.5rem;
@@ -301,6 +286,5 @@ button {
 .toggle-password:hover {
   backgroudn-color: transparent;
 }
-
 
 </style>

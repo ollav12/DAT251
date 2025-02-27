@@ -7,6 +7,7 @@ export default {
       username: '',
       password: '',
       error: '',
+      showPassword: false
     }
   },
 
@@ -16,6 +17,10 @@ export default {
   },
 
   methods: {
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
+
     async handleSubmit(event: Event) {
       event.preventDefault();
       this.error = '';
@@ -60,11 +65,26 @@ export default {
         <input type="username" v-model="username" placeholder="Username" required />
       </div>
 
-      <div class="input-group">
+<!--      <div class="input-group">
         <label for="password">Password</label>
         <input type="password" v-model="password" placeholder="Password" required />
-      </div>
+      </div>-->
 
+      <div class="input-group">
+        <label for="password">Password:</label>
+        <div class="password-wrapper">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="password"
+            placeholder="Password"
+            required
+          />
+          <button type="button" class="toggle-password" @click="togglePasswordVisibility">
+            {{ showPassword ? '👁️' : '🙈' }}
+          </button>
+        </div>
+      </div>
       <button class="register-button" type="submit">Login</button>
       <button class="register-button" type="button" @click="navigateToSignup">Register</button>
     </form>
@@ -119,11 +139,34 @@ button {
   margin-top: 1rem;
 }
 
-button:hover {
-  background-color: #16a085;
-}
-
 .register-button:hover {
   background-color: #47a365;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 40px;
+}
+
+.toggle-password {
+  position: absolute;
+  left: 200px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0 10px;
+  margin: 0;
+}
+
+.toggle-password:hover {
+  backgroudn-color: transparent;
 }
 </style>
