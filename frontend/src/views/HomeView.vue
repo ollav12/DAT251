@@ -1,6 +1,37 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
+type Statistics = {
+  totalTrips: number
+  totalDistanceKm: number
+  totalDurationSeconds: number
+
+  totalEmissionsCO2eKg: number
+  totalEmissionsSavingsCO2eKg: number
+
+  totalCostNOK: number
+  totalSavingsNOK: number
+}
+
+const statistics = ref<Statistics | null>(null)
+const statisticsLoading = ref(false)
+const statisticsError = ref<Error | null>(null)
+
+async function fetchStatistics() {
+  try {
+    statisticsLoading.value = true
+    const response = await fetch('http://localhost:8080/transport/statistics?userId=1')
+    const data = await response.json()
+    console.log('Fetched statistics:', data)
+    statistics.value = data
+  } catch (e) {
+    console.error(e)
+    statisticsError.value = e as Error
+  } finally {
+    statisticsLoading.value = false
+  }
+}
+
 type Trip = {
   id: string
   origin: string
@@ -12,8 +43,6 @@ type Trip = {
   totalEmissionsCO2eKg: number
   savedEmissionsCO2eKg: number
 }
-
-const totalEmissionsCO2eKg = 3467
 
 const data = ref<Trip[]>([])
 const loading = ref(true)
@@ -49,8 +78,10 @@ async function fetchTrips() {
     loading.value = false
   }
 }
+//
 
 onMounted(() => {
+  fetchStatistics()
   fetchTrips()
 })
 </script>
@@ -61,7 +92,7 @@ onMounted(() => {
   <main>
     <section class="stats">
       <p class="emissions-display">
-        <span class="value">{{ totalEmissionsCO2eKg.toLocaleString('se-SE') }}</span
+        <span class="value">{{ statistics?.totalEmissionsCO2eKg?.toLocaleString('se-SE') }}</span
         >{{ ' ' }}
         <span class="unit"> kg CO2e</span>
       </p>
@@ -89,6 +120,7 @@ onMounted(() => {
 
     <section class="recent-trips">
       <h3>Recent trips</h3>
+      <p>Total trips: {{ statistics?.totalTrips || 0 }}</p>
       <ul v-if="data" class="trip-list">
         <li v-for="trip in data" :key="trip.id" class="trip-item">
           <p>{{ trip.origin }} to {{ trip.destination }}</p>
