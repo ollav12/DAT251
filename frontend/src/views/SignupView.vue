@@ -1,14 +1,21 @@
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
-export default {
+export default defineComponent({
   data() {
     return {
       firstName: '',
       lastName: '',
       username: '',
       email: '',
-      password: ''
+      password: '',
+      errorMessage: '',
+      errorFirstName: '',
+      errorLastName: '',
+      errorUsername: '',
+      errorEmail: '',
+      errorPassword: ''
     }
   },
 
@@ -18,8 +25,66 @@ export default {
   },
 
   methods: {
+    validateForm(): boolean {
+      this.validateFirstName(this.firstName);
+      this.validateLastName(this.lastName);
+      this.validateUsername(this.username);
+      this.validateEmail(this.email);
+      this.validatePassword(this.password);
+
+      return !(this.errorFirstName ||
+        this.errorLastName ||
+        this.errorUsername ||
+        this.errorEmail ||
+        this.errorPassword);
+
+    },
+
+    validateFirstName(val: string) {
+      if (!/^[A-Z][a-zA-Z]{1,14}$/.test(val)) {
+        this.errorFirstName = 'First name must be 2-15 letters, starting uppercase.';
+      } else {
+        this.errorFirstName = '';
+      }
+    },
+
+    validateLastName(val: string) {
+      if (!/^[A-Z][a-zA-Z]{1,14}$/.test(val)) {
+        this.errorLastName = 'Last name must be 2-15 letters, starting uppercase.';
+      } else {
+        this.errorLastName = '';
+      }
+    },
+
+    validateUsername(val: string) {
+      if (!/^[a-zA-Z0-9]{2,15}$/.test(val)) {
+        this.errorUsername = 'Username must be 2-15 alphanumeric characters.';
+      } else {
+        this.errorUsername = '';
+      }
+    },
+
+    validateEmail(val: string) {
+      if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(val)) {
+        this.errorEmail = 'Please provide a valid email address.';
+      } else {
+        this.errorEmail = '';
+      }
+    },
+
+    validatePassword(val: string) {
+      if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/.test(val)) {
+        this.errorPassword = 'Password must be 8+ chars and include uppercase, lowercase, and a digit.';
+      } else {
+        this.errorPassword = '';
+      }
+    },
+
     async handleSubmit(e: Event) {
       e.preventDefault();
+      if (!this.validateForm()) {
+        return;
+      }
       try {
         const response = await fetch('http://localhost:8080/auth/register', {
           method: 'POST',
@@ -32,22 +97,41 @@ export default {
             password: this.password
           })
         });
-
         const data = await response.json();
-
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        } else {
-          // Redirect directly after successful signup
-          await this.router.push({name: 'login'});
+          if (Array.isArray(data)) {
+            this.errorMessage = data.join(' ');
+          } else {
+            this.errorMessage = data.message || 'An error occurred during signup.';
+          }
+          return;
         }
-        console.log('Signup success:', data.message);
+        await this.router.push({name: 'login'});
       } catch (error) {
         console.error('Error during signup:', error);
+        this.errorMessage = 'An error occurred during signup';
       }
-    },
+    }
   },
-}
+
+  watch: {
+    firstName(newVal: string) {
+      this.validateFirstName(newVal);
+    },
+    lastName(newVal: string) {
+      this.validateLastName(newVal);
+    },
+    username(newVal: string) {
+      this.validateUsername(newVal);
+    },
+    email(newVal: string) {
+      this.validateEmail(newVal);
+    },
+    password(newVal: string) {
+      this.validatePassword(newVal);
+    }
+  }
+})
 </script>
 
 <template>
@@ -56,25 +140,36 @@ export default {
     <form @submit="handleSubmit">
       <div class="input-group">
         <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" v-model="firstName" required />
+        <input type="text" id="firstName" v-model="firstName" required
+               :class="{'input-valid': !errorFirstName && firstName, 'input-invalid': errorFirstName}"/>
+        <small v-if="errorFirstName" style="color: #dc3545;">{{ errorFirstName }}</small>
       </div>
       <div class="input-group">
         <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" v-model="lastName" required />
+        <input type="text" id="lastName" v-model="lastName" required
+               :class="{'input-valid': !errorLastName && lastName, 'input-invalid': errorLastName}"/>
+        <small v-if="errorLastName" style="color: #dc3545;">{{ errorLastName }}</small>
       </div>
       <div class="input-group">
         <label for="username">Username:</label>
-        <input type="text" id="username" v-model="username" required />
+        <input type="text" id="username" v-model="username" required
+               :class="{'input-valid': !errorUsername && username, 'input-invalid': errorUsername}"/>
+        <small v-if="errorUsername" style="color: #dc3545;">{{ errorUsername }}</small>
       </div>
       <div class="input-group">
         <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required />
+        <input type="email" id="email" v-model="email" required
+               :class="{'input-valid': !errorEmail && email, 'input-invalid': errorEmail}"/>
+        <small v-if="errorEmail" style="color: #dc3545;">{{ errorEmail }}</small>
       </div>
       <div class="input-group">
         <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required />
+        <input type="password" id="password" v-model="password" required
+               :class="{'input-valid': !errorPassword && password, 'input-invalid': errorPassword}"/>
+        <small v-if="errorPassword" style="color: #dc3545;">{{ errorPassword }}</small>
       </div>
       <button class="register-button" type="submit">Signup</button>
+      <p v-if="errorMessage" style="color: #dc3545;">{{ errorMessage }}</p>
     </form>
   </div>
 </template>
@@ -134,4 +229,13 @@ button:hover {
 .register-button:hover {
   background-color: #47a365;
 }
+
+.input-valid {
+  border: 2px solid #28a745;
+}
+
+.input-invalid {
+  border: 2px solid #dc3545;
+}
+
 </style>
