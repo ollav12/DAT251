@@ -201,13 +201,32 @@ label {
   text-align: left;
 }
 
-input {
+/*input {
   width: 100%;
   padding: 0.5rem;
   border-radius: 5px;
   border: none;
   background-color: #ecf0f1;
   color: #1a1a1a;
+}*/
+input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 2px solid #ccc; /* Standard grå border */
+  background-color: #ecf0f1;
+  color: #1a1a1a;
+  outline: none;
+}
+
+input {
+  transition: border 0.3s ease-in-out;
+}
+
+small {
+  font-weight: bold;
+  display: block;
+  margin-top: 0.3rem;
 }
 
 button {
