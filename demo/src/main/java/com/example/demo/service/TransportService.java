@@ -31,42 +31,33 @@ public class TransportService {
 
     public TransportService() {}
 
-    public static class Statistics {
-
-        public int totalTrips;
-        public double totalDistanceKm;
-        public double totalDurationSeconds;
-
-        public double totalEmissionsCO2eKg;
-        public double totalEmissionsSavingsCO2eKg;
-
-        public double totalSavingsNOK;
-        public double totalCostNOK;
-    }
-
-    public Statistics getStatistics(User userId) {
-        var statistics = new Statistics();
-
-        // Transport
-        statistics.totalTrips = tripRepository.countByUser(userId);
-        statistics.totalDistanceKm = tripRepository.sumTotalDistanceKmByUser(
-            userId
-        );
-        statistics.totalDurationSeconds =
-            tripRepository.sumTotalDurationSecondsByUser(userId);
-
+    public record Statistics(
+        // Trip
+        int totalTrips,
+        double totalDistanceKm,
+        double totalDurationSeconds,
         // Emissions
-        statistics.totalEmissionsCO2eKg =
-            tripRepository.sumTotalEmissionsByUser(userId);
-        statistics.totalEmissionsSavingsCO2eKg =
-            tripRepository.sumSavedEmissionsByUser(userId);
-
+        double totalEmissionsCO2eKg,
+        double totalEmissionsSavingsCO2eKg,
         // Financial
-        // TODO: calculate
-        statistics.totalSavingsNOK = 0.0;
-        statistics.totalCostNOK = 0.0;
+        double totalSavingsNOK,
+        double totalCostNOK
+    ) {}
 
-        return statistics;
+    public Statistics getStatistics(User user) {
+        return new Statistics(
+            // Transport
+            tripRepository.countByUser(user),
+            tripRepository.sumTotalDistanceKmByUser(user),
+            tripRepository.sumTotalDurationSecondsByUser(user),
+            // Emissions
+            tripRepository.sumTotalEmissionsByUser(user),
+            tripRepository.sumSavedEmissionsByUser(user),
+            // Financial
+            // TODO: calculate
+            0.0,
+            0.0
+        );
     }
 
     public void addTrip(
