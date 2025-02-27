@@ -193,6 +193,8 @@ public class TransportService {
     private final double emissionsPerKmWalking = 0.0;
     private final double emissionsPerKmBicycling = 0.0;
     private final double emissionsPerKmCar = 0.118;
+    private final double emissionsPerKmSkyssBybanen = 0.001;
+    private final double emissionsPerKmSkyssBus = 0.089;
 
     private TripEstimate getRouteEstimate(DirectionsRoute route) {
         Duration totalDuration = Duration.ZERO;
@@ -225,15 +227,18 @@ public class TransportService {
                         if (step.transitDetails != null) {
                             switch (step.transitDetails.line.vehicle.type) {
                                 case BUS:
+                                    // TODO: check line operator
                                     totalEmissions +=
-                                        (step.distance.inMeters / 1000) * 0.089;
+                                        (step.distance.inMeters / 1000) *
+                                        emissionsPerKmSkyssBus;
                                     break;
                                 case CABLE_CAR:
                                     break;
                                 case TRAM:
                                     // E.g. Bybanen
                                     totalEmissions +=
-                                        (step.distance.inMeters / 1000) * 0.001;
+                                        (step.distance.inMeters / 1000) *
+                                        emissionsPerKmSkyssBybanen;
                                     break;
                                 case SUBWAY:
                                     break;
@@ -245,6 +250,26 @@ public class TransportService {
                                     break;
                                 case FUNICULAR:
                                     break;
+                                case COMMUTER_TRAIN:
+                                    break;
+                                case GONDOLA_LIFT:
+                                    break;
+                                case HIGH_SPEED_TRAIN:
+                                    break;
+                                case INTERCITY_BUS:
+                                    break;
+                                case LONG_DISTANCE_TRAIN:
+                                    break;
+                                case METRO_RAIL:
+                                    break;
+                                case MONORAIL:
+                                    break;
+                                case SHARE_TAXI:
+                                    break;
+                                case TROLLEYBUS:
+                                    break;
+                                case OTHER:
+                                    break;
                                 default:
                                     break;
                             }
@@ -255,8 +280,11 @@ public class TransportService {
                         }
                         break;
                     case DRIVING:
+                        // TODO: personal vehicles
                         totalEmissions +=
                             (step.distance.inMeters / 1000) * emissionsPerKmCar;
+                        break;
+                    case UNKNOWN:
                         break;
                     default:
                         System.out.println("Unknown");
