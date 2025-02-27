@@ -11,6 +11,8 @@ import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
+import com.google.maps.model.TransitMode;
+import com.google.maps.model.TransitRoutingPreference;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
@@ -71,6 +73,13 @@ public class TransportService {
         var estimate = alternatives.get(selectedMode);
         var carEstimate = alternatives.get("driving");
 
+        if (estimate == null) {
+            throw new IllegalArgumentException("No estimate for selected mode");
+        }
+        if (carEstimate == null) {
+            throw new IllegalArgumentException("No estimate for driving mode");
+        }
+
         var totalCO2eSaved =
             carEstimate.getEmissionsCO2eKg() - estimate.getEmissionsCO2eKg();
 
@@ -79,7 +88,7 @@ public class TransportService {
             origin,
             destination,
             selectedMode,
-            estimate.getDistance(),
+            estimate.getDistanceKm(),
             estimate.getDuration().getSeconds(),
             estimate.getEmissionsCO2eKg(),
             totalCO2eSaved
@@ -109,16 +118,16 @@ public class TransportService {
     public class TripEstimate {
 
         private Duration duration;
-        private double distance;
+        private double distanceKm;
         private double emissionsCO2eKg;
 
         public TripEstimate(
             Duration duration,
-            double distance,
+            double distanceKm,
             double emissionsCO2eKg
         ) {
             this.duration = duration;
-            this.distance = distance;
+            this.distanceKm = distanceKm;
             this.emissionsCO2eKg = emissionsCO2eKg;
         }
 
@@ -126,8 +135,8 @@ public class TransportService {
             return duration;
         }
 
-        public double getDistance() {
-            return distance;
+        public double getDistanceKm() {
+            return distanceKm;
         }
 
         public double getEmissionsCO2eKg() {
@@ -182,23 +191,24 @@ public class TransportService {
     private final double emissionsPerKmCar = 0.118;
     private final double emissionsPerKmSkyssBybanen = 0.001;
     private final double emissionsPerKmSkyssBus = 0.089;
+    private final double emissionsPerPersonKmVyTrain = 0.005; // Source: Claude estimate
 
     private TripEstimate getRouteEstimate(DirectionsRoute route) {
         Duration totalDuration = Duration.ZERO;
-        double totalDistance = 0.0;
+        double totalDistanceMeters = 0.0;
         double totalEmissions = 0.0;
 
         for (DirectionsLeg leg : route.legs) {
-            if (leg.duration != null) {
-                totalDuration = totalDuration.plusSeconds(
-                    leg.duration.inSeconds
-                );
-            }
-            if (leg.distance != null) {
-                totalDistance += leg.distance.inMeters;
-            }
-
             for (DirectionsStep step : leg.steps) {
+                if (step.distance != null) {
+                    totalDistanceMeters += step.distance.inMeters;
+                }
+                if (step.duration != null) {
+                    totalDuration = totalDuration.plusSeconds(
+                        step.duration.inSeconds
+                    );
+                }
+
                 switch (step.travelMode) {
                     case WALKING:
                         totalEmissions +=
@@ -232,6 +242,10 @@ public class TransportService {
                                 case RAIL:
                                     break;
                                 case HEAVY_RAIL:
+                                    // E.g. Vy
+                                    totalEmissions +=
+                                        (step.distance.inMeters / 1000) *
+                                        emissionsPerPersonKmVyTrain;
                                     break;
                                 case FERRY:
                                     break;
@@ -280,7 +294,11 @@ public class TransportService {
             }
         }
 
-        return new TripEstimate(totalDuration, totalDistance, totalEmissions);
+        return new TripEstimate(
+            totalDuration,
+            totalDistanceMeters / 1000,
+            totalEmissions
+        );
     }
 
     private final String googleMapsApiKey = System.getenv(
@@ -303,10 +321,16 @@ public class TransportService {
         DirectionsApiRequest request = DirectionsApi.newRequest(context)
             .origin(origin)
             .destination(destination)
-            // .alternatives(true);
-            // .transitRoutingPreference(TransitRoutingPreference.LESS_WALKING)
-            // .transitMode(TransitMode.BUS, TransitMode.SUBWAY, TransitMode.RAIL)
             .mode(mode);
+        if (mode == TravelMode.TRANSIT) {
+            request = request.transitMode(
+                TransitMode.BUS,
+                TransitMode.SUBWAY,
+                TransitMode.TRAM,
+                TransitMode.RAIL,
+                TransitMode.TRAIN
+            );
+        }
 
         DirectionsResult result = null;
         try {
