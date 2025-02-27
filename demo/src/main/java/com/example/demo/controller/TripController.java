@@ -1,10 +1,10 @@
-package com.example.demo.Controller;
+package com.example.demo.controller;
 
-import com.example.demo.Model.Trip;
-import com.example.demo.Model.User;
-import com.example.demo.Service.TransportService;
-import com.example.demo.Service.TripServiceImpl;
-import com.example.demo.Service.UserService;
+import com.example.demo.model.Trip;
+import com.example.demo.model.User;
+import com.example.demo.service.TransportService;
+import com.example.demo.service.TripServiceImpl;
+import com.example.demo.service.UserService;
 import jakarta.websocket.server.PathParam;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

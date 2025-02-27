@@ -1,6 +1,6 @@
-package com.example.demo.Service;
+package com.example.demo.service;
 
-import com.example.demo.Model.Trip;
+import com.example.demo.model.Trip;
 
 public interface TripService {
     Trip registerTrip(Trip trip);

@@ -1,7 +1,7 @@
-package com.example.demo.Service;
+package com.example.demo.service;
 
-import com.example.demo.Model.User;
-import com.example.demo.Repository.UserRepository;
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

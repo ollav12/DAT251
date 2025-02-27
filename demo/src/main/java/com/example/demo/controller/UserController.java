@@ -1,7 +1,7 @@
-package com.example.demo.Controller;
+package com.example.demo.controller;
 
-import com.example.demo.Model.User;
-import com.example.demo.Service.UserServiceImpl;
+import com.example.demo.model.User;
+import com.example.demo.service.UserServiceImpl;
 import java.net.URI;
 import java.util.List;
 import java.util.NoSuchElementException;

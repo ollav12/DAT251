@@ -1,9 +1,9 @@
-package com.example.demo.Controller;
+package com.example.demo.controller;
 
-import com.example.demo.Service.TransportService;
-import com.example.demo.Service.TransportService.Statistics;
-import com.example.demo.Service.TransportService.TripEstimateResults;
-import com.example.demo.Service.UserService;
+import com.example.demo.service.TransportService;
+import com.example.demo.service.TransportService.Statistics;
+import com.example.demo.service.TransportService.TripEstimateResults;
+import com.example.demo.service.UserService;
 import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

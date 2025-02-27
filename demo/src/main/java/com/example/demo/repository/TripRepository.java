@@ -1,7 +1,7 @@
-package com.example.demo.Repository;
+package com.example.demo.repository;
 
-import com.example.demo.Model.Trip;
-import com.example.demo.Model.User;
+import com.example.demo.model.Trip;
+import com.example.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

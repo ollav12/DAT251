@@ -1,9 +1,9 @@
-package com.example.demo.Service;
+package com.example.demo.service;
 
-import com.example.demo.Model.Trip;
-import com.example.demo.Model.User;
-import com.example.demo.Repository.TripRepository;
-import com.example.demo.Repository.UserRepository;
+import com.example.demo.model.Trip;
+import com.example.demo.model.User;
+import com.example.demo.repository.TripRepository;
+import com.example.demo.repository.UserRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
