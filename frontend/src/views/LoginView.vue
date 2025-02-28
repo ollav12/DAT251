@@ -1,5 +1,7 @@
 <script lang="ts">
 import { useRouter } from "vue-router";
+import eye from "@/assets/eye.svg";
+import eyeOff from "@/assets/eye-off.svg";
 
 export default {
   data() {
@@ -7,7 +9,9 @@ export default {
       username: '',
       password: '',
       error: '',
-      showPassword: false
+      showPassword: false,
+      eye,
+      eyeOff,
     }
   },
 
@@ -76,7 +80,7 @@ export default {
             required
           />
           <button type="button" class="toggle-password" @click="togglePasswordVisibility">
-            {{ showPassword ? '👁️' : '🙈' }}
+            <img :src="showPassword ? eye : eyeOff" alt="Toggle password visibility" class="eye-icon" />
           </button>
         </div>
       </div>
@@ -163,4 +167,11 @@ button {
 .toggle-password:hover {
   backgroudn-color: transparent;
 }
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
 </style>

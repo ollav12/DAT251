@@ -14,21 +14,23 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     int countByUser(User user);
 
-    @Query("SELECT SUM(t.totalDistanceKm) FROM Trip t WHERE t.user = :user")
+    @Query(
+        "SELECT COALESCE(SUM(t.totalDistanceKm), 0) FROM Trip t WHERE t.user = :user"
+    )
     double sumTotalDistanceKmByUser(User user);
 
     @Query(
-        "SELECT SUM(t.totalDurationSeconds) FROM Trip t WHERE t.user = :user"
+        "SELECT COALESCE(SUM(t.totalDurationSeconds), 0) FROM Trip t WHERE t.user = :user"
     )
     double sumTotalDurationSecondsByUser(User user);
 
     @Query(
-        "SELECT SUM(t.totalEmissionsCO2eKg) FROM Trip t WHERE t.user = :user"
+        "SELECT COALESCE(SUM(t.totalEmissionsCO2eKg), 0) FROM Trip t WHERE t.user = :user"
     )
     double sumTotalEmissionsByUser(User user);
 
     @Query(
-        "SELECT SUM(t.savedEmissionsCO2eKg) FROM Trip t WHERE t.user = :user"
+        "SELECT COALESCE(SUM(t.savedEmissionsCO2eKg), 0) FROM Trip t WHERE t.user = :user"
     )
     double sumSavedEmissionsByUser(User user);
 }
