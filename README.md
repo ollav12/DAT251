@@ -1,6 +1,6 @@
 # DAT251 Project
-Reducing carbon emissions can be a tedious and boring task, causing many too lose their motivation to make the right choices. Therefore we have made CO₂mpass - a CO₂-tracker created for the purpose of helping individuals make more environmentally friendly choices. Our software  is not your average dull CO₂-tracker - instead, we have highly emphasized motivation when developing our product. By gamifying certain aspects of our software, we give the users a sense of progression, showing you what kind of difference YOU are making, all the while making it fun to do so.
 
+Reducing carbon emissions can be a tedious and boring task, causing many to lose their motivation to make the right choices. Therefore we have made CO₂mpass - a CO₂-tracker created for the purpose of helping individuals make more environmentally friendly choices. Our software is not your average dull CO₂-tracker - instead, we have highly emphasized motivation when developing our product. By gamifying certain aspects of our software, we give the users a sense of progression, showing you what kind of difference YOU are making, all the while making it fun to do so.
 
 This project consists of a backend and a frontend. Follow the instructions below to set up and run each component.
 
@@ -23,6 +23,8 @@ You also need a Google Maps API key set in an environment variable:
 ```sh
 export GOOGLE_MAPS_API_KEY="<YOUR_API_KEY>"
 ```
+
+You can use `direnv` to set this variable for
 
 ## Backend Setup
 
