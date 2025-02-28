@@ -12,7 +12,6 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TransitMode;
-import com.google.maps.model.TransitRoutingPreference;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
