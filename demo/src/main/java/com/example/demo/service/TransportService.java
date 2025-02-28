@@ -185,11 +185,17 @@ public class TransportService {
         return results;
     }
 
+    // All of these are intended to include:
+    // - Amortized vehicle production emissions
+    // - Fuel emissions
+    // But not:
+    // - Food emissions (e.g. from walking)
+    // Public transport should be calculated per person:
     private final double emissionsPerKmWalking = 0.0;
     private final double emissionsPerKmBicycling = 0.0;
     private final double emissionsPerKmCar = 0.118;
-    private final double emissionsPerKmSkyssBybanen = 0.001;
-    private final double emissionsPerKmSkyssBus = 0.089;
+    private final double emissionsPerPersonKmSkyssBybanen = 0.001;
+    private final double emissionsPerPersonKmSkyssBus = 0.089;
     private final double emissionsPerPersonKmVyTrain = 0.005; // Source: Claude estimate
 
     private TripEstimate getRouteEstimate(DirectionsRoute route) {
@@ -226,7 +232,7 @@ public class TransportService {
                                     // TODO: check line operator
                                     totalEmissions +=
                                         (step.distance.inMeters / 1000) *
-                                        emissionsPerKmSkyssBus;
+                                        emissionsPerPersonKmSkyssBus;
                                     break;
                                 case CABLE_CAR:
                                     break;
@@ -234,7 +240,7 @@ public class TransportService {
                                     // E.g. Bybanen
                                     totalEmissions +=
                                         (step.distance.inMeters / 1000) *
-                                        emissionsPerKmSkyssBybanen;
+                                        emissionsPerPersonKmSkyssBybanen;
                                     break;
                                 case SUBWAY:
                                     break;
