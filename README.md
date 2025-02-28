@@ -24,6 +24,16 @@ You also need a Google Maps API key set in an environment variable:
 export GOOGLE_MAPS_API_KEY="<YOUR_API_KEY>"
 ```
 
+> Tip: use direnv to set this variable for all shells inside this directory, by creating a file called `.envrc` in the root of the repository with a plain list of variables, like the Google API key above. Installation instructions can be found [here](https://direnv.net).
+
+### PostgreSQL database
+
+If you want to use a local PostgreSQL database, you can create a database called `mydatabase`, and a user account called `username` with password `password` with full access to it, and setting the following environment variable:
+
+```sh
+export SPRING_PROFILES_ACTIVE="postgres"
+```
+
 ## Backend Setup
 
 1. Navigate to the `demo` directory:
