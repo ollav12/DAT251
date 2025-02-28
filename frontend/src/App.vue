@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import {onMounted} from "vue";
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { onMounted } from 'vue'
 
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
 const showLayout = computed(() => {
-  return !route.meta.hideLayout;
-});
+  return !route.meta.hideLayout
+})
 
 onMounted(() => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
   if (!isLoggedIn) {
-    router.push('/login');
+    router.push('/login')
   }
-});
-
+})
 </script>
 
 <template>
@@ -27,6 +26,7 @@ onMounted(() => {
 
   <nav v-if="showLayout">
     <RouterLink to="/">Home</RouterLink>
+    <RouterLink to="/vehicles">Vehicles</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
   </nav>
 
@@ -45,7 +45,7 @@ nav {
   gap: 1rem;
   font-size: 12px;
   width: 100%;
-  margin-top: 2rem
+  margin-top: 2rem;
 }
 
 nav a.router-link-exact-active {
@@ -85,5 +85,4 @@ header {
   width: 100%;
   padding: 0 1rem;
 }
-
 </style>

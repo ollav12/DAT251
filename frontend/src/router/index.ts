@@ -26,6 +26,11 @@ const router = createRouter({
       name: 'tripestimator',
       component: () => import('../views/TripEstimatorView.vue'),
     },
+    {
+      path: '/vehicles',
+      name: 'vehicles',
+      component: () => import('../views/VehiclesView.vue'),
+    },
   ],
 })
 

@@ -2,7 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.model.Trip;
 import com.example.demo.model.User;
+import com.example.demo.model.Vehicle;
+import com.example.demo.model.VehicleType;
 import com.example.demo.repository.TripRepository;
+import com.example.demo.repository.VehicleRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -15,6 +18,7 @@ import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -23,9 +27,14 @@ import org.springframework.stereotype.Service;
 public class TransportService {
 
     private final TripRepository tripRepository;
+    private final VehicleRepository vehicleRepository;
 
-    public TransportService(TripRepository tripRepository) {
+    public TransportService(
+        TripRepository tripRepository,
+        VehicleRepository vehicleRepository
+    ) {
         this.tripRepository = tripRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     public record Statistics(
@@ -55,6 +64,30 @@ public class TransportService {
             0.0,
             0.0
         );
+    }
+
+    public void addVehicle(
+        User user,
+        String make,
+        String model,
+        int year,
+        VehicleType type,
+        double emissionsCO2ePerKm
+    ) {
+        var vehicle = new Vehicle(make, model, year, type, emissionsCO2ePerKm);
+        vehicleRepository.save(vehicle);
+    }
+
+    public Vehicle getDefaultVehicle(User user) {
+        var defaultVehicle = user.getDefaultVehicle();
+        if (defaultVehicle == null) {
+            throw new IllegalArgumentException("No default vehicle");
+        }
+        return defaultVehicle;
+    }
+
+    public List<Vehicle> getVehicles(User user) {
+        return vehicleRepository.findByOwner(user);
     }
 
     public void addTrip(
