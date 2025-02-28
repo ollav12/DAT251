@@ -24,8 +24,6 @@ You also need a Google Maps API key set in an environment variable:
 export GOOGLE_MAPS_API_KEY="<YOUR_API_KEY>"
 ```
 
-You can use `direnv` to set this variable for
-
 ## Backend Setup
 
 1. Navigate to the `demo` directory:
