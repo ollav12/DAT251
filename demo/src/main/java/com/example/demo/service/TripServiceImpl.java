@@ -3,15 +3,13 @@ package com.example.demo.service;
 import com.example.demo.model.Trip;
 import com.example.demo.repository.TripRepository;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TripServiceImpl implements TripService {
 
-    private TripRepository tripRepository;
+    private final TripRepository tripRepository;
 
-    @Autowired
     public TripServiceImpl(TripRepository tripRepository) {
         this.tripRepository = tripRepository;
     }

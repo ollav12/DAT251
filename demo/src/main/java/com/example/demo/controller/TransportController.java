@@ -5,7 +5,6 @@ import com.example.demo.service.TransportService.Statistics;
 import com.example.demo.service.TransportService.TripEstimateResults;
 import com.example.demo.service.UserService;
 import jakarta.websocket.server.PathParam;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,13 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/transport")
 public class TransportController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final TransportService transportService;
 
-    @Autowired
-    private TransportService transportService;
-
-    public TransportController() {}
+    public TransportController(
+        UserService userService,
+        TransportService transportService
+    ) {
+        this.userService = userService;
+        this.transportService = transportService;
+    }
 
     @GetMapping(
         value = "/statistics",

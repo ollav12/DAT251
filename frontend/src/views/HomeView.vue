@@ -44,6 +44,12 @@ type Trip = {
   savedEmissionsCO2eKg: number
 }
 
+const hideAddTrip = ref(true)
+
+function toggleAddTrip() {
+  hideAddTrip.value = !hideAddTrip.value
+}
+
 const data = ref<Trip[]>([])
 const loading = ref(true)
 const error = ref<Error | null>(null)
@@ -80,6 +86,39 @@ async function fetchTrips() {
 }
 //
 
+function formatDuration(seconds: number) {
+  // Handle edge cases
+  if (seconds === 0) return '0 seconds'
+  if (isNaN(seconds) || seconds < 0) return 'Invalid duration'
+
+  // Less than a minute
+  if (seconds < 60) {
+    return `${Math.round(seconds)} ${seconds === 1 ? 'second' : 'seconds'}`
+  }
+
+  // Less than an hour
+  if (seconds < 3600) {
+    const minutes = seconds / 60
+    if (minutes === Math.floor(minutes)) {
+      // Whole number of minutes
+      return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
+    } else {
+      // Decimal minutes (rounded to 1 decimal place)
+      return `${minutes.toFixed(1)} minutes`
+    }
+  }
+
+  // Hours
+  const hours = seconds / 3600
+  if (hours === Math.floor(hours)) {
+    // Whole number of hours
+    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+  } else {
+    // Decimal hours (rounded to 2 decimal places)
+    return `${hours.toFixed(2)} hours`
+  }
+}
+
 onMounted(() => {
   fetchStatistics()
   fetchTrips()
@@ -92,7 +131,7 @@ onMounted(() => {
   <main>
     <section class="stats">
       <p class="emissions-display">
-        <span class="value">{{ statistics?.totalEmissionsCO2eKg?.toLocaleString('se-SE') }}</span
+        <span class="value">{{ statistics?.totalEmissionsCO2eKg?.toFixed(2) }}</span
         >{{ ' ' }}
         <span class="unit"> kg CO2e</span>
       </p>
@@ -102,8 +141,11 @@ onMounted(() => {
       <!-- trend -->
     </section>
 
-    <section class="add-trip">
-      <h2>Add new trip</h2>
+    <section v-if="hideAddTrip">
+      <button @click="toggleAddTrip">Add new trip</button>
+    </section>
+    <section v-else class="add-trip">
+      <h3>Add new trip</h3>
       <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
         <input name="origin" placeholder="Origin" required />
         <input name="destination" placeholder="Destination" required />
@@ -114,6 +156,7 @@ onMounted(() => {
           <option value="driving">Driving</option>
         </select>
         <button type="submit">Add trip</button>
+        <button @click="toggleAddTrip" class="secondary">Cancel</button>
       </form>
       <!-- TODO: make it possible to estimate before adding -->
     </section>
@@ -123,14 +166,23 @@ onMounted(() => {
       <p>Total trips: {{ statistics?.totalTrips || 0 }}</p>
       <ul v-if="data" class="trip-list">
         <li v-for="trip in data" :key="trip.id" class="trip-item">
-          <p>{{ trip.origin }} to {{ trip.destination }}</p>
-          <p>Travel mode: {{ trip.travelMode }}</p>
-          <p>Distance {{ trip.totalDistanceKm }} meters</p>
-          <p>Duration {{ trip.totalDurationSeconds }} seconds</p>
-          <p>Emissions {{ trip.totalEmissionsCO2eKg }} kg CO2e</p>
-          <p>Saved emissions {{ trip.savedEmissionsCO2eKg }} kg CO2e</p>
-
-          <!-- <pre class="code">All data: {{ JSON.stringify(trip) }}</pre> -->
+          <div>
+            <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
+            <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
+            <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
+            <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
+            <h4 v-else>Trip</h4>
+            <p>{{ trip.origin }} to {{ trip.destination }}</p>
+            <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
+            <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
+          </div>
+          <div>
+            <p>
+              <span class="value">{{ trip.totalEmissionsCO2eKg.toFixed(2) }}</span>
+              <span class="unit">kg CO2e</span>
+            </p>
+            <p>Saved {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg CO2e</p>
+          </div>
         </li>
       </ul>
       <div v-else>No trips found.</div>
@@ -142,7 +194,9 @@ onMounted(() => {
 main {
   display: grid;
   /* grid-template-rows: auto; */
-  max-width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  gap: 16px;
 }
 
 form {
@@ -151,6 +205,45 @@ form {
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+button.secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+select {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 2px;
+  background-color: #fff;
+  color: #000;
+  cursor: pointer;
+}
+
+select:hover {
+  background-color: #f0f0f0;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
 }
 
 .stats {
@@ -170,23 +263,49 @@ form {
   font-weight: bold;
 }
 
-.trip-list {
+ul.trip-list {
   list-style-type: none;
   padding: 0;
   max-width: 100%;
 }
 
-.trip-item {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 10px;
+li.trip-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: nowrap;
+  background-color: var(--color-background-soft);
+  filter: brightness(1.3);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.code {
-  background-color: #333;
-  padding: 10px;
-  border-radius: 5px;
-  overflow: auto;
-  max-width: 100%;
+li.trip-item :nth-child(1) {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+}
+
+li.trip-item :nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: end;
+}
+
+li.trip-item .value {
+  font-size: 2em;
+}
+
+li.trip-item .unit {
+  font-size: 1em;
+  font-weight: bold;
 }
 </style>

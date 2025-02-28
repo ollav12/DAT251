@@ -3,7 +3,6 @@ package com.example.demo.service;
 import com.example.demo.model.Trip;
 import com.example.demo.model.User;
 import com.example.demo.repository.TripRepository;
-import com.example.demo.repository.UserRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -12,61 +11,51 @@ import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.google.maps.model.DirectionsStep;
+import com.google.maps.model.TransitMode;
+import com.google.maps.model.TransitRoutingPreference;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransportService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final TripRepository tripRepository;
 
-    @Autowired
-    private TripRepository tripRepository;
-
-    public TransportService() {}
-
-    public static class Statistics {
-
-        public int totalTrips;
-        public double totalDistanceKm;
-        public double totalDurationSeconds;
-
-        public double totalEmissionsCO2eKg;
-        public double totalEmissionsSavingsCO2eKg;
-
-        public double totalSavingsNOK;
-        public double totalCostNOK;
+    public TransportService(TripRepository tripRepository) {
+        this.tripRepository = tripRepository;
     }
 
-    public Statistics getStatistics(User userId) {
-        var statistics = new Statistics();
-
-        // Transport
-        statistics.totalTrips = tripRepository.countByUser(userId);
-        statistics.totalDistanceKm = tripRepository.sumTotalDistanceKmByUser(
-            userId
-        );
-        statistics.totalDurationSeconds =
-            tripRepository.sumTotalDurationSecondsByUser(userId);
-
+    public record Statistics(
+        // Trip
+        int totalTrips,
+        double totalDistanceKm,
+        double totalDurationSeconds,
         // Emissions
-        statistics.totalEmissionsCO2eKg =
-            tripRepository.sumTotalEmissionsByUser(userId);
-        statistics.totalEmissionsSavingsCO2eKg =
-            tripRepository.sumSavedEmissionsByUser(userId);
-
+        double totalEmissionsCO2eKg,
+        double totalEmissionsSavingsCO2eKg,
         // Financial
-        // TODO: calculate
-        statistics.totalSavingsNOK = 0.0;
-        statistics.totalCostNOK = 0.0;
+        double totalSavingsNOK,
+        double totalCostNOK
+    ) {}
 
-        return statistics;
+    public Statistics getStatistics(User user) {
+        return new Statistics(
+            // Transport
+            tripRepository.countByUser(user),
+            tripRepository.sumTotalDistanceKmByUser(user),
+            tripRepository.sumTotalDurationSecondsByUser(user),
+            // Emissions
+            tripRepository.sumTotalEmissionsByUser(user),
+            tripRepository.sumSavedEmissionsByUser(user),
+            // Financial
+            // TODO: calculate
+            0.0,
+            0.0
+        );
     }
 
     public void addTrip(
@@ -84,6 +73,13 @@ public class TransportService {
         var estimate = alternatives.get(selectedMode);
         var carEstimate = alternatives.get("driving");
 
+        if (estimate == null) {
+            throw new IllegalArgumentException("No estimate for selected mode");
+        }
+        if (carEstimate == null) {
+            throw new IllegalArgumentException("No estimate for driving mode");
+        }
+
         var totalCO2eSaved =
             carEstimate.getEmissionsCO2eKg() - estimate.getEmissionsCO2eKg();
 
@@ -92,7 +88,7 @@ public class TransportService {
             origin,
             destination,
             selectedMode,
-            estimate.getDistance(),
+            estimate.getDistanceKm(),
             estimate.getDuration().getSeconds(),
             estimate.getEmissionsCO2eKg(),
             totalCO2eSaved
@@ -122,16 +118,16 @@ public class TransportService {
     public class TripEstimate {
 
         private Duration duration;
-        private double distance;
+        private double distanceKm;
         private double emissionsCO2eKg;
 
         public TripEstimate(
             Duration duration,
-            double distance,
+            double distanceKm,
             double emissionsCO2eKg
         ) {
             this.duration = duration;
-            this.distance = distance;
+            this.distanceKm = distanceKm;
             this.emissionsCO2eKg = emissionsCO2eKg;
         }
 
@@ -139,8 +135,8 @@ public class TransportService {
             return duration;
         }
 
-        public double getDistance() {
-            return distance;
+        public double getDistanceKm() {
+            return distanceKm;
         }
 
         public double getEmissionsCO2eKg() {
@@ -193,23 +189,26 @@ public class TransportService {
     private final double emissionsPerKmWalking = 0.0;
     private final double emissionsPerKmBicycling = 0.0;
     private final double emissionsPerKmCar = 0.118;
+    private final double emissionsPerKmSkyssBybanen = 0.001;
+    private final double emissionsPerKmSkyssBus = 0.089;
+    private final double emissionsPerPersonKmVyTrain = 0.005; // Source: Claude estimate
 
     private TripEstimate getRouteEstimate(DirectionsRoute route) {
         Duration totalDuration = Duration.ZERO;
-        double totalDistance = 0.0;
+        double totalDistanceMeters = 0.0;
         double totalEmissions = 0.0;
 
         for (DirectionsLeg leg : route.legs) {
-            if (leg.duration != null) {
-                totalDuration = totalDuration.plusSeconds(
-                    leg.duration.inSeconds
-                );
-            }
-            if (leg.distance != null) {
-                totalDistance += leg.distance.inMeters;
-            }
-
             for (DirectionsStep step : leg.steps) {
+                if (step.distance != null) {
+                    totalDistanceMeters += step.distance.inMeters;
+                }
+                if (step.duration != null) {
+                    totalDuration = totalDuration.plusSeconds(
+                        step.duration.inSeconds
+                    );
+                }
+
                 switch (step.travelMode) {
                     case WALKING:
                         totalEmissions +=
@@ -225,25 +224,52 @@ public class TransportService {
                         if (step.transitDetails != null) {
                             switch (step.transitDetails.line.vehicle.type) {
                                 case BUS:
+                                    // TODO: check line operator
                                     totalEmissions +=
-                                        (step.distance.inMeters / 1000) * 0.089;
+                                        (step.distance.inMeters / 1000) *
+                                        emissionsPerKmSkyssBus;
                                     break;
                                 case CABLE_CAR:
                                     break;
                                 case TRAM:
                                     // E.g. Bybanen
                                     totalEmissions +=
-                                        (step.distance.inMeters / 1000) * 0.001;
+                                        (step.distance.inMeters / 1000) *
+                                        emissionsPerKmSkyssBybanen;
                                     break;
                                 case SUBWAY:
                                     break;
                                 case RAIL:
                                     break;
                                 case HEAVY_RAIL:
+                                    // E.g. Vy
+                                    totalEmissions +=
+                                        (step.distance.inMeters / 1000) *
+                                        emissionsPerPersonKmVyTrain;
                                     break;
                                 case FERRY:
                                     break;
                                 case FUNICULAR:
+                                    break;
+                                case COMMUTER_TRAIN:
+                                    break;
+                                case GONDOLA_LIFT:
+                                    break;
+                                case HIGH_SPEED_TRAIN:
+                                    break;
+                                case INTERCITY_BUS:
+                                    break;
+                                case LONG_DISTANCE_TRAIN:
+                                    break;
+                                case METRO_RAIL:
+                                    break;
+                                case MONORAIL:
+                                    break;
+                                case SHARE_TAXI:
+                                    break;
+                                case TROLLEYBUS:
+                                    break;
+                                case OTHER:
                                     break;
                                 default:
                                     break;
@@ -255,8 +281,11 @@ public class TransportService {
                         }
                         break;
                     case DRIVING:
+                        // TODO: personal vehicles
                         totalEmissions +=
                             (step.distance.inMeters / 1000) * emissionsPerKmCar;
+                        break;
+                    case UNKNOWN:
                         break;
                     default:
                         System.out.println("Unknown");
@@ -265,7 +294,11 @@ public class TransportService {
             }
         }
 
-        return new TripEstimate(totalDuration, totalDistance, totalEmissions);
+        return new TripEstimate(
+            totalDuration,
+            totalDistanceMeters / 1000,
+            totalEmissions
+        );
     }
 
     private final String googleMapsApiKey = System.getenv(
@@ -288,10 +321,16 @@ public class TransportService {
         DirectionsApiRequest request = DirectionsApi.newRequest(context)
             .origin(origin)
             .destination(destination)
-            // .alternatives(true);
-            // .transitRoutingPreference(TransitRoutingPreference.LESS_WALKING)
-            // .transitMode(TransitMode.BUS, TransitMode.SUBWAY, TransitMode.RAIL)
             .mode(mode);
+        if (mode == TravelMode.TRANSIT) {
+            request = request.transitMode(
+                TransitMode.BUS,
+                TransitMode.SUBWAY,
+                TransitMode.TRAM,
+                TransitMode.RAIL,
+                TransitMode.TRAIN
+            );
+        }
 
         DirectionsResult result = null;
         try {
