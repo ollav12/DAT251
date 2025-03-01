@@ -56,7 +56,8 @@ public class TransportController {
     ) {
         TripEstimateResults results = transportService.getTripEstimate(
             origin,
-            destination
+            destination,
+            null
         );
         return ResponseEntity.ok().body(results);
     }
