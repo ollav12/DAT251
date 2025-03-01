@@ -5,6 +5,7 @@ import com.example.demo.model.User;
 import com.example.demo.model.Vehicle;
 import com.example.demo.model.VehicleType;
 import com.example.demo.repository.TripRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.VehicleRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
@@ -26,13 +27,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransportService {
 
+    private final UserRepository userRepository;
     private final TripRepository tripRepository;
     private final VehicleRepository vehicleRepository;
 
     public TransportService(
+        UserRepository userRepository,
         TripRepository tripRepository,
         VehicleRepository vehicleRepository
     ) {
+        this.userRepository = userRepository;
         this.tripRepository = tripRepository;
         this.vehicleRepository = vehicleRepository;
     }
@@ -75,6 +79,7 @@ public class TransportService {
         double emissionsCO2ePerKm
     ) {
         var vehicle = new Vehicle(make, model, year, type, emissionsCO2ePerKm);
+        vehicle.setOwner(user);
         vehicleRepository.save(vehicle);
     }
 
@@ -86,8 +91,24 @@ public class TransportService {
         return defaultVehicle;
     }
 
+    public void setDefaultVehicle(User user, String vehicleId) {
+        var vehicleIdLong = Long.parseLong(vehicleId);
+        var vehicle = vehicleRepository.findById(vehicleIdLong).orElseThrow();
+        user.setDefaultVehicle(vehicle);
+        userRepository.save(user);
+    }
+
     public List<Vehicle> getVehicles(User user) {
         return vehicleRepository.findByOwner(user);
+    }
+
+    public void deleteVehicle(User user, String vehicleId) {
+        var vehicleIdLong = Long.parseLong(vehicleId);
+        var vehicle = vehicleRepository.findById(vehicleIdLong).orElseThrow();
+        if (vehicle.isDefault()) {
+            throw new IllegalArgumentException("Cannot delete default vehicle");
+        }
+        vehicleRepository.delete(vehicle);
     }
 
     public void addTrip(

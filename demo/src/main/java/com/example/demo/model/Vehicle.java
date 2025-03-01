@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "vehicles")
@@ -21,7 +22,7 @@ public class Vehicle {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @JoinColumn(name = "owner_id", nullable = false)
     @JsonIgnore
     private User owner;
 
@@ -105,5 +106,17 @@ public class Vehicle {
 
     public void setEmissionsCO2ePerKm(double emissionsCO2ePerKm) {
         this.emissionsCO2ePerKm = emissionsCO2ePerKm;
+    }
+
+    @Transient
+    public boolean isDefault() {
+        if (owner == null) {
+            return false;
+        }
+        var defaultVehicle = owner.getDefaultVehicle();
+        if (defaultVehicle == null) {
+            return false;
+        }
+        return defaultVehicle.getId().equals(this.id);
     }
 }
