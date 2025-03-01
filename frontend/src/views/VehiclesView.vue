@@ -1,99 +1,34 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-
-type Vehicle = {
-  id: number
-  name: string
-  make: string
-  model: string
-  type: string
-  year: number
-  emissionsCO2ePerKm: number
-  default: boolean
-}
-
-type AddVehicle = {
-  make: string
-  model: string
-  type: string
-  year: number
-  emissionsCO2ePerKm: number
-}
+import Transport from '../services/transport'
+import type { Vehicle } from '../services/transport'
 
 const vehicles = ref<Vehicle[]>([])
 
 async function fetchVehicles() {
-  try {
-    const response = await fetch('http://localhost:8080/transport/vehicles')
-    const data = await response.json()
-    console.log('Fetched vehicles', data)
-    vehicles.value = data
-  } catch (error) {
-    console.error(error)
-  }
+  const data = await Transport.listVehicles()
+  vehicles.value = data
 }
 
 async function submitVehicle(e: Event) {
-  try {
-    const make = (e.target as HTMLFormElement).make.value
-    const model = (e.target as HTMLFormElement).model.value
-    const type = (e.target as HTMLFormElement).type.value
-    const year = parseInt((e.target as HTMLFormElement).year.value)
-    const emissionsCO2ePerKm = parseFloat((e.target as HTMLFormElement).emissionsCO2ePerKm.value)
-
-    const vehicle: AddVehicle = {
-      make,
-      model,
-      type,
-      year,
-      emissionsCO2ePerKm,
-    }
-
-    const response = await fetch('http://localhost:8080/transport/vehicles', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(vehicle),
-    })
-    const data = await response.json()
-    console.log('Added vehicle', data)
-    fetchVehicles()
-  } catch (error) {
-    console.error(error)
-  }
+  await Transport.createVehicle({
+    make: (e.target as HTMLFormElement).make.value,
+    model: (e.target as HTMLFormElement).model.value,
+    type: (e.target as HTMLFormElement).type.value,
+    year: parseInt((e.target as HTMLFormElement).year.value),
+    emissionsCO2ePerKm: parseFloat((e.target as HTMLFormElement).emissionsCO2ePerKm.value),
+  })
+  await fetchVehicles()
 }
 
 async function setDefaultVehicle(vehicle: Vehicle) {
-  try {
-    const response = await fetch(`http://localhost:8080/transport/vehicles/${vehicle.id}/default`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
-    console.log('Set default vehicle', data)
-    fetchVehicles()
-  } catch (error) {
-    console.error(error)
-  }
+  await Transport.setDefaultVehicle(vehicle.id)
+  await fetchVehicles()
 }
 
 async function deleteVehicle(vehicleId: number) {
-  try {
-    const response = await fetch(`http://localhost:8080/transport/vehicles/${vehicleId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
-    console.log('Deleted vehicle', data)
-    fetchVehicles()
-  } catch (error) {
-    console.error(error)
-  }
+  await Transport.deleteVehicle(vehicleId)
+  await fetchVehicles()
 }
 
 onMounted(() => {
@@ -125,7 +60,7 @@ onMounted(() => {
       </li>
     </ul>
     <h3>Add Vehicle</h3>
-    <form @submit.prevent="submitVehicle">
+    <form @submit.prevent="submitVehicle" style="display: flex; flex-direction: column; gap: 10px">
       <label for="make">Make:</label>
       <input type="text" id="make" name="make" required />
       <label for="model">Model:</label>

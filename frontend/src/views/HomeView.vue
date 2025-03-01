@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import Transport from '../services/transport'
+import type { Vehicle } from '../services/transport'
 
 type Statistics = {
   totalTrips: number
@@ -54,15 +56,31 @@ const data = ref<Trip[]>([])
 const loading = ref(true)
 const error = ref<Error | null>(null)
 
+const useVehicle = ref(false)
+
+const vehicles = ref<Vehicle[]>([])
+const selectedVehicle = ref<Vehicle['id'] | null>(null)
+
+async function fetchVehicles() {
+  const data = await Transport.listVehicles()
+  for (const vehicle of data) {
+    if (vehicle.default) {
+      selectedVehicle.value = vehicle.id
+    }
+  }
+  vehicles.value = data
+}
+
 async function submitTrip(e: Event) {
   const origin = (e.target as HTMLFormElement).origin.value
   const destination = (e.target as HTMLFormElement).destination.value
-  const mode = (e.target as HTMLFormElement).mode.value
+  const mode = (e.target as HTMLFormElement).mode?.value
+  const vehicleId = (e.target as HTMLFormElement).vehicleId?.value
   try {
     const response = await fetch('http://localhost:8080/trips?userId=1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ origin, destination, mode }),
+      body: JSON.stringify({ origin, destination, mode, vehicleId }),
     })
     console.log(response)
     fetchTrips()
@@ -122,6 +140,7 @@ function formatDuration(seconds: number) {
 onMounted(() => {
   fetchStatistics()
   fetchTrips()
+  fetchVehicles()
 })
 </script>
 
@@ -149,12 +168,27 @@ onMounted(() => {
       <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
         <input name="origin" placeholder="Origin" required />
         <input name="destination" placeholder="Destination" required />
-        <select name="mode" id="mode">
+
+        <div style="display: flex; align-items: center; gap: 10px">
+          <input type="checkbox" id="useVehicle" v-model="useVehicle" />
+          <label for="useVehicle">Use personal vehicle</label>
+        </div>
+        <select v-if="!useVehicle" name="mode" id="mode">
           <option value="walking" selected>Walking</option>
           <option value="bicycling">Bicycling</option>
           <option value="transit">Transit</option>
           <option value="driving">Driving</option>
         </select>
+        <div v-else>
+          <a href="/vehicles">Manage Vehicles</a>
+          <select name="vehicleId" id="vehicleId" v-model="selectedVehicle">
+            <option value="" disabled>Select a vehicle</option>
+            <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
+              {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }})
+            </option>
+          </select>
+        </div>
+
         <button type="submit">Add trip</button>
         <button @click="toggleAddTrip" class="secondary">Cancel</button>
       </form>

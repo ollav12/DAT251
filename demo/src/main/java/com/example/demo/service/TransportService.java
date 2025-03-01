@@ -115,15 +115,35 @@ public class TransportService {
         User user,
         String origin,
         String destination,
-        String selectedMode
+        String selectedMode,
+        String selectedVehicleId
     ) {
+        String mode = null;
+        if (selectedMode != null && selectedVehicleId != null) {
+            throw new IllegalArgumentException(
+                "Cannot select both mode and vehicle"
+            );
+        } else if (selectedMode == null && selectedVehicleId == null) {
+            throw new IllegalArgumentException(
+                "Must select either mode or vehicle"
+            );
+        } else if (selectedMode != null) {
+            mode = selectedMode;
+        } else if (selectedVehicleId != null) {
+            Vehicle vehicle = vehicleRepository
+                .findById(Long.parseLong(selectedVehicleId))
+                .orElseThrow();
+            mode = vehicle.getType().toTravelMode().toString().toLowerCase();
+        }
+
         // Get estimate for all alternative transport modes.
         // We do this so that we can compare to calculate savings.
+        // TODO: use actual vehicle data
         var results = getTripEstimate(origin, destination);
 
         // TODO: we cannot compare costs between alternative modes yet
         var alternatives = results.getAlternatives();
-        var estimate = alternatives.get(selectedMode);
+        var estimate = alternatives.get(mode);
         var carEstimate = alternatives.get("driving");
 
         if (estimate == null) {
@@ -140,7 +160,7 @@ public class TransportService {
             user,
             origin,
             destination,
-            selectedMode,
+            mode,
             estimate.getDistanceKm(),
             estimate.getDuration().getSeconds(),
             estimate.getEmissionsCO2eKg(),
