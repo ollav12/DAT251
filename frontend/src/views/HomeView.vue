@@ -1,19 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import Transport from '../services/transport'
-import type { Vehicle } from '../services/transport'
-
-type Statistics = {
-  totalTrips: number
-  totalDistanceKm: number
-  totalDurationSeconds: number
-
-  totalEmissionsCO2eKg: number
-  totalEmissionsSavingsCO2eKg: number
-
-  totalCostNOK: number
-  totalSavingsNOK: number
-}
+import type { Statistics, Vehicle, Trip } from '../services/transport'
 
 const statistics = ref<Statistics | null>(null)
 const statisticsLoading = ref(false)
@@ -22,8 +10,7 @@ const statisticsError = ref<Error | null>(null)
 async function fetchStatistics() {
   try {
     statisticsLoading.value = true
-    const response = await fetch('http://localhost:8080/transport/statistics?userId=1')
-    const data = await response.json()
+    const data = await Transport.getStatistics()
     console.log('Fetched statistics:', data)
     statistics.value = data
   } catch (e) {
@@ -32,18 +19,6 @@ async function fetchStatistics() {
   } finally {
     statisticsLoading.value = false
   }
-}
-
-type Trip = {
-  id: string
-  origin: string
-  destination: string
-  distance: number
-  travelMode: string
-  totalDistanceKm: number
-  totalDurationSeconds: number
-  totalEmissionsCO2eKg: number
-  savedEmissionsCO2eKg: number
 }
 
 const hideAddTrip = ref(true)
@@ -77,13 +52,14 @@ async function submitTrip(e: Event) {
   const mode = (e.target as HTMLFormElement).mode?.value
   const vehicleId = (e.target as HTMLFormElement).vehicleId?.value
   try {
-    const response = await fetch('http://localhost:8080/trips?userId=1', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ origin, destination, mode, vehicleId }),
+    const data = await Transport.createTrip({
+      origin,
+      destination,
+      mode,
+      vehicleId,
     })
-    console.log(response)
-    fetchTrips()
+    console.log(data)
+    await fetchTrips()
   } catch (e) {
     error.value = e as Error
   }
@@ -92,8 +68,8 @@ async function submitTrip(e: Event) {
 async function fetchTrips() {
   try {
     loading.value = true
-    const response = await fetch('http://localhost:8080/trips')
-    data.value = await response.json()
+    const trips = await Transport.listTrips()
+    data.value = trips
     console.log(data.value)
   } catch (e) {
     console.error(e)
@@ -102,7 +78,6 @@ async function fetchTrips() {
     loading.value = false
   }
 }
-//
 
 function formatDuration(seconds: number) {
   // Handle edge cases

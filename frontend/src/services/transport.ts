@@ -1,5 +1,69 @@
 const baseURL = 'http://localhost:8080'
 
+export type Statistics = {
+  totalTrips: number
+  totalDistanceKm: number
+  totalDurationSeconds: number
+
+  totalEmissionsCO2eKg: number
+  totalEmissionsSavingsCO2eKg: number
+
+  totalCostNOK: number
+  totalSavingsNOK: number
+}
+
+async function getStatistics(): Promise<Statistics> {
+  try {
+    const url = '/transport/statistics?userId=1'
+    const response = await request('GET', url)
+    return response
+  } catch (error) {
+    console.error('Error fetching statistics:', error)
+    throw error
+  }
+}
+
+export type Trip = {
+  id: string
+  origin: string
+  destination: string
+  distance: number
+  travelMode: string
+  totalDistanceKm: number
+  totalDurationSeconds: number
+  totalEmissionsCO2eKg: number
+  savedEmissionsCO2eKg: number
+}
+
+type CreateTrip = {
+  origin: string
+  destination: string
+  mode: string
+  vehicleId: string
+}
+
+async function createTrip(trip: CreateTrip) {
+  try {
+    const url = '/trips?userId=1'
+    const response = await request('POST', url, trip)
+    return response
+  } catch (error) {
+    console.error('Error creating trip:', error)
+    throw error
+  }
+}
+
+async function listTrips(): Promise<Trip[]> {
+  try {
+    const url = '/trips?userId=1'
+    const response = await request('GET', url)
+    return response
+  } catch (error) {
+    console.error('Error fetching trips:', error)
+    throw error
+  }
+}
+
 export type Vehicle = {
   id: number
   make: string
@@ -57,6 +121,11 @@ async function deleteVehicle(id: Vehicle['id']) {
 }
 
 export default {
+  getStatistics,
+
+  createTrip,
+  listTrips,
+
   createVehicle,
   listVehicles,
   setDefaultVehicle,
