@@ -44,60 +44,12 @@ public class TripController {
         return tripService.getTrip(tripid);
     }
 
-    public static class AddTripRequest {
-
-        private String origin;
-        private String destination;
-        private String mode;
-
-        public AddTripRequest() {}
-
-        public AddTripRequest(String origin, String destination, String mode) {
-            this.origin = origin;
-            this.destination = destination;
-            this.mode = mode;
-        }
-
-        public String getOrigin() {
-            return origin;
-        }
-
-        public void setOrigin(String origin) {
-            this.origin = origin;
-        }
-
-        public String getDestination() {
-            return destination;
-        }
-
-        public void setDestination(String destination) {
-            this.destination = destination;
-        }
-
-        public String getMode() {
-            return mode;
-        }
-
-        public void setMode(String mode) {
-            this.mode = mode;
-        }
-
-        public String toString() {
-            return (
-                "AddTripRequest{" +
-                "origin='" +
-                origin +
-                '\'' +
-                ", destination='" +
-                destination +
-                '\'' +
-                ", mode='" +
-                mode +
-                '\'' +
-                '}'
-            );
-        }
-    }
+    public record AddTripRequest(
+        String origin,
+        String destination,
+        String mode,
+        String vehicleId
+    ) {}
 
     @PostMapping("")
     public String addTrip(
@@ -118,7 +70,8 @@ public class TripController {
             user,
             trip.origin,
             trip.destination,
-            trip.mode
+            trip.mode,
+            trip.vehicleId
         );
 
         return "{\"status\": \"success\"}";
