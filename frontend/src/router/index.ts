@@ -22,6 +22,11 @@ const router = createRouter({
       meta: { hideLayout: true },
     },
     {
+      path: '/leaderboard',
+      name: 'leaderboard',
+      component: () => import('../views/LeaderboardView.vue'),
+    },
+    {
       path: '/tripestimator',
       name: 'tripestimator',
       component: () => import('../views/TripEstimatorView.vue'),

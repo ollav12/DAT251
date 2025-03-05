@@ -35,6 +35,15 @@ public class TransportController {
     }
 
     @GetMapping(
+        value = "/leaderboard",
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<TransportService.Leaderboard> getLeaderboard() {
+        var leaderboard = transportService.getLeaderboard();
+        return ResponseEntity.ok().body(leaderboard);
+    }
+
+    @GetMapping(
         value = "/statistics",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
