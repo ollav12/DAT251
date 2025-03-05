@@ -6,4 +6,9 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true # Enables the H2 web console for debugging
+      path: /h2-console # (Optional) Default path is "/h2-console"
