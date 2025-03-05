@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-
-type Statistics = {
-  totalTrips: number
-  totalDistanceKm: number
-  totalDurationSeconds: number
-
-  totalEmissionsCO2eKg: number
-  totalEmissionsSavingsCO2eKg: number
-
-  totalCostNOK: number
-  totalSavingsNOK: number
-}
+import Transport from '../services/transport'
+import type { Statistics, Vehicle, Trip } from '../services/transport'
 
 const statistics = ref<Statistics | null>(null)
 const statisticsLoading = ref(false)
@@ -20,8 +10,7 @@ const statisticsError = ref<Error | null>(null)
 async function fetchStatistics() {
   try {
     statisticsLoading.value = true
-    const response = await fetch('http://localhost:8080/transport/statistics?userId=1')
-    const data = await response.json()
+    const data = await Transport.getStatistics()
     console.log('Fetched statistics:', data)
     statistics.value = data
   } catch (e) {
@@ -30,18 +19,6 @@ async function fetchStatistics() {
   } finally {
     statisticsLoading.value = false
   }
-}
-
-type Trip = {
-  id: string
-  origin: string
-  destination: string
-  distance: number
-  travelMode: string
-  totalDistanceKm: number
-  totalDurationSeconds: number
-  totalEmissionsCO2eKg: number
-  savedEmissionsCO2eKg: number
 }
 
 const hideAddTrip = ref(true)
@@ -54,18 +31,35 @@ const data = ref<Trip[]>([])
 const loading = ref(true)
 const error = ref<Error | null>(null)
 
+const useVehicle = ref(false)
+
+const vehicles = ref<Vehicle[]>([])
+const selectedVehicle = ref<Vehicle['id'] | null>(null)
+
+async function fetchVehicles() {
+  const data = await Transport.listVehicles()
+  for (const vehicle of data) {
+    if (vehicle.default) {
+      selectedVehicle.value = vehicle.id
+    }
+  }
+  vehicles.value = data
+}
+
 async function submitTrip(e: Event) {
   const origin = (e.target as HTMLFormElement).origin.value
   const destination = (e.target as HTMLFormElement).destination.value
-  const mode = (e.target as HTMLFormElement).mode.value
+  const mode = (e.target as HTMLFormElement).mode?.value
+  const vehicleId = (e.target as HTMLFormElement).vehicleId?.value
   try {
-    const response = await fetch('http://localhost:8080/trips?userId=1', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ origin, destination, mode }),
+    const data = await Transport.createTrip({
+      origin,
+      destination,
+      mode,
+      vehicleId,
     })
-    console.log(response)
-    fetchTrips()
+    console.log(data)
+    await fetchTrips()
   } catch (e) {
     error.value = e as Error
   }
@@ -74,8 +68,8 @@ async function submitTrip(e: Event) {
 async function fetchTrips() {
   try {
     loading.value = true
-    const response = await fetch('http://localhost:8080/trips')
-    data.value = await response.json()
+    const trips = await Transport.listTrips()
+    data.value = trips
     console.log(data.value)
   } catch (e) {
     console.error(e)
@@ -84,7 +78,6 @@ async function fetchTrips() {
     loading.value = false
   }
 }
-//
 
 function formatDuration(seconds: number) {
   // Handle edge cases
@@ -122,6 +115,7 @@ function formatDuration(seconds: number) {
 onMounted(() => {
   fetchStatistics()
   fetchTrips()
+  fetchVehicles()
 })
 </script>
 
@@ -149,12 +143,27 @@ onMounted(() => {
       <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
         <input name="origin" placeholder="Origin" required />
         <input name="destination" placeholder="Destination" required />
-        <select name="mode" id="mode">
+
+        <div style="display: flex; align-items: center; gap: 10px">
+          <input type="checkbox" id="useVehicle" v-model="useVehicle" />
+          <label for="useVehicle">Use personal vehicle</label>
+        </div>
+        <select v-if="!useVehicle" name="mode" id="mode">
           <option value="walking" selected>Walking</option>
           <option value="bicycling">Bicycling</option>
           <option value="transit">Transit</option>
           <option value="driving">Driving</option>
         </select>
+        <div v-else>
+          <a href="/vehicles">Manage Vehicles</a>
+          <select name="vehicleId" id="vehicleId" v-model="selectedVehicle">
+            <option value="" disabled>Select a vehicle</option>
+            <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
+              {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }})
+            </option>
+          </select>
+        </div>
+
         <button type="submit">Add trip</button>
         <button @click="toggleAddTrip" class="secondary">Cancel</button>
       </form>

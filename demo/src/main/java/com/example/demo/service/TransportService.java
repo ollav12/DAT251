@@ -2,7 +2,11 @@ package com.example.demo.service;
 
 import com.example.demo.model.Trip;
 import com.example.demo.model.User;
+import com.example.demo.model.Vehicle;
+import com.example.demo.model.VehicleType;
 import com.example.demo.repository.TripRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.VehicleRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -15,6 +19,7 @@ import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,10 +27,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransportService {
 
+    private final UserRepository userRepository;
     private final TripRepository tripRepository;
+    private final VehicleRepository vehicleRepository;
 
-    public TransportService(TripRepository tripRepository) {
+    public TransportService(
+        UserRepository userRepository,
+        TripRepository tripRepository,
+        VehicleRepository vehicleRepository
+    ) {
+        this.userRepository = userRepository;
         this.tripRepository = tripRepository;
+        this.vehicleRepository = vehicleRepository;
     }
 
     public record Statistics(
@@ -57,19 +70,81 @@ public class TransportService {
         );
     }
 
+    public void addVehicle(
+        User user,
+        String make,
+        String model,
+        int year,
+        VehicleType type,
+        double emissionsCO2ePerKm
+    ) {
+        var vehicle = new Vehicle(make, model, year, type, emissionsCO2ePerKm);
+        vehicle.setOwner(user);
+        vehicleRepository.save(vehicle);
+    }
+
+    public Vehicle getDefaultVehicle(User user) {
+        var defaultVehicle = user.getDefaultVehicle();
+        if (defaultVehicle == null) {
+            throw new IllegalArgumentException("No default vehicle");
+        }
+        return defaultVehicle;
+    }
+
+    public void setDefaultVehicle(User user, String vehicleId) {
+        var vehicleIdLong = Long.parseLong(vehicleId);
+        var vehicle = vehicleRepository.findById(vehicleIdLong).orElseThrow();
+        user.setDefaultVehicle(vehicle);
+        userRepository.save(user);
+    }
+
+    public List<Vehicle> getVehicles(User user) {
+        return vehicleRepository.findByOwner(user);
+    }
+
+    public void deleteVehicle(User user, String vehicleId) {
+        var vehicleIdLong = Long.parseLong(vehicleId);
+        var vehicle = vehicleRepository.findById(vehicleIdLong).orElseThrow();
+        if (vehicle.isDefault()) {
+            throw new IllegalArgumentException("Cannot delete default vehicle");
+        }
+        vehicleRepository.delete(vehicle);
+    }
+
     public void addTrip(
         User user,
         String origin,
         String destination,
-        String selectedMode
+        String selectedMode,
+        String selectedVehicleId
     ) {
+        String mode = null;
+        Vehicle vehicle = null;
+        if (selectedMode != null && selectedVehicleId != null) {
+            throw new IllegalArgumentException(
+                "Cannot select both mode and vehicle"
+            );
+        } else if (selectedMode == null && selectedVehicleId == null) {
+            throw new IllegalArgumentException(
+                "Must select either mode or vehicle"
+            );
+        } else if (selectedMode != null) {
+            mode = selectedMode;
+        } else if (selectedVehicleId != null) {
+            vehicle = vehicleRepository
+                .findById(Long.parseLong(selectedVehicleId))
+                .orElseThrow();
+            mode = vehicle.getType().toTravelMode().toString().toLowerCase();
+        }
+
         // Get estimate for all alternative transport modes.
         // We do this so that we can compare to calculate savings.
-        var results = getTripEstimate(origin, destination);
+        // TODO: use actual vehicle data
+        var results = getTripEstimate(origin, destination, vehicle);
 
         // TODO: we cannot compare costs between alternative modes yet
         var alternatives = results.getAlternatives();
-        var estimate = alternatives.get(selectedMode);
+        var estimate = alternatives.get(mode);
         var carEstimate = alternatives.get("driving");
 
         if (estimate == null) {
@@ -86,7 +161,7 @@ public class TransportService {
             user,
             origin,
             destination,
-            selectedMode,
+            mode,
             estimate.getDistanceKm(),
             estimate.getDuration().getSeconds(),
             estimate.getEmissionsCO2eKg(),
@@ -145,7 +220,8 @@ public class TransportService {
 
     public TripEstimateResults getTripEstimate(
         String origin,
-        String destination
+        String destination,
+        Vehicle vehicle
     ) {
         TripEstimateResults results = new TripEstimateResults();
         TravelMode[] modes = {
@@ -166,7 +242,17 @@ public class TransportService {
             // Find and select best route
             TripEstimate bestRoute = null;
             for (DirectionsRoute route : result.routes) {
-                TripEstimate currentRoute = getRouteEstimate(route);
+                Vehicle estimationVehicle = null;
+                if (vehicle != null) {
+                    if (vehicle.getType().toTravelMode() == mode) {
+                        estimationVehicle = vehicle;
+                    }
+                }
+
+                TripEstimate currentRoute = getRouteEstimate(
+                    route,
+                    estimationVehicle
+                );
                 if (
                     bestRoute == null ||
                     currentRoute.getEmissionsCO2eKg() <
@@ -185,14 +271,23 @@ public class TransportService {
         return results;
     }
 
+    // All of these are intended to include:
+    // - Amortized vehicle production emissions
+    // - Fuel emissions
+    // But not:
+    // - Food emissions (e.g. from walking)
+    // Public transport should be calculated per person:
     private final double emissionsPerKmWalking = 0.0;
     private final double emissionsPerKmBicycling = 0.0;
     private final double emissionsPerKmCar = 0.118;
-    private final double emissionsPerKmSkyssBybanen = 0.001;
-    private final double emissionsPerKmSkyssBus = 0.089;
+    private final double emissionsPerPersonKmSkyssBybanen = 0.001;
+    private final double emissionsPerPersonKmSkyssBus = 0.089;
     private final double emissionsPerPersonKmVyTrain = 0.005; // Source: Claude estimate
 
-    private TripEstimate getRouteEstimate(DirectionsRoute route) {
+    private TripEstimate getRouteEstimate(
+        DirectionsRoute route,
+        Vehicle vehicle
+    ) {
         Duration totalDuration = Duration.ZERO;
         double totalDistanceMeters = 0.0;
         double totalEmissions = 0.0;
@@ -215,6 +310,17 @@ public class TransportService {
                             emissionsPerKmWalking;
                         break;
                     case BICYCLING:
+                        if (
+                            vehicle != null &&
+                            vehicle.getType().toTravelMode() ==
+                            TravelMode.BICYCLING
+                        ) {
+                            totalEmissions +=
+                                (step.distance.inMeters / 1000) *
+                                // TODO: clean up units
+                                (vehicle.getEmissionsCO2ePerKm() / 1000);
+                            break;
+                        }
                         totalEmissions +=
                             (step.distance.inMeters / 1000) *
                             emissionsPerKmBicycling;
@@ -226,7 +332,7 @@ public class TransportService {
                                     // TODO: check line operator
                                     totalEmissions +=
                                         (step.distance.inMeters / 1000) *
-                                        emissionsPerKmSkyssBus;
+                                        emissionsPerPersonKmSkyssBus;
                                     break;
                                 case CABLE_CAR:
                                     break;
@@ -234,7 +340,7 @@ public class TransportService {
                                     // E.g. Bybanen
                                     totalEmissions +=
                                         (step.distance.inMeters / 1000) *
-                                        emissionsPerKmSkyssBybanen;
+                                        emissionsPerPersonKmSkyssBybanen;
                                     break;
                                 case SUBWAY:
                                     break;
@@ -280,7 +386,17 @@ public class TransportService {
                         }
                         break;
                     case DRIVING:
-                        // TODO: personal vehicles
+                        if (
+                            vehicle != null &&
+                            vehicle.getType().toTravelMode() ==
+                            TravelMode.DRIVING
+                        ) {
+                            totalEmissions +=
+                                (step.distance.inMeters / 1000) *
+                                // TODO: clean up units
+                                (vehicle.getEmissionsCO2ePerKm() / 1000);
+                            break;
+                        }
                         totalEmissions +=
                             (step.distance.inMeters / 1000) * emissionsPerKmCar;
                         break;

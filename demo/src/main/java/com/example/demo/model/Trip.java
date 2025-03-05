@@ -29,6 +29,8 @@ public class Trip {
     private Double totalEmissionsCO2eKg;
     private Double savedEmissionsCO2eKg;
 
+    // TODO: add vehicle
+
     // TODO: only storing travel mode string for now
     @ManyToOne
     private TransportationMode transportationMode;
