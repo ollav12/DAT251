@@ -41,6 +41,13 @@ public class TransportService {
         this.vehicleRepository = vehicleRepository;
     }
 
+    public record Leaderboard(List<UserRepository.LeaderboardRow> rows) {}
+
+    public Leaderboard getLeaderboard() {
+        var rows = userRepository.getLeaderboard();
+        return new Leaderboard(rows);
+    }
+
     public record Statistics(
         // Trip
         int totalTrips,
