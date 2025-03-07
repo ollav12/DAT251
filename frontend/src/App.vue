@@ -27,6 +27,7 @@ onMounted(() => {
   <nav v-if="showLayout">
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/vehicles">Vehicles</RouterLink>
+    <RouterLink to="/leaderboard">Leaderboard</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
   </nav>
 
