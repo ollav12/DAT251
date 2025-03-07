@@ -10,7 +10,6 @@ import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
 import org.springframework.http.HttpMethod;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +30,7 @@ import org.springframework.test.context.TestPropertySource;
                 "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
                 "spring.jpa.hibernate.ddl-auto=create-drop",
 })
+
 class Dat251ApplicationTests {
 
         @Autowired
@@ -42,31 +42,26 @@ class Dat251ApplicationTests {
         @Autowired
         private UserRepository userRepository;
 
-        @AfterEach
-        public void cleanupDatabase() {
-                userRepository.deleteAll();
-        }
-
         private User createTestUser() {
-                User user = new User();
-                user.setUsername("Test");
-                user.setPassword("password123");
-                user.setEmail("test@gmail.com");
-                user.setFirstName("MyName");
-                user.setLastName("MyLastName");
-                user.setPoints(100);
-                return user;
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test");
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
+                return notRegisteredUser;
         }
 
         private User createTestUser2() {
-                User user = new User();
-                user.setUsername("Test2"); // new username
-                user.setPassword("password123");
-                user.setEmail("test@gmail.com");
-                user.setFirstName("MyName");
-                user.setLastName("MyLastName");
-                user.setPoints(200); // +100 points
-                return user;
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test2"); // new username
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(200); // +100 points
+                return notRegisteredUser;
         }
 
         @Test
@@ -74,66 +69,106 @@ class Dat251ApplicationTests {
         }
 
         @Test
-        void testCreatingAndRetrievingUser() {
-                User user = createTestUser();
+        void testCreatingUser() throws InterruptedException {
 
-                // Executes the POST createUser method
+                User notRegisteredUser = createTestUser();
+
                 ResponseEntity<User> response = restTemplate.postForEntity(
                                 "/users",
-                                user,
+                                notRegisteredUser,
                                 User.class);
+
+                userRepository.flush();
+
+                System.out.println("Status code: " + response.getStatusCode());
+                System.out.println("Response body: " + response.getBody());
+
                 User registeredUser = response.getBody();
                 assertNotNull(registeredUser);
                 assertEquals("Test", registeredUser.getUsername());
                 assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        }
+
+        @Test
+        void testRetrievingUser() {
+
+                User user = new User();
+                user.setUsername("Test8969988");
+                user.setPassword("password123");
+                user.setEmail("test@gmail.com");
+                user.setFirstName("MyName");
+                user.setLastName("MyLastName");
+                user.setPoints(100);
+
+                userRepository.saveAndFlush(user);
 
                 // Executes the GET getUser method
                 ResponseEntity<User> getResponse = restTemplate.getForEntity(
-                                "/users/" + registeredUser.getId(),
+                                "/users/" + user.getId(),
                                 User.class);
                 User retrievedUser = getResponse.getBody();
                 assertNotNull(retrievedUser);
                 assertEquals(HttpStatus.OK, getResponse.getStatusCode());
-                assertEquals("Test", retrievedUser.getUsername());
+                assertEquals("Test8969988", retrievedUser.getUsername());
         }
 
         @Test
         void testDeletingUser() {
-                User user = createTestUser();
-                ResponseEntity<User> response = restTemplate.postForEntity(
-                                "/users",
-                                user,
-                                User.class);
-                User registeredUser = response.getBody();
-                assertNotNull(registeredUser);
-                assertEquals(HttpStatus.CREATED, response.getStatusCode());
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test7653333");
+                notRegisteredUser.setPassword("password1234");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
+
+                userRepository.saveAndFlush(notRegisteredUser);
+
+                System.out.println("userid: " + notRegisteredUser.getId());
 
                 // Executes the DELETE deleteUser method
-                restTemplate.delete("/users/" + registeredUser.getId());
+                restTemplate.delete("/users/" + notRegisteredUser.getId());
                 ResponseEntity<User> getResponse = restTemplate.getForEntity(
-                                "/users/" + registeredUser.getId(),
+                                "/users/" + notRegisteredUser.getId(),
                                 User.class);
                 assertEquals(HttpStatus.NOT_FOUND, getResponse.getStatusCode());
+                // System.out.println("users:" + userRepository.findAll());
+                // assertEquals(0, userRepository.count());
+
         }
 
         @Test
         void testUpdatingUser() {
-                User user = createTestUser();
+
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test999");
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
+
                 User user2 = createTestUser2();
 
-                ResponseEntity<User> response = restTemplate.postForEntity(
-                                "/users",
-                                user,
-                                User.class);
-                User registeredUser = response.getBody();
-                assertNotNull(registeredUser);
-                assertEquals(HttpStatus.CREATED, response.getStatusCode());
+                userRepository.saveAndFlush(notRegisteredUser);
+
+                /*
+                 * ResponseEntity<User> response = restTemplate.postForEntity(
+                 * "/users",
+                 * notRegisteredUser,
+                 * User.class);
+                 * User registeredUser = response.getBody();
+                 * assertNotNull(registeredUser);
+                 * assertEquals(HttpStatus.CREATED, response.getStatusCode());
+                 */
 
                 // Executes the PUT updateUser method
-                restTemplate.put("/users/" + registeredUser.getId(), user2);
+                restTemplate.put("/users/" + notRegisteredUser.getId(), user2);
+
+                userRepository.flush();
 
                 ResponseEntity<User> getResponse = restTemplate.getForEntity(
-                                "/users/" + registeredUser.getId(),
+                                "/users/" + notRegisteredUser.getId(),
                                 User.class);
                 assertEquals(HttpStatus.OK, getResponse.getStatusCode());
                 User updatedUser = getResponse.getBody();
@@ -150,12 +185,19 @@ class Dat251ApplicationTests {
 
         @Test
         void testUserRegistration() {
-                User user = createTestUser();
+
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test888");
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
 
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(
                                 "/auth/register",
                                 HttpMethod.POST,
-                                new HttpEntity<>(user),
+                                new HttpEntity<>(notRegisteredUser),
                                 new ParameterizedTypeReference<Map<String, String>>() {
                                 });
 
@@ -168,19 +210,26 @@ class Dat251ApplicationTests {
 
         @Test
         void testUserLogin() {
-                User user = createTestUser();
+
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test1111");
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
 
                 restTemplate.exchange(
                                 "/auth/register",
                                 HttpMethod.POST,
-                                new HttpEntity<>(user),
+                                new HttpEntity<>(notRegisteredUser),
                                 new ParameterizedTypeReference<Map<String, String>>() {
                                 });
 
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(
                                 "/auth/login",
                                 HttpMethod.POST,
-                                new HttpEntity<>(user),
+                                new HttpEntity<>(notRegisteredUser),
                                 new ParameterizedTypeReference<Map<String, String>>() {
                                 });
 
@@ -193,7 +242,14 @@ class Dat251ApplicationTests {
 
         @Test
         void testNotRegisteredUserLogin() {
-                User notRegisteredUser = createTestUser();
+
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test8887");
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
 
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(
                                 "/auth/login",
@@ -211,21 +267,28 @@ class Dat251ApplicationTests {
 
         @Test
         void testLoginWithWrongPassword() {
-                User user = createTestUser();
+
+                User notRegisteredUser = new User();
+                notRegisteredUser.setUsername("Test3458");
+                notRegisteredUser.setPassword("password123");
+                notRegisteredUser.setEmail("test@gmail.com");
+                notRegisteredUser.setFirstName("MyName");
+                notRegisteredUser.setLastName("MyLastName");
+                notRegisteredUser.setPoints(100);
 
                 restTemplate.exchange(
                                 "/auth/register",
                                 HttpMethod.POST,
-                                new HttpEntity<>(user),
+                                new HttpEntity<>(notRegisteredUser),
                                 new ParameterizedTypeReference<Map<String, String>>() {
                                 });
 
-                user.setPassword("newPassword123");
+                notRegisteredUser.setPassword("newPassword123");
 
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(
                                 "/auth/login",
                                 HttpMethod.POST,
-                                new HttpEntity<>(user),
+                                new HttpEntity<>(notRegisteredUser),
                                 new ParameterizedTypeReference<Map<String, String>>() {
                                 });
 
