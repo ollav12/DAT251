@@ -184,6 +184,9 @@ onMounted(() => {
             <p>{{ trip.origin }} to {{ trip.destination }}</p>
             <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
             <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
+            <p v-if="trip.vehicle">
+              {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
+            </p>
           </div>
           <div>
             <p>
