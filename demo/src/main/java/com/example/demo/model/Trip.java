@@ -38,20 +38,21 @@ public class Trip {
     @Embedded
     private MoneySaved moneySaved;
 
-    // TODO: we should store trip alternatives, only storing saved against worst alternative for now
+    // TODO: we should store trip alternatives, only storing saved against worst
+    // alternative for now
 
-    public Trip() {}
+    public Trip() {
+    }
 
     public Trip(
-        User user,
-        String origin,
-        String destination,
-        String travelMode,
-        double totalDistanceKm,
-        double totalDurationSeconds,
-        double totalEmissionsCO2eKg,
-        double savedEmissionsCO2eKg
-    ) {
+            User user,
+            String origin,
+            String destination,
+            String travelMode,
+            double totalDistanceKm,
+            double totalDurationSeconds,
+            double totalEmissionsCO2eKg,
+            double savedEmissionsCO2eKg) {
         this.user = user;
         this.origin = origin;
         this.destination = destination;
@@ -105,4 +106,45 @@ public class Trip {
     public MoneySaved getMoneySaved() {
         return this.moneySaved;
     }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public void setTravelMode(String travelMode) {
+        this.travelMode = travelMode;
+    }
+
+    public void setTotalDistanceKm(Double totalDistanceKm) {
+        this.totalDistanceKm = totalDistanceKm;
+    }
+
+    public void setTotalDurationSeconds(Double totalDurationSeconds) {
+        this.totalDurationSeconds = totalDurationSeconds;
+    }
+
+    public void setTotalEmissionsCO2eKg(Double totalEmissionsCO2eKg) {
+        this.totalEmissionsCO2eKg = totalEmissionsCO2eKg;
+    }
+
+    public void setSavedEmissionsCO2eKg(Double savedEmissionsCO2eKg) {
+        this.savedEmissionsCO2eKg = savedEmissionsCO2eKg;
+    }
+
+    public void setTransportationMode(TransportationMode transportationMode) {
+        this.transportationMode = transportationMode;
+    }
+
+    public void setMoneySaved(MoneySaved moneySaved) {
+        this.moneySaved = moneySaved;
+    }
+
 }

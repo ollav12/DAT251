@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 
+import com.example.demo.model.Trip;
 import com.example.demo.model.User;
+import com.example.demo.repository.TripRepository;
 import com.example.demo.repository.UserRepository;
 
 import org.springframework.http.HttpMethod;
@@ -41,6 +43,9 @@ class Dat251ApplicationTests {
 
         @Autowired
         private UserRepository userRepository;
+
+        @Autowired
+        private TripRepository tripRepository;
 
         private User createTestUser() {
                 User notRegisteredUser = new User();
@@ -296,6 +301,45 @@ class Dat251ApplicationTests {
                 Map<String, String> body = response.getBody();
                 assertNotNull(body);
                 assertEquals("Invalid password", body.get("error"));
+
+        }
+
+        @Test
+        void testGetUserEmission() {
+
+                User user = new User();
+                user.setUsername("Test332155");
+                user.setPassword("password123");
+                user.setEmail("user@gmail.com");
+                user.setFirstName("MyName");
+                user.setLastName("MyLastName");
+                user.setPoints(100);
+
+                Trip trip = new Trip();
+                trip.setUser(user);
+                trip.setOrigin("Inndalsveien, 5063 Bergen");
+                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
+                trip.setTotalDistanceKm(300.0);
+                trip.setTotalDurationSeconds(10800.0);
+                trip.setTotalEmissionsCO2eKg(10.0);
+                trip.setSavedEmissionsCO2eKg(0.0);
+
+                userRepository.saveAndFlush(user);
+                tripRepository.saveAndFlush(trip);
+
+                ResponseEntity<Double> response = restTemplate.getForEntity(
+                                "/users/" + user.getId() + "/emission",
+                                Double.class);
+
+                System.out.println("User ID: " + user.getId());
+                System.out.println("Response status: " + response.getStatusCode());
+                System.out.println("Response body: " + response.getBody());
+
+                assertEquals(HttpStatus.OK, response.getStatusCode());
+
+                Double userEmission = response.getBody();
+
+                assertEquals(10.0, userEmission);
 
         }
 
