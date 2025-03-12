@@ -10,7 +10,10 @@ import com.example.demo.repository.VehicleRepository;
 import com.google.maps.DirectionsApi;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
+import com.google.maps.PlaceAutocompleteRequest;
+import com.google.maps.PlacesApi;
 import com.google.maps.errors.ZeroResultsException;
+import com.google.maps.model.AutocompletePrediction;
 import com.google.maps.model.DirectionsLeg;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
@@ -18,9 +21,11 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -75,6 +80,14 @@ public class TransportService {
             0.0,
             0.0
         );
+    }
+
+    public List<String> getAddressAutocomplete(
+        String query,
+        UUID sessionToken
+    ) {
+        var results = this.getAddressAutocompleteResults(query, sessionToken);
+        return results;
     }
 
     public void addVehicle(
@@ -169,6 +182,7 @@ public class TransportService {
             origin,
             destination,
             mode,
+            vehicle,
             estimate.getDistanceKm(),
             estimate.getDuration().getSeconds(),
             estimate.getEmissionsCO2eKg(),
@@ -469,5 +483,45 @@ public class TransportService {
         }
 
         return result;
+    }
+
+    @Cacheable(value = "address", key = "#query")
+    private List<String> getAddressAutocompleteResults(
+        String query,
+        UUID sessionToken
+    ) {
+        GeoApiContext context = new GeoApiContext.Builder()
+            .apiKey(this.googleMapsApiKey)
+            .build();
+
+        PlaceAutocompleteRequest.SessionToken token =
+            new PlaceAutocompleteRequest.SessionToken(sessionToken);
+
+        PlaceAutocompleteRequest request = PlacesApi.placeAutocomplete(
+            context,
+            query,
+            token
+        );
+
+        AutocompletePrediction[] result = null;
+        try {
+            result = request.await();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(
+                "Failed to fetch address autocomplete",
+                e
+            );
+        } finally {
+            context.shutdown();
+        }
+
+        List<String> addresses = new ArrayList<>();
+        for (AutocompletePrediction prediction : result) {
+            // TODO: not sure if this is the optimal value to use
+            addresses.add(prediction.description);
+        }
+
+        return addresses;
     }
 }

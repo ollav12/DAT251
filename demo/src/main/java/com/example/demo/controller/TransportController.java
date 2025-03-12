@@ -8,6 +8,7 @@ import com.example.demo.service.TransportService.TripEstimateResults;
 import com.example.demo.service.UserService;
 import jakarta.websocket.server.PathParam;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,6 +43,18 @@ public class TransportController {
     public ResponseEntity<TransportService.Leaderboard> getLeaderboard() {
         var leaderboard = transportService.getLeaderboard();
         return ResponseEntity.ok().body(leaderboard);
+    }
+
+    @GetMapping("/addresses")
+    public ResponseEntity<List<String>> getAddressAutocomplete(
+        @RequestParam(value = "query") String query,
+        @RequestParam(value = "sessionToken") UUID sessionToken
+    ) {
+        List<String> addresses = transportService.getAddressAutocomplete(
+            query,
+            sessionToken
+        );
+        return ResponseEntity.ok().body(addresses);
     }
 
     @GetMapping(

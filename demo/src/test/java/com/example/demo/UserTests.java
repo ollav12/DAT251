@@ -33,7 +33,7 @@ import org.springframework.test.context.TestPropertySource;
                 "spring.jpa.hibernate.ddl-auto=create-drop",
 })
 
-class Dat251ApplicationTests {
+class UserTests {
 
         @Autowired
         private TestRestTemplate restTemplate;
