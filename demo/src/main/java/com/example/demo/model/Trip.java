@@ -1,7 +1,9 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,6 +19,7 @@ public class Trip {
     private long id;
 
     @ManyToOne
+    @JsonIgnore
     private User user;
 
     private String origin;
@@ -29,7 +32,8 @@ public class Trip {
     private Double totalEmissionsCO2eKg;
     private Double savedEmissionsCO2eKg;
 
-    // TODO: add vehicle
+    @ManyToOne
+    private Vehicle vehicle;
 
     // TODO: only storing travel mode string for now
     @ManyToOne
@@ -47,6 +51,7 @@ public class Trip {
         String origin,
         String destination,
         String travelMode,
+        Vehicle vehicle,
         double totalDistanceKm,
         double totalDurationSeconds,
         double totalEmissionsCO2eKg,
@@ -56,6 +61,7 @@ public class Trip {
         this.origin = origin;
         this.destination = destination;
         this.travelMode = travelMode;
+        this.vehicle = vehicle;
         this.totalDistanceKm = totalDistanceKm;
         this.totalDurationSeconds = totalDurationSeconds;
         this.totalEmissionsCO2eKg = totalEmissionsCO2eKg;
@@ -80,6 +86,10 @@ public class Trip {
 
     public String getTravelMode() {
         return travelMode;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 
     public Double getTotalDistanceKm() {

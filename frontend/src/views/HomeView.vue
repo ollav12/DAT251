@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { debounce } from 'lodash-es'
 import Transport from '../services/transport'
 import type { Statistics, Vehicle, Trip } from '../services/transport'
 
@@ -112,6 +113,33 @@ function formatDuration(seconds: number) {
   }
 }
 
+function generateUUID(): string {
+  if (crypto && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  throw new Error('UUID generation not supported')
+}
+
+// Used for address completion API
+const sessionToken = generateUUID()
+
+const originQuery = ref<string>('')
+const originOptions = ref<string[]>([])
+async function fetchOriginSuggestions() {
+  const data = await Transport.getAddressCompletion(originQuery.value, sessionToken)
+  console.log(data)
+  originOptions.value = data.map((location) => location)
+}
+const debouncedFetchOriginSuggestions = debounce(fetchOriginSuggestions, 300)
+
+const destinationQuery = ref<string>('')
+const destinationOptions = ref<string[]>([])
+async function fetchDestinationSuggestions() {
+  const data = await Transport.getAddressCompletion(destinationQuery.value, sessionToken)
+  destinationOptions.value = data.map((location) => location)
+}
+const debouncedFetchDestinationSuggestions = debounce(fetchDestinationSuggestions, 300)
+
 onMounted(() => {
   fetchStatistics()
   fetchTrips()
@@ -141,8 +169,38 @@ onMounted(() => {
     <section v-else class="add-trip">
       <h3>Add new trip</h3>
       <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
-        <input name="origin" placeholder="Origin" required />
-        <input name="destination" placeholder="Destination" required />
+        <label for="origin">Origin</label>
+        <input
+          name="origin"
+          placeholder="Origin"
+          list="origin-autocomplete"
+          v-model="originQuery"
+          @input="debouncedFetchOriginSuggestions"
+          required
+        />
+        <datalist id="origin-autocomplete">
+          <option
+            v-for="suggestion in originOptions"
+            :key="suggestion"
+            :value="suggestion"
+          ></option>
+        </datalist>
+        <label for="destination">Destination</label>
+        <input
+          name="destination"
+          placeholder="Destination"
+          list="destination-autocomplete"
+          v-model="destinationQuery"
+          @input="debouncedFetchDestinationSuggestions"
+          required
+        />
+        <datalist id="destination-autocomplete">
+          <option
+            v-for="suggestion in destinationOptions"
+            :key="suggestion"
+            :value="suggestion"
+          ></option>
+        </datalist>
 
         <div style="display: flex; align-items: center; gap: 10px">
           <input type="checkbox" id="useVehicle" v-model="useVehicle" />
@@ -184,6 +242,9 @@ onMounted(() => {
             <p>{{ trip.origin }} to {{ trip.destination }}</p>
             <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
             <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
+            <p v-if="trip.vehicle">
+              {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
+            </p>
           </div>
           <div>
             <p>
