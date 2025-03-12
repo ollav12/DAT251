@@ -37,15 +37,15 @@ public class Vehicle {
 
     private double emissionsCO2ePerKm;
 
-    public Vehicle() {}
+    public Vehicle() {
+    }
 
     public Vehicle(
-        String make,
-        String model,
-        int year,
-        VehicleType type,
-        double emissionsCO2ePerKm
-    ) {
+            String make,
+            String model,
+            int year,
+            VehicleType type,
+            double emissionsCO2ePerKm) {
         this.make = make;
         this.model = model;
         this.year = year;
