@@ -36,6 +36,18 @@ export type Trip = {
   savedEmissionsCO2eKg: number
 }
 
+// The UUID should be generated client side on load
+async function getAddressCompletion(query: string, sessionTokenUUID: string): Promise<string[]> {
+  try {
+    const url = `/transport/addresses?query=${query}&sessionToken=${sessionTokenUUID}`
+    const response = await request('GET', url)
+    return response
+  } catch (error) {
+    console.error('Error fetching address completion:', error)
+    throw error
+  }
+}
+
 type CreateTrip = {
   origin: string
   destination: string
@@ -123,6 +135,8 @@ async function deleteVehicle(id: Vehicle['id']) {
 
 export default {
   getStatistics,
+
+  getAddressCompletion,
 
   createTrip,
   listTrips,
