@@ -28,6 +28,7 @@ export type Trip = {
   origin: string
   destination: string
   distance: number
+  vehicle?: Vehicle
   travelMode: string
   totalDistanceKm: number
   totalDurationSeconds: number

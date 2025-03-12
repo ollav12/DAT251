@@ -169,6 +169,7 @@ public class TransportService {
             origin,
             destination,
             mode,
+            vehicle,
             estimate.getDistanceKm(),
             estimate.getDuration().getSeconds(),
             estimate.getEmissionsCO2eKg(),
