@@ -13,15 +13,28 @@ public class Challenge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long challengeID;
+    private String challengeTitle;
     private String description;
     private int rewardPoints;
     private int duration; // hours
 
-    public Challenge(long challengeID, String description, int rewardPoints, int duration) {
-        this.challengeID = challengeID;
+    public Challenge(String ChallengeTitle, String description, int rewardPoints, int duration) {
+        this.challengeTitle = ChallengeTitle;
         this.description = description;
         this.rewardPoints = rewardPoints;
         this.duration = duration;
+    }
+
+    public Challenge() {
+
+    }
+
+    public String getChallengeTitle() {
+        return challengeTitle;
+    }
+
+    public void setChallengeTitle(String challengeTitle) {
+        this.challengeTitle = challengeTitle;
     }
 
     public long getChallengeID() {

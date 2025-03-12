@@ -9,6 +9,7 @@ import java.util.Map;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpMethod;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
