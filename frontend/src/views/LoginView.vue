@@ -165,7 +165,7 @@ button {
 }
 
 .toggle-password:hover {
-  backgroudn-color: transparent;
+  background-color: transparent;
 }
 
 .eye-icon {
