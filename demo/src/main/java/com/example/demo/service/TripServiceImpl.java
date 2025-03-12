@@ -1,8 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Trip;
+import com.example.demo.model.User;
 import com.example.demo.repository.TripRepository;
+import com.example.demo.repository.UserRepository;
+
 import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,8 +15,11 @@ public class TripServiceImpl implements TripService {
 
     private final TripRepository tripRepository;
 
-    public TripServiceImpl(TripRepository tripRepository) {
+    private final UserRepository userRepository;
+
+    public TripServiceImpl(TripRepository tripRepository, UserRepository userRepository) {
         this.tripRepository = tripRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -29,6 +37,15 @@ public class TripServiceImpl implements TripService {
             return tripRepository.findById(id);
         } catch (Exception e) {
             throw new RuntimeException("Trip not found");
+        }
+    }
+
+    public Double getUserTotalEmission(long userId) {
+        try {
+            User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+            return tripRepository.sumTotalEmissionsByUser(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Trips not found");
         }
     }
 
