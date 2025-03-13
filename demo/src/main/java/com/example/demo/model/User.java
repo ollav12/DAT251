@@ -28,6 +28,10 @@ public class User {
 
     private String email;
     private String password;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean isAdmin;
+
     private int points;
 
     @OneToOne
@@ -77,6 +81,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
     public int getPoints() {

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
+import { getMe, type User } from './services/user'
 
 const router = useRouter()
 const route = useRoute()
@@ -10,11 +11,19 @@ const showLayout = computed(() => {
   return !route.meta.hideLayout
 })
 
+const user = ref<User>()
+
 onMounted(() => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
   if (!isLoggedIn) {
     router.push('/login')
   }
+
+  // TODO: things like admin role could be stored in a JWT
+  // That way we do not have to make a request every time.
+  getMe().then((data) => {
+    user.value = data
+  })
 })
 </script>
 
@@ -29,6 +38,7 @@ onMounted(() => {
     <RouterLink to="/vehicles">Vehicles</RouterLink>
     <RouterLink to="/leaderboard">Leaderboard</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
+    <RouterLink v-if="user?.admin" to="/admin">Admin</RouterLink>
   </nav>
 
   <RouterView />
