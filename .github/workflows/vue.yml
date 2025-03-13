@@ -14,8 +14,6 @@ jobs:
         with:
           node-version: "22"
       - run: npm ci
-        working-directory: frontend 
-      - run: npm install --save-dev @types/lodash-es
-        working-directory: frontend 
+        working-directory: frontend
       - run: npm run build
         working-directory: frontend
