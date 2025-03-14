@@ -28,22 +28,31 @@ public class User {
 
     private String email;
     private String password;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean isAdmin;
+
     private int points;
 
     @OneToOne
     @JoinColumn(name = "default_vehicle_id")
     private Vehicle defaultVehicle;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "owner",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<Vehicle> vehicles;
 
     public User(
-            String firstName,
-            String lastName,
-            String username,
-            String email,
-            String password,
-            int points) {
+        String firstName,
+        String lastName,
+        String username,
+        String email,
+        String password,
+        int points
+    ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -52,8 +61,7 @@ public class User {
         this.points = points;
     }
 
-    public User() {
-    }
+    public User() {}
 
     public String getFirstName() {
         return firstName;
@@ -73,6 +81,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
     public int getPoints() {
@@ -129,11 +141,23 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [id=" + id + ", firstName=" + firstName + ", lastName=" +
-                lastName + ", username=" + username
-                + ", email=" + email + ", password=" + password + ", points=" + points +
-                ", defaultVehicle="
-                + defaultVehicle;
+        return (
+            "User [id=" +
+            id +
+            ", firstName=" +
+            firstName +
+            ", lastName=" +
+            lastName +
+            ", username=" +
+            username +
+            ", email=" +
+            email +
+            ", password=" +
+            password +
+            ", points=" +
+            points +
+            ", defaultVehicle=" +
+            defaultVehicle
+        );
     }
-
 }

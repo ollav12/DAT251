@@ -147,7 +147,7 @@ export default {
   deleteVehicle,
 }
 
-async function request(method: string, url: string, body?: unknown) {
+export async function request(method: string, url: string, body?: unknown) {
   try {
     const response = await fetch(`${baseURL}${url}`, {
       method,
