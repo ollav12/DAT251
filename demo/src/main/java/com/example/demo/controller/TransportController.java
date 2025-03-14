@@ -9,6 +9,7 @@ import com.example.demo.service.UserService;
 import jakarta.websocket.server.PathParam;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,8 +41,11 @@ public class TransportController {
         value = "/leaderboard",
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<TransportService.Leaderboard> getLeaderboard() {
-        var leaderboard = transportService.getLeaderboard();
+    public ResponseEntity<TransportService.Leaderboard> getLeaderboard(
+        @Param("metric") TransportService.LeaderboardMetric metric,
+        @Param("period") TransportService.LeaderboardPeriod period
+    ) {
+        var leaderboard = transportService.getLeaderboard(metric, period);
         return ResponseEntity.ok().body(leaderboard);
     }
 
