@@ -10,19 +10,20 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
-    public record LeaderboardRow(
-        String username,
-        String firstName,
-        String lastName,
-        double totalEmissions
-    ) {}
+    // User findById(long id);
 
-    @Query(
-        "SELECT new com.example.demo.repository.UserRepository$LeaderboardRow(u.username, u.firstName, u.lastName, SUM(t.totalEmissionsCO2eKg) AS totalEmissions) " +
-        "FROM User u " +
-        "JOIN Trip t ON t.user = u " +
-        "GROUP BY u.username, u.firstName, u.lastName " +
-        "ORDER BY totalEmissions ASC"
-    )
+    public record LeaderboardRow(
+            String username,
+            String firstName,
+            String lastName,
+            double totalEmissions) {
+    }
+
+    @Query("SELECT new com.example.demo.repository.UserRepository$LeaderboardRow(u.username, u.firstName, u.lastName, SUM(t.totalEmissionsCO2eKg) AS totalEmissions) "
+            +
+            "FROM User u " +
+            "JOIN Trip t ON t.user = u " +
+            "GROUP BY u.username, u.firstName, u.lastName " +
+            "ORDER BY totalEmissions ASC")
     List<LeaderboardRow> getLeaderboard();
 }

@@ -43,6 +43,8 @@ public class TripServiceImpl implements TripService {
     public Double getUserTotalEmission(long userId) {
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+            // NoSuchElementException("User not
+            // found"));
             return tripRepository.sumTotalEmissionsByUser(user);
         } catch (Exception e) {
             throw new RuntimeException("Trips not found");

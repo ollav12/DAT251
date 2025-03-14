@@ -15,9 +15,8 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserServiceImpl(
-        UserRepository userRepository,
-        BCryptPasswordEncoder bCryptPasswordEncoder
-    ) {
+            UserRepository userRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -51,23 +50,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(long id) {
         return userRepository
-            .findById(id)
-            .orElseThrow(() ->
-                new NoSuchElementException(
-                    "User with id: " + id + " was not found"
-                )
-            );
+                .findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "User with id: " + id + " was not found"));
     }
 
     @Override
     public String deleteUser(long id) {
         User user = userRepository
-            .findById(id)
-            .orElseThrow(() ->
-                new NoSuchElementException(
-                    "User with id: " + id + " was not found"
-                )
-            );
+                .findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "User with id: " + id + " was not found"));
         userRepository.delete(user);
         return "User with id: " + id + " was successfully deleted";
     }
@@ -75,12 +68,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public String updateUser(User updatedUser, long id) {
         User exsistingUser = userRepository
-            .findById(id)
-            .orElseThrow(() ->
-                new NoSuchElementException(
-                    "User with id: " + id + " was not found"
-                )
-            );
+                .findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "User with id: " + id + " was not found"));
 
         exsistingUser.setEmail(updatedUser.getEmail());
         exsistingUser.setFirstName(updatedUser.getFirstName());
@@ -88,15 +78,11 @@ public class UserServiceImpl implements UserService {
         exsistingUser.setPoints(updatedUser.getPoints());
         exsistingUser.setUsername(updatedUser.getUsername());
 
-        if (
-            !bCryptPasswordEncoder.matches(
+        if (!bCryptPasswordEncoder.matches(
                 updatedUser.getPassword(),
-                exsistingUser.getPassword()
-            )
-        ) {
+                exsistingUser.getPassword())) {
             exsistingUser.setPassword(
-                bCryptPasswordEncoder.encode(updatedUser.getPassword())
-            );
+                    bCryptPasswordEncoder.encode(updatedUser.getPassword()));
         }
 
         userRepository.save(exsistingUser);

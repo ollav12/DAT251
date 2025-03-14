@@ -18,8 +18,8 @@ public class Challenge {
     private int rewardPoints;
     private int duration; // hours
 
-    public Challenge(String ChallengeTitle, String description, int rewardPoints, int duration) {
-        this.challengeTitle = ChallengeTitle;
+    public Challenge(String challengeTitle, String description, int rewardPoints, int duration) {
+        this.challengeTitle = challengeTitle;
         this.description = description;
         this.rewardPoints = rewardPoints;
         this.duration = duration;

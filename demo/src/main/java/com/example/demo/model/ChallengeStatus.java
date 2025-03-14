@@ -13,17 +13,14 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "completed_challenge")
-public class UserChallenge {
+@Table(name = "challenge_status")
+public class ChallengeStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long challengeID;
+    private long challengeStatusId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    private long userID;
     @ManyToOne
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;
@@ -40,22 +37,22 @@ public class UserChallenge {
         COMPLETED
     }
 
-    public UserChallenge(User user, Challenge challenge) {
-        this.user = user;
+    public ChallengeStatus(long userID, Challenge challenge) {
+        this.userID = userID;
         this.challenge = challenge;
         this.status = Status.NOT_STARTED;
     }
 
-    public UserChallenge() {
+    public ChallengeStatus() {
 
     }
 
-    public User getUser() {
-        return user;
+    public long getUserID() {
+        return userID;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(long userID) {
+        this.userID = userID;
     }
 
     public Challenge getChallenge() {
@@ -88,5 +85,13 @@ public class UserChallenge {
 
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public long getChallengeStatusId() {
+        return challengeStatusId;
+    }
+
+    public void setChallengeStatusId(long challengeStatusId) {
+        this.challengeStatusId = challengeStatusId;
     }
 }
