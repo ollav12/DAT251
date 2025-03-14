@@ -53,4 +53,18 @@ public class TripServiceImpl implements TripService {
         // TODO: filter trips by user
         return tripRepository.findAll();
     }
+
+    public List<Trip> getAllTripsByUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+        return tripRepository.findAllTripsByUser(user);
+    }
+
+    public void deleteUserEmissions(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+        tripRepository.deleteUserTrip(user);
+    }
 }
+
+
+
+

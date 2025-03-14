@@ -24,6 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.List;
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = {
                 "spring.datasource.url=jdbc:h2:mem:testdb",
@@ -341,6 +344,46 @@ class UserTests {
                 Double userEmission = response.getBody();
 
                 assertEquals(10.0, userEmission);
+
+        }
+
+
+        @Test
+        void testDeleteUserEmission() {
+
+                User user = new User();
+                user.setUsername("Test332156");
+                user.setPassword("password123");
+                user.setEmail("user@gmail.com");
+                user.setFirstName("MyName");
+                user.setLastName("MyLastName");
+                user.setPoints(100);
+
+                Trip trip = new Trip();
+                trip.setUser(user);
+                trip.setOrigin("Inndalsveien, 5063 Bergen");
+                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
+                trip.setTotalDistanceKm(300.0);
+                trip.setTotalDurationSeconds(10800.0);
+                trip.setTotalEmissionsCO2eKg(10.0);
+                trip.setSavedEmissionsCO2eKg(0.0);
+
+
+
+                userRepository.saveAndFlush(user);
+                tripRepository.saveAndFlush(trip);
+
+                restTemplate.delete("/users/" + user.getId() + "/emission");
+                ResponseEntity<List<Trip>> getResponse = restTemplate.exchange(
+                        "/users/" + user.getId() + "/trips",
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<List<Trip>>() {});
+
+                List<Trip> trips = getResponse.getBody();
+                assertEquals(HttpStatus.OK, getResponse.getStatusCode());
+                assertEquals(0, trips.size());
+
 
         }
 
