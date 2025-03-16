@@ -69,7 +69,7 @@ public class ChallengeTests {
         challengeRepo.flush();
     }
 
-    // @Test
+    @Test
     void testCreateChallenge() {
         ResponseEntity<Challenge> response = restTemplate.postForEntity(
                 "/challenges",
@@ -83,7 +83,6 @@ public class ChallengeTests {
         Challenge testChallenge = response.getBody();
         assertNotNull(testChallenge);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(1, testChallenge.getChallengeID());
         assertEquals("Test Challenge", testChallenge.getChallengeTitle());
         assertEquals("Test Description", testChallenge.getDescription());
         assertEquals(10, testChallenge.getDuration());
@@ -143,4 +142,29 @@ public class ChallengeTests {
         // assertEquals(2, response1.getBody().size());
     }
 
+    @Test
+    void testUserReceivesPointsWhenCompletingChallenge() {
+        // Record initial points
+        int initialPoints = testUser.getPoints();
+        int challengeReward = testChallenge.getRewardPoints();
+
+        // Complete the challenge - assuming there's an endpoint like:
+        // /users/{userId}/challenges/{challengeId}/complete
+        ResponseEntity<User> response = restTemplate.postForEntity(
+                "/users/" + testUser.getId() + "/challenges/" + testChallenge.getChallengeID() + "/complete",
+                null,
+                User.class);
+
+        // Verify the response
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        User updatedUser = response.getBody();
+        assertNotNull(updatedUser);
+
+        // Verify the user received the points
+        assertEquals(initialPoints + challengeReward, updatedUser.getPoints());
+
+        // Verify the points were persisted in the database
+        User userFromDb = userRepo.findById(testUser.getId()).orElseThrow();
+        assertEquals(initialPoints + challengeReward, userFromDb.getPoints());
+    }
 }

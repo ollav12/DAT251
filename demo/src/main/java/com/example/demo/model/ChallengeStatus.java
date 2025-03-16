@@ -33,7 +33,7 @@ public class ChallengeStatus {
 
     public enum Status {
         NOT_STARTED,
-        STARTED,
+        IN_PROGRESS,
         COMPLETED
     }
 
