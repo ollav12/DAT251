@@ -17,6 +17,13 @@ public class AuthController {
         this.userService = userService;
     }
 
+    public record LoginResponse(
+            Long userId,
+            String message,
+            String equippedBorder,
+            String equippedProfilePicture
+    ) {}
+
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(
         @RequestBody User user
@@ -30,10 +37,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
-            userService.loginUser(user.getUsername(), user.getPassword());
-            return ResponseEntity.ok(
-                Map.of("message", "User logged in successfully")
-            );
+            User loggedInUser = userService.loginUser(user.getUsername(), user.getPassword());
+            return ResponseEntity.ok(new LoginResponse(
+                    loggedInUser.getId(),
+                    "User logged in successfully",
+                    loggedInUser.getEquippedBorder() != null ? loggedInUser.getEquippedBorder().getImage() : "",
+                    loggedInUser.getEquippedProfilePicture() != null ? loggedInUser.getEquippedProfilePicture().getImage() : ""
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
                 Map.of("error", e.getMessage())

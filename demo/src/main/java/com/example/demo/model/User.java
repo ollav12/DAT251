@@ -1,16 +1,10 @@
 package com.example.demo.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -45,6 +39,22 @@ public class User {
     )
     private List<Vehicle> vehicles;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_cosmetics",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
+    )
+    private Set<Cosmetics> ownedCosmetics = new HashSet<>();
+
+    @OneToOne
+    @JoinColumn(name = "equipped_border_id")
+    private Cosmetics equippedBorder;
+
+    @OneToOne
+    @JoinColumn(name = "equipped_profile_picture_id")
+    private Cosmetics equippedProfilePicture;
+
     public User(
         String firstName,
         String lastName,
@@ -59,6 +69,9 @@ public class User {
         this.email = email;
         this.password = password;
         this.points = points;
+        this.ownedCosmetics = new HashSet<>();
+        this.equippedBorder = null;
+        this.equippedProfilePicture = null;
     }
 
     public User() {}
@@ -137,6 +150,30 @@ public class User {
 
     public void setVehicles(List<Vehicle> vehicles) {
         this.vehicles = vehicles;
+    }
+
+    public Set<Cosmetics> getOwnedCosmetics() {
+        return ownedCosmetics;
+    }
+
+    public void setOwnedCosmetics(Set<Cosmetics> ownedCosmetics) {
+        this.ownedCosmetics = ownedCosmetics;
+    }
+
+    public Cosmetics getEquippedBorder() {
+        return equippedBorder;
+    }
+
+    public void setEquippedBorder(Cosmetics equippedBorder) {
+        this.equippedBorder = equippedBorder;
+    }
+
+    public Cosmetics getEquippedProfilePicture() {
+        return equippedProfilePicture;
+    }
+
+    public void setEquippedProfilePicture(Cosmetics equippedProfilePicture) {
+        this.equippedProfilePicture = equippedProfilePicture;
     }
 
     @Override
