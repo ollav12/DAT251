@@ -2,6 +2,7 @@
 import { useRouter } from "vue-router";
 import eye from "@/assets/eye.svg";
 import eyeOff from "@/assets/eye-off.svg";
+import { useCosmeticsStore } from '@/composables/useCosmeticsStore';
 
 export default {
   data() {
@@ -17,7 +18,8 @@ export default {
 
   setup() {
     const router = useRouter();
-    return { router };
+    const { updateEquippedBorder, updateEquippedProfilePicture } = useCosmeticsStore();
+    return { router, updateEquippedBorder, updateEquippedProfilePicture };
   },
 
   methods: {
@@ -44,6 +46,17 @@ export default {
           this.error = data.error;
           throw new Error(data.error);
         } else {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userId', data.userId);
+
+          // Save equipped cosmetics
+          if (data.equippedBorder) {
+            this.updateEquippedBorder(data.equippedBorder);
+          }
+
+          if (data.equippedProfilePicture) {
+            this.updateEquippedProfilePicture(data.equippedProfilePicture);
+          }
           // Redirect directly after successful login
           await this.router.push({name: 'home'});
         }
