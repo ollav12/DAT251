@@ -43,8 +43,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
             userService.loginUser(user.getUsername(), user.getPassword());
-            return ResponseEntity.ok(
-                    Map.of("message", "User logged in successfully"));
+            return ResponseEntity.ok(user.getId());
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
                     Map.of("error", e.getMessage()));

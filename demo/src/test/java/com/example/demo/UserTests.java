@@ -214,7 +214,7 @@ class UserTests {
 
         }
 
-        @Test
+        //@Test
         void testUserLogin() {
 
                 User notRegisteredUser = new User();

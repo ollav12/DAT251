@@ -45,6 +45,8 @@ export default {
           throw new Error(data.error);
         } else {
           // Redirect directly after successful login
+          console.log(data)
+          //localStorage.setItem("userId", data);
           await this.router.push({name: 'home'});
         }
         console.log('Login success:', data.message);

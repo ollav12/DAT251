@@ -16,5 +16,5 @@ public interface ChallengeStatusRepository extends JpaRepository<ChallengeStatus
 
     List<ChallengeStatus> findByUserIDAndStatus(long userID, ChallengeStatus.Status status);
 
-    Optional<ChallengeStatus> findByUserAndChallenge(User user, Challenge challenge);
+    //Optional<ChallengeStatus> findByUserAndChallenge(User user, Challenge challenge);
 }

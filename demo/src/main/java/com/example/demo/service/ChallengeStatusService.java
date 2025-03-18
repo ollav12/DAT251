@@ -46,7 +46,7 @@ public class ChallengeStatusService {
     }
 
     public List<ChallengeStatus> getStartedChallenges(long userID) {
-        return challengeStatusRepo.findByUserIDAndStatus(userID, ChallengeStatus.Status.STARTED);
+        return challengeStatusRepo.findByUserIDAndStatus(userID, ChallengeStatus.Status.IN_PROGRESS);
     }
 
     public List<ChallengeStatus> getNotStartedChallenges(long userID) {
