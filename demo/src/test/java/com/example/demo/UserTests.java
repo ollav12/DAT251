@@ -11,6 +11,7 @@ import com.example.demo.model.User;
 import com.example.demo.repository.TripRepository;
 import com.example.demo.repository.UserRepository;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpMethod;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,7 @@ class UserTests {
         @Autowired
         private TripRepository tripRepository;
 
+
         private User createTestUser() {
                 User notRegisteredUser = new User();
                 notRegisteredUser.setUsername("Test");
@@ -62,16 +64,19 @@ class UserTests {
                 return notRegisteredUser;
         }
 
-        private User createTestUser2() {
-                User notRegisteredUser = new User();
-                notRegisteredUser.setUsername("Test2"); // new username
-                notRegisteredUser.setPassword("password123");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(200); // +100 points
-                return notRegisteredUser;
+        private Trip createTestTrip(User user) {
+                Trip trip = new Trip();
+                trip.setUser(user);
+                trip.setOrigin("Inndalsveien, 5063 Bergen");
+                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
+                trip.setTotalDistanceKm(300.0);
+                trip.setTotalDurationSeconds(10800.0);
+                trip.setTotalEmissionsCO2eKg(10.0);
+                trip.setSavedEmissionsCO2eKg(0.0);
+                return trip;
+
         }
+
 
         @Test
         void contextLoads() {
@@ -81,6 +86,7 @@ class UserTests {
         void testCreatingUser() throws InterruptedException {
 
                 User notRegisteredUser = createTestUser();
+                notRegisteredUser.setUsername("Test");
 
                 ResponseEntity<User> response = restTemplate.postForEntity(
                                 "/users",
@@ -101,13 +107,9 @@ class UserTests {
         @Test
         void testRetrievingUser() {
 
-                User user = new User();
+                User user = createTestUser();
                 user.setUsername("Test8969988");
-                user.setPassword("password123");
-                user.setEmail("test@gmail.com");
-                user.setFirstName("MyName");
-                user.setLastName("MyLastName");
-                user.setPoints(100);
+
 
                 userRepository.saveAndFlush(user);
 
@@ -123,13 +125,12 @@ class UserTests {
 
         @Test
         void testDeletingUser() {
-                User notRegisteredUser = new User();
+
+
+
+                User notRegisteredUser = createTestUser();
                 notRegisteredUser.setUsername("Test7653333");
-                notRegisteredUser.setPassword("password1234");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(100);
+
 
                 userRepository.saveAndFlush(notRegisteredUser);
 
@@ -149,27 +150,14 @@ class UserTests {
         @Test
         void testUpdatingUser() {
 
-                User notRegisteredUser = new User();
+                User notRegisteredUser = createTestUser();
                 notRegisteredUser.setUsername("Test999");
-                notRegisteredUser.setPassword("password123");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(100);
 
-                User user2 = createTestUser2();
+                User user2 = createTestUser();
+                user2.setUsername("Test2");
+                user2.setPoints(200);
 
                 userRepository.saveAndFlush(notRegisteredUser);
-
-                /*
-                 * ResponseEntity<User> response = restTemplate.postForEntity(
-                 * "/users",
-                 * notRegisteredUser,
-                 * User.class);
-                 * User registeredUser = response.getBody();
-                 * assertNotNull(registeredUser);
-                 * assertEquals(HttpStatus.CREATED, response.getStatusCode());
-                 */
 
                 // Executes the PUT updateUser method
                 restTemplate.put("/users/" + notRegisteredUser.getId(), user2);
@@ -195,20 +183,16 @@ class UserTests {
         @Test
         void testUserRegistration() {
 
-                User notRegisteredUser = new User();
+                User notRegisteredUser = createTestUser();
                 notRegisteredUser.setUsername("Test888");
-                notRegisteredUser.setPassword("password123");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(100);
+
 
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(
                                 "/auth/register",
                                 HttpMethod.POST,
                                 new HttpEntity<>(notRegisteredUser),
-                                new ParameterizedTypeReference<Map<String, String>>() {
-                                });
+                        new ParameterizedTypeReference<>() {
+                        });
 
                 assertEquals(HttpStatus.OK, response.getStatusCode());
                 Map<String, String> body = response.getBody();
@@ -220,13 +204,9 @@ class UserTests {
         @Test
         void testUserLogin() {
 
-                User notRegisteredUser = new User();
+                User notRegisteredUser = createTestUser();
                 notRegisteredUser.setUsername("Test1111");
-                notRegisteredUser.setPassword("password123");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(100);
+
 
                 restTemplate.exchange(
                                 "/auth/register",
@@ -239,8 +219,8 @@ class UserTests {
                                 "/auth/login",
                                 HttpMethod.POST,
                                 new HttpEntity<>(notRegisteredUser),
-                                new ParameterizedTypeReference<Map<String, String>>() {
-                                });
+                        new ParameterizedTypeReference<>() {
+                        });
 
                 assertEquals(HttpStatus.OK, response.getStatusCode());
                 Map<String, String> body = response.getBody();
@@ -252,20 +232,16 @@ class UserTests {
         @Test
         void testNotRegisteredUserLogin() {
 
-                User notRegisteredUser = new User();
+                User notRegisteredUser = createTestUser();
                 notRegisteredUser.setUsername("Test8887");
-                notRegisteredUser.setPassword("password123");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(100);
+
 
                 ResponseEntity<Map<String, String>> response = restTemplate.exchange(
                                 "/auth/login",
                                 HttpMethod.POST,
                                 new HttpEntity<>(notRegisteredUser),
-                                new ParameterizedTypeReference<Map<String, String>>() {
-                                });
+                        new ParameterizedTypeReference<>() {
+                        });
 
                 assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
                 Map<String, String> body = response.getBody();
@@ -277,13 +253,9 @@ class UserTests {
         @Test
         void testLoginWithWrongPassword() {
 
-                User notRegisteredUser = new User();
+                User notRegisteredUser = createTestUser();
                 notRegisteredUser.setUsername("Test3458");
-                notRegisteredUser.setPassword("password123");
-                notRegisteredUser.setEmail("test@gmail.com");
-                notRegisteredUser.setFirstName("MyName");
-                notRegisteredUser.setLastName("MyLastName");
-                notRegisteredUser.setPoints(100);
+
 
                 restTemplate.exchange(
                                 "/auth/register",
@@ -298,8 +270,8 @@ class UserTests {
                                 "/auth/login",
                                 HttpMethod.POST,
                                 new HttpEntity<>(notRegisteredUser),
-                                new ParameterizedTypeReference<Map<String, String>>() {
-                                });
+                        new ParameterizedTypeReference<>() {
+                        });
 
                 assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
                 Map<String, String> body = response.getBody();
@@ -311,22 +283,11 @@ class UserTests {
         @Test
         void testGetUserEmission() {
 
-                User user = new User();
+                User user = createTestUser();
                 user.setUsername("Test332155");
-                user.setPassword("password123");
-                user.setEmail("user@gmail.com");
-                user.setFirstName("MyName");
-                user.setLastName("MyLastName");
-                user.setPoints(100);
 
-                Trip trip = new Trip();
-                trip.setUser(user);
-                trip.setOrigin("Inndalsveien, 5063 Bergen");
-                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
-                trip.setTotalDistanceKm(300.0);
-                trip.setTotalDurationSeconds(10800.0);
-                trip.setTotalEmissionsCO2eKg(10.0);
-                trip.setSavedEmissionsCO2eKg(0.0);
+
+                Trip trip = createTestTrip(user);
 
                 userRepository.saveAndFlush(user);
                 tripRepository.saveAndFlush(trip);
@@ -351,23 +312,10 @@ class UserTests {
         @Test
         void testDeleteUserEmission() {
 
-                User user = new User();
+                User user = createTestUser();
                 user.setUsername("Test332156");
-                user.setPassword("password123");
-                user.setEmail("user@gmail.com");
-                user.setFirstName("MyName");
-                user.setLastName("MyLastName");
-                user.setPoints(100);
 
-                Trip trip = new Trip();
-                trip.setUser(user);
-                trip.setOrigin("Inndalsveien, 5063 Bergen");
-                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
-                trip.setTotalDistanceKm(300.0);
-                trip.setTotalDurationSeconds(10800.0);
-                trip.setTotalEmissionsCO2eKg(10.0);
-                trip.setSavedEmissionsCO2eKg(0.0);
-
+                Trip trip = createTestTrip(user);
 
 
                 userRepository.saveAndFlush(user);
@@ -387,31 +335,14 @@ class UserTests {
 
         @Test
         void testUpdateUserTrip() {
-                User user = new User();
+                User user = createTestUser();
                 user.setUsername("Test432156");
-                user.setPassword("password123");
-                user.setEmail("user@gmail.com");
-                user.setFirstName("MyName");
-                user.setLastName("MyLastName");
-                user.setPoints(100);
 
-                Trip trip = new Trip();
-                trip.setUser(user);
-                trip.setOrigin("Inndalsveien, 5063 Bergen");
-                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
-                trip.setTotalDistanceKm(300.0);
-                trip.setTotalDurationSeconds(10800.0);
-                trip.setTotalEmissionsCO2eKg(10.0);
-                trip.setSavedEmissionsCO2eKg(0.0);
 
-                Trip updatedTrip = new Trip();
-                updatedTrip.setUser(user);
-                updatedTrip.setOrigin("Inndalsveien, 5063 Bergen");
-                updatedTrip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
-                updatedTrip.setTotalDistanceKm(300.0);
-                updatedTrip.setTotalDurationSeconds(10800.0);
+                Trip trip = createTestTrip(user);
+
+                Trip updatedTrip = createTestTrip(user);
                 updatedTrip.setTotalEmissionsCO2eKg(20.0); // +10 kg
-                updatedTrip.setSavedEmissionsCO2eKg(0.0);
 
                 userRepository.saveAndFlush(user);
                 tripRepository.saveAndFlush(trip);
@@ -426,8 +357,6 @@ class UserTests {
                 Trip updatedTripResponse = getResponse.getBody();
                 assertNotNull(updatedTripResponse);
                 assertEquals(20.0, updatedTripResponse.getTotalEmissionsCO2eKg());
-
-
 
         }
 
