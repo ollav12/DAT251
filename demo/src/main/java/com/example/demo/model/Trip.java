@@ -157,4 +157,7 @@ public class Trip {
         this.moneySaved = moneySaved;
     }
 
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
 }

@@ -383,6 +383,50 @@ class UserTests {
                 List<Trip> trips = getResponse.getBody();
                 assertEquals(HttpStatus.OK, getResponse.getStatusCode());
                 assertEquals(0, trips.size());
+        }
+
+        @Test
+        void testUpdateUserTrip() {
+                User user = new User();
+                user.setUsername("Test432156");
+                user.setPassword("password123");
+                user.setEmail("user@gmail.com");
+                user.setFirstName("MyName");
+                user.setLastName("MyLastName");
+                user.setPoints(100);
+
+                Trip trip = new Trip();
+                trip.setUser(user);
+                trip.setOrigin("Inndalsveien, 5063 Bergen");
+                trip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
+                trip.setTotalDistanceKm(300.0);
+                trip.setTotalDurationSeconds(10800.0);
+                trip.setTotalEmissionsCO2eKg(10.0);
+                trip.setSavedEmissionsCO2eKg(0.0);
+
+                Trip updatedTrip = new Trip();
+                updatedTrip.setUser(user);
+                updatedTrip.setOrigin("Inndalsveien, 5063 Bergen");
+                updatedTrip.setDestination("Høyteknologisenteret - Universitetet i Bergen, Thormøhlens Gate 55, 5006 Bergen");
+                updatedTrip.setTotalDistanceKm(300.0);
+                updatedTrip.setTotalDurationSeconds(10800.0);
+                updatedTrip.setTotalEmissionsCO2eKg(20.0); // +10 kg
+                updatedTrip.setSavedEmissionsCO2eKg(0.0);
+
+                userRepository.saveAndFlush(user);
+                tripRepository.saveAndFlush(trip);
+
+                restTemplate.put("/trips/" + trip.getId(), updatedTrip);
+
+                ResponseEntity<Trip> getResponse = restTemplate.getForEntity(
+                        "/trips/" + trip.getId(),
+                        Trip.class);
+
+                assertEquals(HttpStatus.OK, getResponse.getStatusCode());
+                Trip updatedTripResponse = getResponse.getBody();
+                assertNotNull(updatedTripResponse);
+                assertEquals(20.0, updatedTripResponse.getTotalEmissionsCO2eKg());
+
 
 
         }

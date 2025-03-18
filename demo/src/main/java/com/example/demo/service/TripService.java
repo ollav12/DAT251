@@ -17,4 +17,6 @@ public interface TripService {
     List<Trip> getAllTripsByUser(Long userId);
 
     void deleteUserEmissions(long userId);
+
+    Trip updateTrip(Long tripId, Trip trip);
 }
