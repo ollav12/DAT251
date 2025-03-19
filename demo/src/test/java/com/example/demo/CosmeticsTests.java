@@ -168,19 +168,26 @@ public class CosmeticsTests {
         User newUser = userRepo.findByUsername("newuser123");
         assertNotNull(newUser);
 
-        // Check equipped border and profile icon
-        assertEquals(2, newUser.getEquippedBorder().getId());
-        assertEquals(1, newUser.getEquippedProfilePicture().getId());
+        // Find default cosmetics by name instead of assuming IDs
+        Cosmetics defaultFireBorder = cosmeticsRepo.findByName("Default Fire border");
+        Cosmetics defaultProfilePic = cosmeticsRepo.findByName("Default Profile Picture");
 
-        // Equip a new border
+        // Check equipped border and profile icon
+        assertEquals(defaultFireBorder.getId(), newUser.getEquippedBorder().getId());
+        assertEquals(defaultProfilePic.getId(), newUser.getEquippedProfilePicture().getId());
+
+        // Find cosmetics to equip by name
+        Cosmetics elitePlantBorder = cosmeticsRepo.findByName("Elite Plant Border");
+        Cosmetics giraffePicture = cosmeticsRepo.findByName("Giraffe Profile Picture");
+
+        // Equip new cosmetics
         restTemplate.put(
-                "/cosmetics/equip/8?userId=" + newUser.getId(),
+                "/cosmetics/equip/" + elitePlantBorder.getId() + "?userId=" + newUser.getId(),
                 null
         );
 
-        // Equip a new profile icon
         restTemplate.put(
-                "/cosmetics/equip/6?userId=" + newUser.getId(),
+                "/cosmetics/equip/" + giraffePicture.getId() + "?userId=" + newUser.getId(),
                 null
         );
 
@@ -188,7 +195,7 @@ public class CosmeticsTests {
         newUser = userRepo.findByUsername("newuser123");
 
         // Check equipped border and profile icon
-        assertEquals(8, newUser.getEquippedBorder().getId());
-        assertEquals(6, newUser.getEquippedProfilePicture().getId());
+        assertEquals(elitePlantBorder.getId(), newUser.getEquippedBorder().getId());
+        assertEquals(giraffePicture.getId(), newUser.getEquippedProfilePicture().getId());
     }
 }
