@@ -4,6 +4,8 @@ import com.example.demo.model.Cosmetics;
 import com.example.demo.repository.CosmeticsRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,10 +20,10 @@ public class CosmeticsService {
     }
 
     public List<Cosmetics> getInventory(Long userId) {
-        return cosmeticsRepository.findInventoryByUserId(userId);
-        /*return new ArrayList<>(userRepository.findById(userId)
+        //return cosmeticsRepository.findInventoryByUserId(userId);
+        return new ArrayList<>(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"))
-                .getOwnedCosmetics());*/
+                .getOwnedCosmetics());
     }
 
     public List<Cosmetics> getShop() { return cosmeticsRepository.getAll(); }

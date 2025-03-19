@@ -59,4 +59,16 @@ public class Cosmetics {
 
     public CosmeticsType getCategory() { return category; }
     public void setCategory(CosmeticsType category) { this.category = category; }
+
+    @Override
+    public String toString() {
+        return "Cosmetics{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price='" + price + '\'' +
+                ", description='" + description + '\'' +
+                ", image='" + image + '\'' +
+                ", category=" + category +
+                '}';
+    }
 }
