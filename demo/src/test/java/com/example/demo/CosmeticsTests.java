@@ -102,7 +102,7 @@ public class CosmeticsTests {
     }
 
     /**
-     * The shop is successfully instantiated and returned
+     * The shop is successfully instantiated and contains all available cosmetics
      */
     @Test
     void testGetShop() {
@@ -125,17 +125,70 @@ public class CosmeticsTests {
      * User can purchase cosmetics and they appear in their inventory
      */
     @Test
-    @Disabled("Not implemented yet")
     void testPurchaseCosmetics() {
-        throw new UnsupportedOperationException("Not implemented");
+        User newUser = userRepo.findByUsername("newuser123");
+        assertNotNull(newUser);
+
+        // Check the number of items in inventory before purchase
+        var inventoryResponse = restTemplate.getForEntity(
+                "/cosmetics/inventory?userId=" + newUser.getId(),
+                Cosmetics[].class
+        );
+        var cosmetics = inventoryResponse.getBody();
+        assertNotNull(cosmetics);
+        assertEquals(3, cosmetics.length);
+
+        // Purchase a new cosmetic
+        var purchaseRequest = new HashMap<String, String>();
+        purchaseRequest.put("name", "Lion Profile Picture");
+        var purchaseResponse = restTemplate.postForEntity(
+                "/cosmetics/purchaseCosmetics?userId=" + newUser.getId() + "&name=" + purchaseRequest.get("name"),
+                purchaseRequest,
+                Cosmetics.class
+        );
+
+        // Check that the purchase was successful
+        assertEquals(200, purchaseResponse.getStatusCodeValue());
+
+        // Check the number of items in inventory after purchase
+        inventoryResponse = restTemplate.getForEntity(
+                "/cosmetics/inventory?userId=" + newUser.getId(),
+                Cosmetics[].class
+        );
+        cosmetics = inventoryResponse.getBody();
+        assertNotNull(cosmetics);
+        assertEquals(4, cosmetics.length);
     }
 
     /**
      * User can equip cosmetics and their profile is updated
      */
     @Test
-    @Disabled("Not implemented yet")
     void testEquipCosmetics() {
-        throw new UnsupportedOperationException("Not implemented");
+        User newUser = userRepo.findByUsername("newuser123");
+        assertNotNull(newUser);
+
+        // Check equipped border and profile icon
+        assertEquals(2, newUser.getEquippedBorder().getId());
+        assertEquals(1, newUser.getEquippedProfilePicture().getId());
+
+        // Equip a new border
+        restTemplate.put(
+                "/cosmetics/equip/8?userId=" + newUser.getId(),
+                null
+        );
+
+        // Equip a new profile icon
+        restTemplate.put(
+                "/cosmetics/equip/6?userId=" + newUser.getId(),
+                null
+        );
+
+        // Check that the user's profile has been updated
+        newUser = userRepo.findByUsername("newuser123");
+
+        // Check equipped border and profile icon
+        assertEquals(8, newUser.getEquippedBorder().getId());
+        assertEquals(6, newUser.getEquippedProfilePicture().getId());
     }
 }

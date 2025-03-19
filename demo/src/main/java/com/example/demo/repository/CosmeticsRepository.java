@@ -16,7 +16,4 @@ public interface CosmeticsRepository extends JpaRepository<Cosmetics, Long> {
         nativeQuery = true
     )
     List<Cosmetics> getAll();
-
-    @Query("SELECT c FROM Cosmetics c JOIN c.owners u WHERE u.id = :userId")
-    List<Cosmetics> findInventoryByUserId(@Param("userId") Long userId);
 }

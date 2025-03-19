@@ -20,7 +20,6 @@ public class CosmeticsService {
     }
 
     public List<Cosmetics> getInventory(Long userId) {
-        //return cosmeticsRepository.findInventoryByUserId(userId);
         return new ArrayList<>(userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"))
                 .getOwnedCosmetics());
