@@ -47,11 +47,11 @@ public class User {
     )
     private Set<Cosmetics> ownedCosmetics = new HashSet<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "equipped_border_id")
     private Cosmetics equippedBorder;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "equipped_profile_picture_id")
     private Cosmetics equippedProfilePicture;
 

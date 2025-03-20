@@ -45,21 +45,21 @@ public class CosmeticsTests {
         cosmeticsRepo.deleteAll();
 
         // Add the default cosmetics to the H2 database
-        Cosmetics defaultPicture = new Cosmetics("Default Profile Picture", "0", "A Profile picture of a spire", "default_picture.png", CosmeticsType.PROFILE_PICTURE);
-        Cosmetics defaultFireBorder = new Cosmetics("Default Fire border", "0", "First Fire border", "fireborder_1.png", CosmeticsType.BORDER);
-        Cosmetics defaultGreenBorder = new Cosmetics("Default Plant border", "0", "First Plant border", "greenborder_1.png", CosmeticsType.BORDER);
+        Cosmetics defaultPicture = new Cosmetics("Default Profile Picture", 0, "A Profile picture of a spire", "default_picture.png", CosmeticsType.PROFILE_PICTURE);
+        Cosmetics defaultFireBorder = new Cosmetics("Default Fire border", 0, "First Fire border", "fireborder_1.png", CosmeticsType.BORDER);
+        Cosmetics defaultGreenBorder = new Cosmetics("Default Plant border", 0, "First Plant border", "greenborder_1.png", CosmeticsType.BORDER);
 
         cosmeticsRepo.saveAll(Arrays.asList(defaultPicture, defaultFireBorder, defaultGreenBorder));
 
         // Additional cosmetics available in the shop
-        Cosmetics elephantPicture = new Cosmetics("Elephant Profile Picture", "100", "A profile picture of an elephant", "elephant.png", CosmeticsType.PROFILE_PICTURE);
-        Cosmetics foxPicture = new Cosmetics("Fox Profile Picture", "100", "A profile picture of a fox", "fox.png", CosmeticsType.PROFILE_PICTURE);
-        Cosmetics giraffePicture = new Cosmetics("Giraffe Profile Picture", "150", "A profile picture of a giraffe", "giraffe.png", CosmeticsType.PROFILE_PICTURE);
-        Cosmetics lionPicture = new Cosmetics("Lion Profile Picture", "200", "A profile picture of a lion", "lion.png", CosmeticsType.PROFILE_PICTURE);
-        Cosmetics fireBorder2 = new Cosmetics("Advanced Fire Border", "150", "Second tier fire border", "fireborder_2.png", CosmeticsType.BORDER);
-        Cosmetics fireBorder3 = new Cosmetics("Elite Fire Border", "250", "Third tier fire border", "fireborder_3.png", CosmeticsType.BORDER);
-        Cosmetics greenBorder2 = new Cosmetics("Advanced Plant Border", "150", "Second tier plant border", "greenborder_2.png", CosmeticsType.BORDER);
-        Cosmetics greenBorder3 = new Cosmetics("Elite Plant Border", "250", "Third tier plant border", "greenborder_3.png", CosmeticsType.BORDER);
+        Cosmetics elephantPicture = new Cosmetics("Elephant Profile Picture", 100, "A profile picture of an elephant", "elephant.png", CosmeticsType.PROFILE_PICTURE);
+        Cosmetics foxPicture = new Cosmetics("Fox Profile Picture", 100, "A profile picture of a fox", "fox.png", CosmeticsType.PROFILE_PICTURE);
+        Cosmetics giraffePicture = new Cosmetics("Giraffe Profile Picture", 150, "A profile picture of a giraffe", "giraffe.png", CosmeticsType.PROFILE_PICTURE);
+        Cosmetics lionPicture = new Cosmetics("Lion Profile Picture", 200, "A profile picture of a lion", "lion.png", CosmeticsType.PROFILE_PICTURE);
+        Cosmetics fireBorder2 = new Cosmetics("Advanced Fire Border", 150, "Second tier fire border", "fireborder_2.png", CosmeticsType.BORDER);
+        Cosmetics fireBorder3 = new Cosmetics("Elite Fire Border", 250, "Third tier fire border", "fireborder_3.png", CosmeticsType.BORDER);
+        Cosmetics greenBorder2 = new Cosmetics("Advanced Plant Border", 150, "Second tier plant border", "greenborder_2.png", CosmeticsType.BORDER);
+        Cosmetics greenBorder3 = new Cosmetics("Elite Plant Border", 250, "Third tier plant border", "greenborder_3.png", CosmeticsType.BORDER);
 
         cosmeticsRepo.saveAll(Arrays.asList(
                 elephantPicture, foxPicture, giraffePicture, lionPicture,
@@ -122,12 +122,16 @@ public class CosmeticsTests {
     }
 
     /**
-     * User can purchase cosmetics and they appear in their inventory
+     * User can purchase cosmetics given enough money, and they appear in their inventory
      */
     @Test
-    void testPurchaseCosmetics() {
+    void testPurchaseCosmeticsWithMoney() {
         User newUser = userRepo.findByUsername("newuser123");
         assertNotNull(newUser);
+
+        // Add enough points to the user's account
+        newUser.setPoints(300); // Lion Profile Picture costs 200 points
+        userRepo.save(newUser);
 
         // Check the number of items in inventory before purchase
         var inventoryResponse = restTemplate.getForEntity(
@@ -142,7 +146,7 @@ public class CosmeticsTests {
         var purchaseRequest = new HashMap<String, String>();
         purchaseRequest.put("name", "Lion Profile Picture");
         var purchaseResponse = restTemplate.postForEntity(
-                "/cosmetics/purchaseCosmetics?userId=" + newUser.getId() + "&name=" + purchaseRequest.get("name"),
+                "/cosmetics/purchaseCosmetics?userId=" + newUser.getId(),
                 purchaseRequest,
                 Cosmetics.class
         );
@@ -158,6 +162,45 @@ public class CosmeticsTests {
         cosmetics = inventoryResponse.getBody();
         assertNotNull(cosmetics);
         assertEquals(4, cosmetics.length);
+    }
+
+    /**
+     * User can not purchase cosmetics because of insufficient funds, and the item does not appear in their inventory
+     */
+    @Test
+    void testPurchaseCosmeticsWithoutMoney() {
+        User newUser = userRepo.findByUsername("newuser123");
+        assertNotNull(newUser);
+
+        // Check the number of items in inventory before purchase
+        var inventoryResponse = restTemplate.getForEntity(
+                "/cosmetics/inventory?userId=" + newUser.getId(),
+                Cosmetics[].class
+        );
+        var cosmetics = inventoryResponse.getBody();
+        assertNotNull(cosmetics);
+        assertEquals(3, cosmetics.length);
+
+        // Attempt to purchase a new cosmetic
+        var purchaseRequest = new HashMap<String, String>();
+        purchaseRequest.put("name", "Lion Profile Picture");
+        var purchaseResponse = restTemplate.postForEntity(
+                "/cosmetics/purchaseCosmetics?userId=" + newUser.getId(),
+                purchaseRequest,
+                Cosmetics.class
+        );
+
+        // Check that the purchase was unsuccessful
+        assertEquals(500, purchaseResponse.getStatusCodeValue());
+
+        // Check that the number of items in inventory remains the same as before
+        inventoryResponse = restTemplate.getForEntity(
+                "/cosmetics/inventory?userId=" + newUser.getId(),
+                Cosmetics[].class
+        );
+        cosmetics = inventoryResponse.getBody();
+        assertNotNull(cosmetics);
+        assertEquals(3, cosmetics.length);
     }
 
     /**

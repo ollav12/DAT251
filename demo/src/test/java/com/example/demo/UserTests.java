@@ -53,6 +53,14 @@ class UserTests {
         private TripRepository tripRepository;
 
 
+        @BeforeEach
+        void setup() {
+                tripRepository.deleteAll();
+                userRepository.deleteAll();
+                tripRepository.flush();
+                userRepository.flush();
+        }
+
         private User createTestUser() {
                 User notRegisteredUser = new User();
                 notRegisteredUser.setUsername("Test");

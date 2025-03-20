@@ -2,7 +2,7 @@ spring:
   application:
     name: DAT251
   profiles:
-    active: nodb
+    active: postgres
   mvc:
     cors:
       allowed-origins: "*"

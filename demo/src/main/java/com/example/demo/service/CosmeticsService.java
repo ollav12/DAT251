@@ -34,6 +34,12 @@ public class CosmeticsService {
         if (cosmetics == null) {
             throw new RuntimeException("Cosmetics not found");
         }
+
+        // Deduct points from user
+        if (user.getPoints() < cosmetics.getPrice()) {
+            throw new RuntimeException("Insufficient points");
+        }
+        user.setPoints(user.getPoints() - cosmetics.getPrice());
         user.getOwnedCosmetics().add(cosmetics);
         userRepository.save(user);
         return cosmetics;
