@@ -88,4 +88,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(exsistingUser);
         return "User with id: " + id + "has been successfully updated";
     }
+
+    @Override
+    public void updateUserPoints(long userId, int rewardPoints) {
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setPoints(user.getPoints() + rewardPoints);
+        userRepository.save(user);
+    }
 }

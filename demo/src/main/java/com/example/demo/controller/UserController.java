@@ -86,7 +86,7 @@ public class UserController {
             User registeredUser = userService.registerUser(user);
             List<Challenge> challenges = challengeService.getAllChallenges();
             for (Challenge challenge : challenges) {
-                challengeStatusService.startChallenge(user.getId(), challenge);
+                challengeStatusService.assignChallenge(user.getId(), challenge);
             }
 
             return ResponseEntity.created(

@@ -2,8 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Challenge;
 import com.example.demo.model.User;
-import com.example.demo.model.ChallengeStatus.Status;
 import com.example.demo.model.ChallengeStatus;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ChallengeService;
 import com.example.demo.service.ChallengeStatusService;
 import com.example.demo.service.UserService;
@@ -12,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -23,17 +21,19 @@ public class ChallengeStatusController {
     private final ChallengeStatusService challengeStatusService;
     private final ChallengeService challengeService;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     public ChallengeStatusController(ChallengeStatusService challengeStatusService, UserService userService,
-            ChallengeService challengeService) {
+                                     ChallengeService challengeService, UserRepository userRepository) {
         this.challengeStatusService = challengeStatusService;
         this.userService = userService;
         this.challengeService = challengeService;
+        this.userRepository = userRepository;
     }
 
-    @PostMapping("/{userId}/challenges/{challengeId}/start")
-    public ResponseEntity<ChallengeStatus> startChallenge(@PathVariable long userId,
-            @PathVariable long challengeId) {
+    @PostMapping("/{userId}/challenges/{challengeId}/assign")
+    public ResponseEntity<ChallengeStatus> assignChallenge(@PathVariable long userId,
+                                                           @PathVariable long challengeId) {
         User user = userService.getUser(userId);
         Challenge challenge = challengeService.getChallenge(challengeId);
 
@@ -41,27 +41,41 @@ public class ChallengeStatusController {
             return ResponseEntity.notFound().build();
         }
 
-        ChallengeStatus challengeStatus = challengeStatusService.startChallenge(user.getId(), challenge);
+        ChallengeStatus challengeStatus = challengeStatusService.assignChallenge(user.getId(), challenge);
         return new ResponseEntity<>(challengeStatus, HttpStatus.CREATED);
     }
 
     @PostMapping("/{userId}/challenges/{challengeId}/complete")
-    public ResponseEntity<Map<String, Object>> completeChallenge(@PathVariable long userId,
-            @PathVariable long challengeId) {
-        ChallengeStatus challengeStatus = challengeStatusService.getChallenge(challengeId);
-        Challenge challenge = challengeService.getChallenge(challengeId);
-
-        if (challenge == null || challengeStatus.getStatus() == Status.COMPLETED) { // Check that challenge exists and
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<User> completeChallenge(@PathVariable long userId, @PathVariable long challengeId) {
+        // Hent bruker og challenge
+        User user = userService.getUser(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        challengeStatusService.completeChallenge(challengeStatus);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("challenge", challenge);
-        response.put("pointsEarned", challenge.getRewardPoints());
+        Challenge challenge = challengeService.getChallenge(challengeId);
+        if (challenge == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
 
-        return ResponseEntity.ok(response);
+        // Hent challenge status
+        ChallengeStatus challengeStatus = challengeStatusService.getChallengeStatus(userId, challengeId);
+        if (challengeStatus == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // Sjekk om utfordringen allerede er fullført
+        if (challengeStatus.getStatus() == ChallengeStatus.Status.COMPLETED) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
+        }
+
+        // Fullfør utfordringen og returner oppdatert bruker
+        User updatedUser = challengeStatusService.completeChallenge(userId, challengeId);
+
+        return ResponseEntity.ok(updatedUser);
     }
+
 
     @GetMapping("/{userId}/challenges")
     public ResponseEntity<List<ChallengeStatus>> getUserChallenges(@PathVariable long userId) {
@@ -118,7 +132,7 @@ public class ChallengeStatusController {
             boolean isStarted = startedChallenges.stream()
                     .anyMatch(status -> status.getChallenge().getChallengeID() == challenge.getChallengeID());
             if (!isStarted) {
-                challengeStatusService.startChallenge(userId, challenge);
+                challengeStatusService.assignChallenge(userId, challenge);
             }
         }
         return ResponseEntity.ok(challengeStatusService.getStartedChallenges(userId));

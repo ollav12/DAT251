@@ -1,16 +1,9 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "challenge_status")
@@ -21,6 +14,7 @@ public class ChallengeStatus {
     private long challengeStatusId;
 
     private long userID;
+
     @ManyToOne
     @JoinColumn(name = "challenge_id")
     private Challenge challenge;
@@ -31,27 +25,50 @@ public class ChallengeStatus {
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
 
+    private double currentValue;
+    private int actionsCompleted;
+    private int currentStreak;
+    private LocalDateTime lastActionDate;
+
+    @ElementCollection
+    private List<LocalDateTime> checkpoints;
+
     public enum Status {
         NOT_STARTED,
         IN_PROGRESS,
         COMPLETED
     }
 
-    public ChallengeStatus(long userID, Challenge challenge) {
+    public ChallengeStatus(long userID, Challenge challenge, Status status, LocalDateTime startedAt, LocalDateTime completedAt, double currentValue, int actionsCompleted, int currentStreak, LocalDateTime lastActionDate, List<LocalDateTime> checkpoints) {
         this.userID = userID;
         this.challenge = challenge;
-        this.status = Status.NOT_STARTED;
+        this.status = status;
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+        this.currentValue = currentValue;
+        this.actionsCompleted = actionsCompleted;
+        this.currentStreak = currentStreak;
+        this.lastActionDate = lastActionDate;
+        this.checkpoints = checkpoints;
     }
 
     public ChallengeStatus() {
 
     }
 
+    public long getChallengeStatusId() {
+        return challengeStatusId;
+    }
+
+    public void setChallengeStatusId(long challengeStatusId) {
+        this.challengeStatusId = challengeStatusId;
+    }
+
     public long getUserID() {
         return userID;
     }
 
-    public void setUser(long userID) {
+    public void setUserID(long userID) {
         this.userID = userID;
     }
 
@@ -87,11 +104,43 @@ public class ChallengeStatus {
         this.completedAt = completedAt;
     }
 
-    public long getChallengeStatusId() {
-        return challengeStatusId;
+    public double getCurrentValue() {
+        return currentValue;
     }
 
-    public void setChallengeStatusId(long challengeStatusId) {
-        this.challengeStatusId = challengeStatusId;
+    public void setCurrentValue(double currentValue) {
+        this.currentValue = currentValue;
+    }
+
+    public int getActionsCompleted() {
+        return actionsCompleted;
+    }
+
+    public void setActionsCompleted(int actionsCompleted) {
+        this.actionsCompleted = actionsCompleted;
+    }
+
+    public int getCurrentStreak() {
+        return currentStreak;
+    }
+
+    public void setCurrentStreak(int currentStreak) {
+        this.currentStreak = currentStreak;
+    }
+
+    public LocalDateTime getLastActionDate() {
+        return lastActionDate;
+    }
+
+    public void setLastActionDate(LocalDateTime lastActionDate) {
+        this.lastActionDate = lastActionDate;
+    }
+
+    public List<LocalDateTime> getCheckpoints() {
+        return checkpoints;
+    }
+
+    public void setCheckpoints(List<LocalDateTime> checkpoints) {
+        this.checkpoints = checkpoints;
     }
 }
