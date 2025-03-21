@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { useCosmeticImages} from '@/composables/useCosmeticImages'
+import { useCosmeticImages } from '@/composables/useCosmeticImages'
 import { useCosmeticsStore } from '@/composables/useCosmeticsStore'
 
-const { getImagePath } = useCosmeticImages();
+const { getImagePath } = useCosmeticImages()
 const { userPoints, fetchUserPoints, updatePoints } = useCosmeticsStore()
 const errorMessage = ref('')
 const showError = ref(false)
@@ -18,7 +18,7 @@ type cosmetics = {
     category: string
   }[]
 }
-const data = ref<cosmetics>({rows: [] })
+const data = ref<cosmetics>({ rows: [] })
 const loading = ref(false)
 
 const canAfford = computed(() => (price: number) => {
@@ -46,7 +46,7 @@ async function fetchInventory(): Promise<void> {
   try {
     const userId = localStorage.getItem('userId')
     const response = await fetch(`http://localhost:8080/cosmetics/inventory?userId=${userId}`, {
-      credentials: 'include'
+      credentials: 'include',
     })
     if (response.ok) {
       const inventory = await response.json()
@@ -69,14 +69,17 @@ async function buyCosmetic(name: string, price: number): Promise<void> {
 
   try {
     const userId = localStorage.getItem('userId')
-    const response = await fetch(`http://localhost:8080/cosmetics/purchaseCosmetics?userId=${userId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `http://localhost:8080/cosmetics/purchaseCosmetics?userId=${userId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name }),
+        credentials: 'include',
       },
-      body: JSON.stringify({ name }),
-      credentials: 'include'
-    })
+    )
     if (response.ok) {
       // Update local points after successful purchase
       updatePoints(userPoints.value - price)
@@ -113,19 +116,24 @@ onMounted(async () => {
   <div class="shopbox">
     <h2>Borders</h2>
     <div class="cosmetic-container">
-      <div v-for="cosmetic in data.rows" :key="cosmetic.name"
-           class="cosmetic-group"
-           :class="{ 'unaffordable': !canAfford(cosmetic.price) }"
-           v-show="cosmetic.category === 'BORDER' && !isOwned(cosmetic.name)">
+      <div
+        v-for="cosmetic in data.rows"
+        :key="cosmetic.name"
+        class="cosmetic-group"
+        :class="{ unaffordable: !canAfford(cosmetic.price) }"
+        v-show="cosmetic.category === 'BORDER' && !isOwned(cosmetic.name)"
+      >
         <img :src="getImagePath(cosmetic.image)" alt="cosmetic" class="cosmetic-image" />
-        <label>{{cosmetic.name}}</label>
-        <p class="cosmetic-description">{{cosmetic.description}}</p>
+        <label>{{ cosmetic.name }}</label>
+        <p class="cosmetic-description">{{ cosmetic.description }}</p>
         <p class="cosmetic-price" :class="{ 'price-unaffordable': !canAfford(cosmetic.price) }">
-          {{cosmetic.price}} points
+          {{ cosmetic.price }} points
         </p>
-        <button type="button"
-                @click="buyCosmetic(cosmetic.name, cosmetic.price)"
-                :class="{ 'button-unaffordable': !canAfford(cosmetic.price) }">
+        <button
+          type="button"
+          @click="buyCosmetic(cosmetic.name, cosmetic.price)"
+          :class="{ 'button-unaffordable': !canAfford(cosmetic.price) }"
+        >
           {{ canAfford(cosmetic.price) ? 'Buy' : 'Not enough points' }}
         </button>
       </div>
@@ -136,19 +144,24 @@ onMounted(async () => {
   <div class="shopbox">
     <h2>Profile Icons</h2>
     <div class="cosmetic-container">
-      <div v-for="cosmetic in data.rows" :key="cosmetic.name"
-           class="cosmetic-group"
-           :class="{ 'unaffordable': !canAfford(cosmetic.price) }"
-           v-show="cosmetic.category === 'PROFILE_PICTURE' && !isOwned(cosmetic.name)">
+      <div
+        v-for="cosmetic in data.rows"
+        :key="cosmetic.name"
+        class="cosmetic-group"
+        :class="{ unaffordable: !canAfford(cosmetic.price) }"
+        v-show="cosmetic.category === 'PROFILE_PICTURE' && !isOwned(cosmetic.name)"
+      >
         <img :src="getImagePath(cosmetic.image)" alt="cosmetic" class="cosmetic-image" />
-        <label>{{cosmetic.name}}</label>
-        <p class="cosmetic-description">{{cosmetic.description}}</p>
+        <label>{{ cosmetic.name }}</label>
+        <p class="cosmetic-description">{{ cosmetic.description }}</p>
         <p class="cosmetic-price" :class="{ 'price-unaffordable': !canAfford(cosmetic.price) }">
-          {{cosmetic.price}} points
+          {{ cosmetic.price }} points
         </p>
-        <button type="button"
-                @click="buyCosmetic(cosmetic.name, cosmetic.price)"
-                :class="{ 'button-unaffordable': !canAfford(cosmetic.price) }">
+        <button
+          type="button"
+          @click="buyCosmetic(cosmetic.name, cosmetic.price)"
+          :class="{ 'button-unaffordable': !canAfford(cosmetic.price) }"
+        >
           {{ canAfford(cosmetic.price) ? 'Buy' : 'Not enough points' }}
         </button>
       </div>
@@ -262,8 +275,14 @@ button:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .unaffordable {

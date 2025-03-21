@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useCosmeticImages } from '@/composables/useCosmeticImages'
-import { useCosmeticsStore } from '@/composables/useCosmeticsStore';
+import { useCosmeticsStore } from '@/composables/useCosmeticsStore'
 
-const { getImagePath } = useCosmeticImages();
-const { updateEquippedBorder, updateEquippedProfilePicture } = useCosmeticsStore();
+const { getImagePath } = useCosmeticImages()
+const { updateEquippedBorder, updateEquippedProfilePicture } = useCosmeticsStore()
 
 type cosmetics = {
   rows: {
@@ -26,12 +26,12 @@ async function fetchPurchasedCosmetics(): Promise<void> {
     const response = await fetch(`http://localhost:8080/cosmetics/inventory?userId=${userId}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      credentials: 'include'
+      credentials: 'include',
     })
 
-    if(!response.ok) {
+    if (!response.ok) {
       console.error('Error:', response.status, response.statusText)
       return
     }
@@ -48,15 +48,18 @@ async function fetchPurchasedCosmetics(): Promise<void> {
 async function equipCosmetic(cosmeticId: number): Promise<void> {
   try {
     const userId = localStorage.getItem('userId')
-    const response = await fetch(`http://localhost:8080/cosmetics/equip/${cosmeticId}?userId=${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `http://localhost:8080/cosmetics/equip/${cosmeticId}?userId=${userId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
       },
-      credentials: 'include'
-    })
+    )
 
-    if(response.ok) {
+    if (response.ok) {
       const equippedCosmetic = await response.json()
 
       if (equippedCosmetic.category === 'BORDER') {
@@ -82,11 +85,16 @@ onMounted(async () => {
   <div class="inventorybox">
     <h2>Borders</h2>
     <div class="inventory-container">
-      <div v-for="cosmetic in data.rows" :key="cosmetic.name" class="cosmetic-group" v-show="cosmetic.category === 'BORDER'">
+      <div
+        v-for="cosmetic in data.rows"
+        :key="cosmetic.name"
+        class="cosmetic-group"
+        v-show="cosmetic.category === 'BORDER'"
+      >
         <img :src="getImagePath(cosmetic.image)" alt="cosmetic" class="cosmetic-image" />
-        <label>{{cosmetic.name}}</label>
-        <p class="cosmetic-description">{{cosmetic.description}}</p>
-        <p class="cosmetic-category">Type: {{cosmetic.category.toLowerCase()}}</p>
+        <label>{{ cosmetic.name }}</label>
+        <p class="cosmetic-description">{{ cosmetic.description }}</p>
+        <p class="cosmetic-category">Type: {{ cosmetic.category.toLowerCase() }}</p>
         <button type="button" @click="equipCosmetic(cosmetic.id)">Equip</button>
       </div>
     </div>
@@ -94,11 +102,16 @@ onMounted(async () => {
   <div class="inventorybox">
     <h2>Profile Icons</h2>
     <div class="inventory-container">
-      <div v-for="cosmetic in data.rows" :key="cosmetic.name" class="cosmetic-group" v-show="cosmetic.category === 'PROFILE_PICTURE'">
+      <div
+        v-for="cosmetic in data.rows"
+        :key="cosmetic.name"
+        class="cosmetic-group"
+        v-show="cosmetic.category === 'PROFILE_PICTURE'"
+      >
         <img :src="getImagePath(cosmetic.image)" alt="cosmetic" class="cosmetic-image" />
-        <label>{{cosmetic.name}}</label>
-        <p class="cosmetic-description">{{cosmetic.description}}</p>
-        <p class="cosmetic-category">Type: {{cosmetic.category.toLowerCase()}}</p>
+        <label>{{ cosmetic.name }}</label>
+        <p class="cosmetic-description">{{ cosmetic.description }}</p>
+        <p class="cosmetic-category">Type: {{ cosmetic.category.toLowerCase() }}</p>
         <button type="button" @click="equipCosmetic(cosmetic.id)">Equip</button>
       </div>
     </div>
