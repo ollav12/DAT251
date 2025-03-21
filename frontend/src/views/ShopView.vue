@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { useCosmeticImages } from '@/composables/useCosmeticImages'
 import { useCosmeticsStore } from '@/composables/useCosmeticsStore'
+import { getUserIdFromLocalStorage } from '@/services/user'
 
 const { getImagePath } = useCosmeticImages()
 const { userPoints, fetchUserPoints, updatePoints } = useCosmeticsStore()
@@ -44,7 +45,7 @@ async function fetchCosmetics(): Promise<void> {
 
 async function fetchInventory(): Promise<void> {
   try {
-    const userId = localStorage.getItem('userId')
+    const userId = getUserIdFromLocalStorage()
     const response = await fetch(`http://localhost:8080/cosmetics/inventory?userId=${userId}`, {
       credentials: 'include',
     })
@@ -68,7 +69,7 @@ async function buyCosmetic(name: string, price: number): Promise<void> {
   }
 
   try {
-    const userId = localStorage.getItem('userId')
+    const userId = getUserIdFromLocalStorage()
     const response = await fetch(
       `http://localhost:8080/cosmetics/purchaseCosmetics?userId=${userId}`,
       {

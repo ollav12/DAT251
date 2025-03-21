@@ -1,5 +1,9 @@
 import { request } from './transport'
 
+export function getUserIdFromLocalStorage(): string | null {
+  return localStorage.getItem('userId')
+}
+
 export type User = {
   id: string
   email: string
@@ -20,5 +24,5 @@ async function getUser(id: string): Promise<User> {
 
 export async function getMe() {
   // TODO: use correct user id
-  return getUser('1')
+  return getUser(getUserIdFromLocalStorage() || '')
 }

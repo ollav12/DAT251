@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useCosmeticImages } from '@/composables/useCosmeticImages'
 import { useCosmeticsStore } from '@/composables/useCosmeticsStore'
+import { getUserIdFromLocalStorage } from '@/services/user'
 
 const { getImagePath } = useCosmeticImages()
 const { updateEquippedBorder, updateEquippedProfilePicture } = useCosmeticsStore()
@@ -22,7 +23,7 @@ const loading = ref(false)
 async function fetchPurchasedCosmetics(): Promise<void> {
   loading.value = true
   try {
-    const userId = localStorage.getItem('userId')
+    const userId = getUserIdFromLocalStorage()
     const response = await fetch(`http://localhost:8080/cosmetics/inventory?userId=${userId}`, {
       method: 'GET',
       headers: {
@@ -47,7 +48,7 @@ async function fetchPurchasedCosmetics(): Promise<void> {
 
 async function equipCosmetic(cosmeticId: number): Promise<void> {
   try {
-    const userId = localStorage.getItem('userId')
+    const userId = getUserIdFromLocalStorage()
     const response = await fetch(
       `http://localhost:8080/cosmetics/equip/${cosmeticId}?userId=${userId}`,
       {

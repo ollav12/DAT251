@@ -1,3 +1,5 @@
+import { getUserIdFromLocalStorage } from './user'
+
 const baseURL = 'http://localhost:8080'
 
 export type Statistics = {
@@ -14,7 +16,8 @@ export type Statistics = {
 
 async function getStatistics(): Promise<Statistics> {
   try {
-    const url = '/transport/statistics?userId=1'
+    const userId = getUserIdFromLocalStorage()
+    const url = `/transport/statistics?userId=${userId}`
     const response = await request('GET', url)
     return response
   } catch (error) {
@@ -57,7 +60,8 @@ type CreateTrip = {
 
 async function createTrip(trip: CreateTrip) {
   try {
-    const url = '/trips?userId=1'
+    const userId = getUserIdFromLocalStorage()
+    const url = `/trips?userId=${userId}`
     const response = await request('POST', url, trip)
     return response
   } catch (error) {
@@ -68,7 +72,8 @@ async function createTrip(trip: CreateTrip) {
 
 async function listTrips(): Promise<Trip[]> {
   try {
-    const url = '/trips?userId=1'
+    const userId = getUserIdFromLocalStorage()
+    const url = `/trips?userId=${userId}`
     const response = await request('GET', url)
     return response
   } catch (error) {
@@ -89,7 +94,8 @@ export type Vehicle = {
 
 async function listVehicles(): Promise<Vehicle[]> {
   try {
-    const url = '/transport/vehicles?userId=1'
+    const userId = getUserIdFromLocalStorage()
+    const url = `/transport/vehicles?userId=${userId}`
     const response = await request('GET', url)
     return response
   } catch (error) {
@@ -102,7 +108,8 @@ type CreateVehicle = Pick<Vehicle, 'make' | 'model' | 'type' | 'year' | 'emissio
 
 async function createVehicle(vehicle: CreateVehicle) {
   try {
-    const url = '/transport/vehicles'
+    const userId = getUserIdFromLocalStorage()
+    const url = `/transport/vehicles?userId=${userId}`
     const response = await request('POST', url, vehicle)
     return response
   } catch (error) {
