@@ -37,6 +37,7 @@ export type Trip = {
   totalDurationSeconds: number
   totalEmissionsCO2eKg: number
   savedEmissionsCO2eKg: number
+  createdAt: string
 }
 
 // The UUID should be generated client side on load
@@ -74,6 +75,17 @@ async function listTrips(): Promise<Trip[]> {
   try {
     const userId = getUserIdFromLocalStorage()
     const url = `/trips?userId=${userId}`
+    const response = await request('GET', url)
+    return response
+  } catch (error) {
+    console.error('Error fetching trips:', error)
+    throw error
+  }
+}
+
+async function listUserTrips(userId: number): Promise<Trip[]> {
+  try {
+    const url = `/users/${userId}/trips`
     const response = await request('GET', url)
     return response
   } catch (error) {
@@ -147,7 +159,7 @@ export default {
 
   createTrip,
   listTrips,
-
+  listUserTrips,
   createVehicle,
   listVehicles,
   setDefaultVehicle,
