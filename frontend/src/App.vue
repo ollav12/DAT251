@@ -5,6 +5,7 @@ import { onMounted } from 'vue'
 import { getMe, type User } from './services/user'
 import UserProfileView from "@/views/UserProfileView.vue";
 
+
 const router = useRouter()
 const route = useRoute()
 
@@ -41,6 +42,7 @@ onMounted(() => {
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
     <RouterLink to="/shop">Shop</RouterLink>
     <RouterLink to="/inventory">Inventory</RouterLink>
+    <RouterLink to="/statistics">Statistics</RouterLink>
     <RouterLink v-if="user?.admin" to="/admin">Admin</RouterLink>
 
     <UserProfileView />
