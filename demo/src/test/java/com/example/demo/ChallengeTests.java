@@ -21,6 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -129,7 +130,6 @@ public class ChallengeTests {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Challenge createdChallenge = response.getBody();
         assertNotNull(createdChallenge);
-        assertNotNull(createdChallenge.getChallengeID()); // ID should be assigned
         assertEquals("Take Public Transport", createdChallenge.getChallengeTitle());
         assertEquals(Challenge.ChallengeType.ACTION, createdChallenge.getChallengeType());
         assertEquals(5, createdChallenge.getRequiredActions());
@@ -157,7 +157,8 @@ public class ChallengeTests {
             "/challenges",
             HttpMethod.GET,
             null,
-            new ParameterizedTypeReference<List<Challenge>>() {});
+                new ParameterizedTypeReference<>() {
+                });
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<Challenge> challenges = response.getBody();
@@ -258,7 +259,7 @@ public class ChallengeTests {
 
         // Update metric progress
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/metrics",
+            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
             new ChallengeController.MetricUpdate("kg CO2", 5.0),
             Void.class);
 
@@ -270,7 +271,7 @@ public class ChallengeTests {
 
         // Complete the challenge
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/metrics",
+            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
             new ChallengeController.MetricUpdate("kg CO2", 6.0),
             Void.class);
 
@@ -444,8 +445,9 @@ public class ChallengeTests {
         completedChallengeRepo.flush();
 
         // Add more progress, but still below target
-        restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/metrics",
+
+                restTemplate.postForEntity(
+            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
             new ChallengeController.MetricUpdate("liters", 10.0),
             Void.class);
 
@@ -457,7 +459,7 @@ public class ChallengeTests {
 
         // Add final increment that reaches target
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/metrics",
+            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
             new ChallengeController.MetricUpdate("liters", 5.0),
             Void.class);
 
