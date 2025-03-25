@@ -67,13 +67,6 @@ public class ChallengeController {
         return ResponseEntity.noContent().build();
     }
 
-    // New endpoint for recording user navigation
-    @PostMapping("/users/{userId}/navigation")
-    public ResponseEntity<Void> recordNavigation(@PathVariable long userId, @RequestBody NavigationRequest request) {
-        challengeService.recordNavigation(userId, request.getRoute());
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/users/{userId}/challenges/{challengeId}/metrics")
     public ResponseEntity<?> updateMetricsForChallenge(
             @PathVariable Long userId,
@@ -147,7 +140,7 @@ public class ChallengeController {
         status.setCurrentValue(newValue);
 
         // Check if challenge is completed
-        if (newValue >= challenge.getRequiredActions() &&
+        if (newValue >= challenge.getTargetValue() &&
                 status.getStatus() != ChallengeStatus.Status.COMPLETED) {
             checkChallengeCompleted(userId, status, challenge);
         }

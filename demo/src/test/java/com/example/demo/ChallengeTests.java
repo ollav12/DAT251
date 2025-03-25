@@ -74,8 +74,7 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.METRIC,
             10.0, // target value
-            "kg CO2",
-            0// metric unit
+            "kg CO2" // metric unit
         );
         challengeRepo.save(metricChallenge);
 
@@ -101,8 +100,7 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.ACTION,
             5.0, // target value (5 times)
-            "trips", // metric unit
-            5    // required actions
+            "trips" // metric unit
         );
 
         ResponseEntity<Challenge> response = restTemplate.postForEntity(
@@ -116,7 +114,6 @@ public class ChallengeTests {
         assertNotNull(createdChallenge);
         assertEquals("Take Public Transport", createdChallenge.getChallengeTitle());
         assertEquals(Challenge.ChallengeType.ACTION, createdChallenge.getChallengeType());
-        assertEquals(5, createdChallenge.getRequiredActions());
     }
 
     @Test
@@ -180,8 +177,7 @@ public class ChallengeTests {
                 7,   // duration in days
                 Challenge.ChallengeType.ACTION,
                 5.0, // target value (5 times)
-                "trips", // metric unit
-                5    // required actions
+                "trips" // metric unit
         );
         challengeRepo.save(actionChallenge);
 
@@ -275,8 +271,7 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.ACTION,
             1.0, // target value
-            "action", // metric unit
-            1    // required actions
+            "action" // metric unit
         );
         challengeRepo.save(actionChallenge);
 
@@ -320,8 +315,7 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.ACTION,
             1.0, // target value
-            "action", // metric unit
-            1    // required actions
+            "action" // metric unit
         );
         challengeRepo.save(actionChallenge);
 
@@ -367,8 +361,7 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.METRIC,
             20.0, // target value
-            "liters", // metric unit
-            0    // required actions (not relevant for metric)
+            "liters" // metric unit
         );
         challengeRepo.save(metricChallenge);
 
@@ -409,8 +402,7 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.METRIC,
             30.0, // target value
-            "liters", // metric unit
-            0    // required actions (not relevant for metric)
+            "liters" // metric unit
         );
         challengeRepo.save(metricChallenge);
 

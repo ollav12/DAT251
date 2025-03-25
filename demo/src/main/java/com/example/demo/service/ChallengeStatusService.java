@@ -64,18 +64,9 @@ public class ChallengeStatusService {
                 // For metric challenges, check if current value meets or exceeds target
                 metricsComplete = status.getCurrentValue() >= challenge.getTargetValue();
                 break;
-            case STREAK:
-                // For streak challenges, check if streak count meets target
-                metricsComplete = status.getCurrentValue() >= challenge.getTargetValue();
-                break;
-            case NAVIGATION:
-                // For navigation challenges, check if the specified route was visited
-                // This would typically be handled through a separate navigation event
-                metricsComplete = status.getStatus() == ChallengeStatus.Status.IN_PROGRESS;
-                break;
             case ACTION:
                 // For action challenges, check if required actions are performed
-                metricsComplete = status.getCurrentValue() >= challenge.getRequiredActions() ||
+                metricsComplete = status.getCurrentValue() >= challenge.getTargetValue() ||
                          status.getStatus() == ChallengeStatus.Status.IN_PROGRESS;
                 break;
             default:

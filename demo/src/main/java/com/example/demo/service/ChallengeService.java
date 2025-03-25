@@ -49,11 +49,6 @@ public class ChallengeService {
     public Challenge createChallenge(Challenge challenge) {
         // Set default values based on challenge type
         switch (challenge.getChallengeType()) {
-            case NAVIGATION:
-                if (challenge.getTargetRoute() == null) {
-                    throw new IllegalArgumentException("Navigation challenges require a target route");
-                }
-                break;
             case METRIC:
                 if (challenge.getTargetValue() <= 0) {
                     throw new IllegalArgumentException("Metric challenges require a positive target value");
@@ -62,26 +57,13 @@ public class ChallengeService {
                     throw new IllegalArgumentException("Metric challenges require a unit of measurement");
                 }
                 break;
+            case ACTION:
+                if (challenge.getTargetValue() <= 0) {
+                    throw new IllegalArgumentException("Action challenges require a positive target value");
+                }
+                break;
         }
-        return challengeRepository.save(challenge);
-    }
-
-    // Methods for updating progress
-    public void recordNavigation(long userId, String route) {
-        List<ChallengeStatus> statuses = challengeStatusRepository.findByUserIDAndStatus(userId, ChallengeStatus.Status.IN_PROGRESS);
-
-        for (ChallengeStatus status : statuses) {
-            Challenge challenge = status.getChallenge();
-            if (challenge.getChallengeType() == Challenge.ChallengeType.NAVIGATION &&
-                route.equals(challenge.getTargetRoute())) {
-                status.setStatus(ChallengeStatus.Status.COMPLETED);
-                status.setCompletedAt(LocalDateTime.now());
-                challengeStatusRepository.save(status);
-
-                // Also update user points
-                userService.updateUserPoints(userId, challenge.getRewardPoints());
-            }
-        }
+        return challenge;
     }
 
     public void updateMetricProgress(long userId, String metricType, double value) {

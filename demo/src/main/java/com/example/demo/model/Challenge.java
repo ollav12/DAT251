@@ -20,14 +20,13 @@ public class Challenge {
 
     private double targetValue;
     private String metricUnit;
-    private int requiredActions;
 
     public enum ChallengeType {
         METRIC,
         ACTION
     }
 
-    public Challenge(String challengeTitle, String description, int rewardPoints, int duration, ChallengeType type, double targetValue, String metricUnit, int requiredActions) {
+    public Challenge(String challengeTitle, String description, int rewardPoints, int duration, ChallengeType type, double targetValue, String metricUnit) {
         this.challengeTitle = challengeTitle;
         this.description = description;
         this.rewardPoints = rewardPoints;
@@ -105,11 +104,4 @@ public class Challenge {
         this.metricUnit = metricUnit;
     }
 
-    public int getRequiredActions() {
-        return requiredActions;
-    }
-
-    public void setRequiredActions(int requiredActions) {
-        this.requiredActions = requiredActions;
-    }
 }
