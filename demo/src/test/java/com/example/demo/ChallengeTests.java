@@ -78,6 +78,18 @@ public class ChallengeTests {
         );
         challengeRepo.save(metricChallenge);
 
+        // Create an action challenge
+        testChallenge = new Challenge(
+            "Take bus to work",
+            "Take the bus to work instead of driving",
+            50,  // reward points
+            7,   // duration in days
+            Challenge.ChallengeType.ACTION,
+            1.0, // target value
+            "trip" // metric unit
+        );
+        challengeRepo.save(testChallenge);
+
         // Set up challenge status for navigation challenge
         ChallengeStatus navStatus = new ChallengeStatus();
         navStatus.setUserID(testUser.getId());
