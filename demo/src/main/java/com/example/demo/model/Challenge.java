@@ -20,17 +20,14 @@ public class Challenge {
 
     private double targetValue;
     private String metricUnit;
-    private String targetRoute;
     private int requiredActions;
 
     public enum ChallengeType {
-        NAVIGATION,
         METRIC,
-        ACTION,
-        STREAK
+        ACTION
     }
 
-    public Challenge(String challengeTitle, String description, int rewardPoints, int duration, ChallengeType type, double targetValue, String metricUnit, String targetRoute, int requiredActions) {
+    public Challenge(String challengeTitle, String description, int rewardPoints, int duration, ChallengeType type, double targetValue, String metricUnit, int requiredActions) {
         this.challengeTitle = challengeTitle;
         this.description = description;
         this.rewardPoints = rewardPoints;
@@ -38,8 +35,6 @@ public class Challenge {
         this.challengeType = type;
         this.targetValue = targetValue;
         this.metricUnit = metricUnit;
-        this.targetRoute = targetRoute;
-        this.requiredActions = requiredActions;
     }
 
     public Challenge() {
@@ -108,14 +103,6 @@ public class Challenge {
 
     public void setMetricUnit(String metricUnit) {
         this.metricUnit = metricUnit;
-    }
-
-    public String getTargetRoute() {
-        return targetRoute;
-    }
-
-    public void setTargetRoute(String targetRoute) {
-        this.targetRoute = targetRoute;
     }
 
     public int getRequiredActions() {

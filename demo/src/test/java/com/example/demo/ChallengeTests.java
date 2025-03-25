@@ -66,20 +66,6 @@ public class ChallengeTests {
         testUser = new User("Test", "User", "testuser", "test@gmail.com", "password", 100);
         userRepo.save(testUser);
 
-        // Create a navigation challenge
-        testChallenge = new Challenge(
-            "Visit Sustainability Page",
-            "Navigate to the sustainability dashboard",
-            50,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.NAVIGATION,
-            0.0, // target value (not relevant for navigation)
-            "", // metric unit (not relevant for navigation)
-            "/sustainability", // target route
-            0   // required actions (not relevant for navigation)
-        );
-        challengeRepo.save(testChallenge);
-
         // Create a metric challenge
         Challenge metricChallenge = new Challenge(
             "Reduce Carbon Footprint",
@@ -88,9 +74,8 @@ public class ChallengeTests {
             7,   // duration in days
             Challenge.ChallengeType.METRIC,
             10.0, // target value
-            "kg CO2", // metric unit
-            "",  // target route (not relevant for metric)
-            0    // required actions (not relevant for metric)
+            "kg CO2",
+            0// metric unit
         );
         challengeRepo.save(metricChallenge);
 
@@ -117,7 +102,6 @@ public class ChallengeTests {
             Challenge.ChallengeType.ACTION,
             5.0, // target value (5 times)
             "trips", // metric unit
-            "",  // target route (not relevant for this type)
             5    // required actions
         );
 
@@ -189,22 +173,21 @@ public class ChallengeTests {
     @Test
     void testAssignChallengeToUser() {
         // Create a streak challenge
-        Challenge streakChallenge = new Challenge(
-            "Daily Login",
-            "Login for 5 consecutive days",
-            50,
-            5,
-            Challenge.ChallengeType.STREAK,
-            5.0, // 5 days streak
-            "days",
-            "",
-            0
+        Challenge actionChallenge = new Challenge(
+                "Take Public Transport",
+                "Use public transit 5 times this week",
+                75,  // reward points
+                7,   // duration in days
+                Challenge.ChallengeType.ACTION,
+                5.0, // target value (5 times)
+                "trips", // metric unit
+                5    // required actions
         );
-        challengeRepo.save(streakChallenge);
+        challengeRepo.save(actionChallenge);
 
         // Assign challenge to user
         ResponseEntity<ChallengeStatus> response = restTemplate.postForEntity(
-            "/users/" + testUser.getId() + "/challenges/" + streakChallenge.getChallengeID() + "/assign",
+            "/users/" + testUser.getId() + "/challenges/" + actionChallenge.getChallengeID() + "/assign",
             null,
             ChallengeStatus.class);
 
@@ -212,7 +195,7 @@ public class ChallengeTests {
         ChallengeStatus status = response.getBody();
         assertNotNull(status);
         assertEquals(testUser.getId(), status.getUserID());
-        assertEquals(streakChallenge.getChallengeID(), status.getChallenge().getChallengeID());
+        assertEquals(actionChallenge.getChallengeID(), status.getChallenge().getChallengeID());
         assertEquals(ChallengeStatus.Status.NOT_STARTED, status.getStatus());
     }
 
@@ -293,7 +276,6 @@ public class ChallengeTests {
             Challenge.ChallengeType.ACTION,
             1.0, // target value
             "action", // metric unit
-            "",  // target route
             1    // required actions
         );
         challengeRepo.save(actionChallenge);
@@ -339,7 +321,6 @@ public class ChallengeTests {
             Challenge.ChallengeType.ACTION,
             1.0, // target value
             "action", // metric unit
-            "",  // target route
             1    // required actions
         );
         challengeRepo.save(actionChallenge);
@@ -387,7 +368,6 @@ public class ChallengeTests {
             Challenge.ChallengeType.METRIC,
             20.0, // target value
             "liters", // metric unit
-            "",  // target route (not relevant for metric)
             0    // required actions (not relevant for metric)
         );
         challengeRepo.save(metricChallenge);
@@ -430,7 +410,6 @@ public class ChallengeTests {
             Challenge.ChallengeType.METRIC,
             30.0, // target value
             "liters", // metric unit
-            "",  // target route (not relevant for metric)
             0    // required actions (not relevant for metric)
         );
         challengeRepo.save(metricChallenge);
