@@ -8,12 +8,15 @@ const chartContainerMonthly = ref(null);
 const chartContainerYearly = ref(null);
 
 
+
 const optionsDaily = {
   theme: "light2",
   animationEnabled: true,
   animationDuration: 3000,
   title: { text: "Daily CO2e Emission" },
-  axisY: { title: "CO2e Emission in kgCO2e", suffix: " kgCO2e" },
+  axisY: { title: "CO2e Emission in kgCO2e", suffix: " kgCO2e", stripLines: []
+
+  },
   data: [{
     type: "line",
     xValueFormatString: "MMM DD, YYYY",
@@ -21,7 +24,7 @@ const optionsDaily = {
     markerSize: 0,
     dataPoints: [
      //Default data?
-    ]
+    ],
   }]
 };
 
@@ -30,7 +33,7 @@ const optionsMonthly = {
   animationEnabled: true,
   animationDuration: 3000,
   title: { text: "Monthly CO2e Emission" },
-  axisY: { title: "CO2e Emission in kgCO2e", suffix: " kgCO2e" },
+  axisY: { title: "CO2e Emission in kgCO2e", suffix: " kgCO2e", stripLines:[] },
   data: [{
     type: "line",
     xValueFormatString: "MMM DD, YYYY",
@@ -38,7 +41,7 @@ const optionsMonthly = {
     markerSize: 0,
     dataPoints: [
       //Default data?
-    ]
+    ],
   }]
 };
 
@@ -47,7 +50,7 @@ const optionsYearly = {
   animationEnabled: true,
   animationDuration: 3000,
   title: { text: "Yearly CO2e Emission" },
-  axisY: { title: "CO2e Emission in kgCO2e", suffix: " kgCO2e" },
+  axisY: { title: "CO2e Emission in kgCO2e", suffix: " kgCO2e", stripLines:[] },
   data: [{
     type: "line",
     xValueFormatString: "MMM DD, YYYY",
@@ -89,25 +92,53 @@ onMounted(async () => {
     const yearlyTrips = trips.filter(trip => trip.createdAt && new Date(trip.createdAt).getFullYear() === currentYear);
     console.log("yearlyTrips: ", yearlyTrips);
 
+
+     const calculateAverage = (trips) => {
+       const totalEmissionsCO2eKg = trips.reduce((acc, trip) => acc + trip.totalEmissionsCO2eKg, 0);
+       return totalEmissionsCO2eKg / trips.length;
+     };
+
+     const averageEmissionDaily = calculateAverage(dailyTrips);
+     const averageEmissionMonthly = calculateAverage(monthlyTrips);
+     const averageEmissionYearly = calculateAverage(yearlyTrips);
+
+
     // Transform trips into chart data points
     optionsDaily.data[0].dataPoints = dailyTrips.map(trip => ({
       x: new Date(trip.createdAt),
       y: trip.totalEmissionsCO2eKg
     }));
 
+
+    optionsDaily.axisY.stripLines = [{
+      value: averageEmissionDaily,
+      label: "Average",
+    }];
+
      optionsMonthly.data[0].dataPoints = monthlyTrips.map(trip => ({
        x: new Date(trip.createdAt),
        y: trip.totalEmissionsCO2eKg
      }));
+
+      optionsMonthly.axisY.stripLines = [{
+        value: averageEmissionMonthly,
+        label: "Average",
+      }];
 
      optionsYearly.data[0].dataPoints = yearlyTrips.map(trip => ({
        x: new Date(trip.createdAt),
        y: trip.totalEmissionsCO2eKg
      }));
 
+      optionsYearly.axisY.stripLines = [{
+        value: averageEmissionYearly,
+        label: "Average",
+      }];
+
   const chartDaily = new CanvasJS.Chart(chartContainerDaily.value, optionsDaily);
   const chartMonthly = new CanvasJS.Chart(chartContainerMonthly.value, optionsMonthly);
   const chartYearly = new CanvasJS.Chart(chartContainerYearly.value, optionsYearly);
+
 
      chartDaily.render();
      chartMonthly.render();
