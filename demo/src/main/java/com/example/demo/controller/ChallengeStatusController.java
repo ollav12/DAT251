@@ -24,7 +24,7 @@ public class ChallengeStatusController {
     private final UserRepository userRepository;
 
     public ChallengeStatusController(ChallengeStatusService challengeStatusService, UserService userService,
-                                     ChallengeService challengeService, UserRepository userRepository) {
+            ChallengeService challengeService, UserRepository userRepository) {
         this.challengeStatusService = challengeStatusService;
         this.userService = userService;
         this.challengeService = challengeService;
@@ -33,7 +33,7 @@ public class ChallengeStatusController {
 
     @PostMapping("/{userId}/challenges/{challengeId}/assign")
     public ResponseEntity<ChallengeStatus> assignChallenge(@PathVariable long userId,
-                                                           @PathVariable long challengeId) {
+            @PathVariable long challengeId) {
         User user = userService.getUser(userId);
         Challenge challenge = challengeService.getChallenge(challengeId);
 
@@ -75,7 +75,6 @@ public class ChallengeStatusController {
 
         return ResponseEntity.ok(updatedUser);
     }
-
 
     @GetMapping("/{userId}/challenges")
     public ResponseEntity<List<ChallengeStatus>> getUserChallenges(@PathVariable long userId) {
