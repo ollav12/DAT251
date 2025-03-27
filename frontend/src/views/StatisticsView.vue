@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import CanvasJS from '@canvasjs/charts';
 import TransportService from '../services/transport'
 
@@ -7,6 +7,7 @@ const chartContainerDaily = ref(null);
 const chartContainerMonthly = ref(null);
 const chartContainerYearly = ref(null);
 
+const trips = ref([]);
 
 
 const optionsDaily = {
@@ -72,7 +73,7 @@ onMounted(async () => {
 
     const userId = localStorage.getItem("userId");
     console.log("userId: ", userId);
-    const trips = await TransportService.listUserTrips(userId);
+     trips.value = await TransportService.listUserTrips(userId);
     console.log("trips: ", trips);
 
 
@@ -81,15 +82,15 @@ onMounted(async () => {
     const currentYear = new Date().getFullYear();
 
     // Filter trips by current day
-    const dailyTrips = trips.filter(trip => trip.createdAt && new Date(trip.createdAt).getDate() === currentDate && new Date(trip.createdAt).getMonth() === currentMonth && new Date(trip.createdAt).getFullYear() === currentYear);
+    const dailyTrips = trips.value.filter(trip => trip.createdAt && new Date(trip.createdAt).getDate() === currentDate && new Date(trip.createdAt).getMonth() === currentMonth && new Date(trip.createdAt).getFullYear() === currentYear);
     console.log("dailyTrips: ", dailyTrips);
 
     // Filter trips by current month
-    const monthlyTrips = trips.filter(trip => trip.createdAt && new Date(trip.createdAt).getMonth() === currentMonth && new Date(trip.createdAt).getFullYear() === currentYear);
+    const monthlyTrips = trips.value.filter(trip => trip.createdAt && new Date(trip.createdAt).getMonth() === currentMonth && new Date(trip.createdAt).getFullYear() === currentYear);
     console.log("monthlyTrips: ", monthlyTrips);
 
     // Filter trips by current year
-    const yearlyTrips = trips.filter(trip => trip.createdAt && new Date(trip.createdAt).getFullYear() === currentYear);
+    const yearlyTrips = trips.value.filter(trip => trip.createdAt && new Date(trip.createdAt).getFullYear() === currentYear);
     console.log("yearlyTrips: ", yearlyTrips);
 
 
@@ -135,29 +136,56 @@ onMounted(async () => {
         label: "Average",
       }];
 
-  const chartDaily = new CanvasJS.Chart(chartContainerDaily.value, optionsDaily);
-  const chartMonthly = new CanvasJS.Chart(chartContainerMonthly.value, optionsMonthly);
-  const chartYearly = new CanvasJS.Chart(chartContainerYearly.value, optionsYearly);
+
+      await nextTick(() => {
+        renderCharts();
+      });
 
 
-     chartDaily.render();
-     chartMonthly.render();
-     chartYearly.render();
 
   } catch (error) {
     console.error("Failed to load trip data ",  error);
   }
 
 });
+
+const renderCharts = () => {
+  if (trips.value.length > 0) {
+
+    if(chartContainerDaily.value) {
+      const chartDaily = new CanvasJS.Chart(chartContainerDaily.value, optionsDaily);
+      chartDaily.render();
+    }
+
+    if(chartContainerMonthly.value) {
+      const chartMonthly = new CanvasJS.Chart(chartContainerMonthly.value, optionsMonthly);
+      chartMonthly.render();
+
+    }
+
+    if(chartContainerYearly.value) {
+      const chartYearly = new CanvasJS.Chart(chartContainerYearly.value, optionsYearly);
+      chartYearly.render();
+    }
+  }
+}
+
+//TODO Don't display graphs if trips are empty
+
 </script>
 
 <template>
-  <h1>Daily Emission</h1>
-  <div ref="chartContainerDaily" style="width: 100%; height: 360px; margin-bottom: 20px; margin-top: 5px;"></div>
-  <h1>Monthly Emission</h1>
-  <div ref="chartContainerMonthly" style="width: 100%; height: 360px; margin-top: 5px; margin-bottom: 20px;"></div>
-  <h1>Yearly Emission</h1>
-  <div ref="chartContainerYearly" style="width: 100%; height: 360px; margin-top: 5px; margin-bottom: 20px;"></div>
+  <div v-if="!trips || trips.length < 2">
+    <h1>Please add atleast two trips to see statistics</h1>
+  </div>
+  <div v-else>
+    <h1>Daily Emission</h1>
+    <div ref="chartContainerDaily" style="width: 100%; height: 360px; margin-bottom: 20px; margin-top: 5px;"></div>
+    <h1>Monthly Emission</h1>
+    <div ref="chartContainerMonthly" style="width: 100%; height: 360px; margin-top: 5px; margin-bottom: 20px;"></div>
+    <h1>Yearly Emission</h1>
+    <div ref="chartContainerYearly" style="width: 100%; height: 360px; margin-top: 5px; margin-bottom: 20px;"></div>
+  </div>
 </template>
 
 <style scoped>
