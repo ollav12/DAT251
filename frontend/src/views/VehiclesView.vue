@@ -59,7 +59,8 @@ onMounted(() => {
         <button v-if="!vehicle.default" @click="deleteVehicle(vehicle.id)">Delete</button>
       </li>
     </ul>
-    <h3>Add Vehicle</h3>
+    <fieldset>
+    <legend>Add Vehicle</legend>
     <form @submit.prevent="submitVehicle" style="display: flex; flex-direction: column; gap: 10px">
       <label for="make">Make:</label>
       <input type="text" id="make" name="make" required />
@@ -88,6 +89,7 @@ onMounted(() => {
       />
       <button type="submit">Add Vehicle</button>
     </form>
+    </fieldset>
   </main>
 </template>
 
@@ -97,6 +99,87 @@ main {
   max-width: 480px;
   margin: 0 auto;
   gap: 16px;
+}
+
+fieldset {
+  border: 1px solid darkgrey;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 8px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid darkgrey;
+  border-radius: 8px;
+  color: white;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+input[type="text"]:hover {
+  background-color: #ddd;
+}
+
+input[type="text"]:focus {
+  border-color: #2b5797;
+  outline: none;
+  background-color: #4e4e4e;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid darkgrey;
+  border-radius: 8px;
+  color: white;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+button[type="submit"] {
+  padding: 8px 12px;
+  border: 1px solid darkgrey;
+  border-radius: 16px;
+  background-color: #2b5797;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  background-color: #ddd;
+}
+
+button[type="submit"]:active {
+  background-color: #2b5797;
+  color: white;
+}
+
+select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid darkgrey;
+  border-radius: 8px;
+  color: white;
+  background-color: #3d3d3d;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+select:hover {
+  background-color: #4e4e4e;
 }
 
 ul.vehicle-list {
