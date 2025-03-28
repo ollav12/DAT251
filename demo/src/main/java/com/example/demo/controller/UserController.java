@@ -49,7 +49,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable long id) {
         try {
@@ -84,10 +84,6 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
             User registeredUser = userService.registerUser(user);
-            List<Challenge> challenges = challengeService.getAllChallenges();
-            for (Challenge challenge : challenges) {
-                challengeStatusService.assignChallenge(user.getId(), challenge);
-            }
 
             return ResponseEntity.created(
                     new URI("/users/" + registeredUser.getId())).body(registeredUser);

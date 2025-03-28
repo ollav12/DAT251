@@ -31,10 +31,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> register(
             @RequestBody User user) {
         userService.registerUser(user);
-        List<Challenge> challenges = challengeService.getAllChallenges();
-        for (Challenge challenge : challenges) {
-            challengeStatusService.assignChallenge(user.getId(), challenge);
-        }
+
         return ResponseEntity.ok(
                 Map.of("message", "User registered successfully"));
     }

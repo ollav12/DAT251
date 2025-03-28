@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.Challenge;
 import com.example.demo.model.User;
+import com.example.demo.model.ChallengeStatus.Status;
 import com.example.demo.model.ChallengeStatus;
 import com.example.demo.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -115,13 +116,8 @@ public class ChallengeStatusService {
         challengeStatusRepo.deleteById(id);
     }
 
-    public void updateChallenge(long challengeStatusId, ChallengeStatus challengeStatus) {
-        ChallengeStatus temp = challengeStatusRepo.findById(challengeStatusId).orElseThrow();
-        temp.setCompletedAt(challengeStatus.getCompletedAt());
-        temp.setStartedAt(challengeStatus.getStartedAt());
-        temp.setStatus(challengeStatus.getStatus());
-        temp.setCurrentValue(challengeStatus.getCurrentValue());
-        challengeStatusRepo.save(temp);
+    public void updateChallenge(long challengeStatusId, ChallengeStatus status) {
+        challengeStatusRepo.save(status);
     }
 
     public ChallengeStatus getChallenge(long id) {
