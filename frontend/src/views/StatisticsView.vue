@@ -1,16 +1,36 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import CanvasJS from '@canvasjs/charts';
-import TransportService from '../services/transport'
+import TransportService, { type Trip } from '../services/transport'
 
 const chartContainerDaily = ref(null);
 const chartContainerMonthly = ref(null);
 const chartContainerYearly = ref(null);
 
-const trips = ref([]);
+const trips = ref<Trip[]>([]);
 
+type CanvasOptions = {
+  theme: string;
+  animationEnabled: boolean;
+  animationDuration: number;
+  title: { text: string };
+  axisY: { title: string; suffix: string; stripLines: {
+    value: number;
+    label: string;
+    }[] };
+  data: {
+    type: string;
+    xValueFormatString: string;
+    yValueFormatString: string;
+    markerSize: number;
+    dataPoints: {
+      x: Date;
+      y: number;
+    }[];
+  }[];
+};
 
-const optionsDaily = {
+const optionsDaily: CanvasOptions = {
   theme: "light2",
   animationEnabled: true,
   animationDuration: 3000,
@@ -29,7 +49,7 @@ const optionsDaily = {
   }]
 };
 
-const optionsMonthly = {
+const optionsMonthly: CanvasOptions = {
   theme: "light2",
   animationEnabled: true,
   animationDuration: 3000,
@@ -46,7 +66,7 @@ const optionsMonthly = {
   }]
 };
 
-const optionsYearly = {
+const optionsYearly: CanvasOptions = {
   theme: "light2",
   animationEnabled: true,
   animationDuration: 3000,
@@ -73,7 +93,7 @@ onMounted(async () => {
 
     const userId = localStorage.getItem("userId");
     console.log("userId: ", userId);
-     trips.value = await TransportService.listUserTrips(userId);
+    trips.value = await TransportService.listUserTrips(parseInt(userId || ""));
     console.log("trips: ", trips);
 
 
@@ -94,7 +114,7 @@ onMounted(async () => {
     console.log("yearlyTrips: ", yearlyTrips);
 
 
-     const calculateAverage = (trips) => {
+     const calculateAverage = (trips: Trip[]) => {
        const totalEmissionsCO2eKg = trips.reduce((acc, trip) => acc + trip.totalEmissionsCO2eKg, 0);
        return totalEmissionsCO2eKg / trips.length;
      };
