@@ -194,7 +194,7 @@ async function startChallenge(challengeID: number): Promise<void> {
       throw new Error("User ID not found")
     }
     
-    const response = await fetch(`http://localhost:8080/users/${userId}/challenges/${challengeID}/assign`, {
+    const response = await fetch(`http://localhost:8080/users/${userId}/challenges/${challengeID}/start`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -1,10 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.controller.ChallengeStatusController.MetricUpdate;
 import com.example.demo.model.Challenge;
 import com.example.demo.model.User;
-import com.example.demo.model.ChallengeStatus.Status;
 import com.example.demo.model.ChallengeStatus;
-import com.example.demo.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +16,46 @@ import java.util.List;
 @Service
 public class ChallengeStatusService {
 
-    private final UserRepository userRepo;
+    private final UserServiceImpl userService;
     private final ChallengeStatusRepository challengeStatusRepo;
+    private final ChallengeService challengeService;
 
-    public ChallengeStatusService(ChallengeStatusRepository challengeStatusRepo, UserRepository userRepo) {
-        this.userRepo = userRepo;
+    public ChallengeStatusService(ChallengeStatusRepository challengeStatusRepo, UserServiceImpl userService,
+            ChallengeService challengeService) {
         this.challengeStatusRepo = challengeStatusRepo;
+        this.userService = userService;
+        this.challengeService = challengeService;
     }
 
-    public ChallengeStatus assignChallenge(long userID, Challenge challenge) {
+    /**
+     * Get all user challenges
+     * 
+     * @param userID
+     * @return
+     */
+    public List<ChallengeStatus> getAllUserChallenges(long userID) {
+        return challengeStatusRepo.findByUserID(userID);
+    }
+
+    /**
+     * Get a user challenge
+     * 
+     * @param id
+     * @return
+     */
+    public ChallengeStatus getChallenge(long id) {
+        return challengeStatusRepo.findById(id).orElse(null);
+    }
+
+    /**
+     * Start a challenge by creating new challenge status and save to database
+     * 
+     * @param userID
+     * @param challengeId
+     * @return
+     */
+    public ChallengeStatus startChallenge(long userID, long challengeId) {
+        Challenge challenge = challengeService.getChallenge(challengeId);
         ChallengeStatus challengeStatus = new ChallengeStatus();
         challengeStatus.setUserID(userID);
         challengeStatus.setChallenge(challenge);
@@ -35,18 +65,13 @@ public class ChallengeStatusService {
         return challengeStatus;
     }
 
-    /*
-     * public ChallengeStatus completeChallenge(ChallengeStatus challengeStatus) {
-     * challengeStatus.setStatus(ChallengeStatus.Status.COMPLETED);
-     * challengeStatus.setCompletedAt(LocalDateTime.now());
-     * User user = userRepo.findById(challengeStatus.getUserID()).orElseThrow();
-     * user.setPoints(user.getPoints() +
-     * challengeStatus.getChallenge().getRewardPoints());
-     * userRepo.save(user);
-     * return challengeStatusRepo.save(challengeStatus);
-     * }
+    /**
+     * Complete a challenge if requirements are met
+     * 
+     * @param userId
+     * @param challengeId
+     * @return
      */
-
     public User completeChallenge(long userId, long challengeId) {
         // Find the challenge status
         ChallengeStatus status = challengeStatusRepo.findByUserIDAndChallenge_ChallengeID(
@@ -89,43 +114,56 @@ public class ChallengeStatusService {
         challengeStatusRepo.save(status);
 
         // Award points to user
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
+        User user = userService.getUser(userId);
         user.setPoints(user.getPoints() + challenge.getRewardPoints());
-        return userRepo.save(user);
+        userService.updateUser(user, userId);
+        return user;
     }
 
-    public List<ChallengeStatus> getUserChallenges(long userID) {
-        return challengeStatusRepo.findByUserID(userID);
+    /**
+     * Track a user challenge
+     * 
+     * @param userId
+     * @param challengeId
+     * @param metricUpdate
+     * @return
+     */
+    public ChallengeStatus trackUserChallenge(Long userId, Long challengeId, MetricUpdate metricUpdate) {
+        ChallengeStatus status = challengeStatusRepo.findByUserIDAndChallenge_ChallengeID(
+                userId, challengeId);
+
+        Challenge challenge = status.getChallenge();
+        if (status.getStatus() == ChallengeStatus.Status.NOT_STARTED) {
+            status.setStatus(ChallengeStatus.Status.IN_PROGRESS);
+        }
+        double newValue = status.getCurrentValue() + metricUpdate.getValue();
+        status.setCurrentValue(newValue);
+
+        if (newValue >= challenge.getTargetValue() &&
+                status.getStatus() != ChallengeStatus.Status.COMPLETED) {
+
+            // checkChallengeCompleted(userId, status, challenge);
+        }
+
+        return challengeStatusRepo.save(status);
     }
 
-    public List<ChallengeStatus> getCompletedChallenges(long userID) {
-        return challengeStatusRepo.findByUserIDAndStatus(userID, ChallengeStatus.Status.COMPLETED);
-    }
-
-    public List<ChallengeStatus> getStartedChallenges(long userID) {
-        return challengeStatusRepo.findByUserIDAndStatus(userID, ChallengeStatus.Status.IN_PROGRESS);
-    }
-
-    public List<ChallengeStatus> getNotStartedChallenges(long userID) {
-        return challengeStatusRepo.findByUserIDAndStatus(userID, ChallengeStatus.Status.NOT_STARTED);
-    }
-
+    /**
+     * Delete a user challenge
+     * 
+     * @param id
+     */
     public void deleteChallenge(long id) {
         challengeStatusRepo.deleteById(id);
     }
 
+    /**
+     * Update a user challenge
+     * 
+     * @param challengeStatusId
+     * @param status
+     */
     public void updateChallenge(long challengeStatusId, ChallengeStatus status) {
         challengeStatusRepo.save(status);
     }
-
-    public ChallengeStatus getChallenge(long id) {
-        return challengeStatusRepo.findById(id).orElse(null);
-    }
-
-    public ChallengeStatus getChallengeStatus(long userId, long challengeId) {
-        return challengeStatusRepo.findByUserIDAndChallenge_ChallengeID(userId, challengeId);
-    }
-
 }

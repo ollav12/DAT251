@@ -39,7 +39,9 @@ public class ChallengeStatus {
         COMPLETED
     }
 
-    public ChallengeStatus(long userID, Challenge challenge, Status status, LocalDateTime startedAt, LocalDateTime completedAt, double currentValue, int actionsCompleted, int currentStreak, LocalDateTime lastActionDate, List<LocalDateTime> checkpoints) {
+    public ChallengeStatus(long userID, Challenge challenge, Status status, LocalDateTime startedAt,
+            LocalDateTime completedAt, double currentValue, int actionsCompleted, int currentStreak,
+            LocalDateTime lastActionDate, List<LocalDateTime> checkpoints) {
         this.userID = userID;
         this.challenge = challenge;
         this.status = status;

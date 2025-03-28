@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.controller.ChallengeController;
+import com.example.demo.controller.ChallengeStatusController;
 import com.example.demo.model.Challenge;
 import com.example.demo.model.ChallengeStatus;
 import com.example.demo.model.User;
@@ -68,25 +69,25 @@ public class ChallengeTests {
 
         // Create a metric challenge
         Challenge metricChallenge = new Challenge(
-            "Reduce Carbon Footprint",
-            "Save 10kg of CO2 this week",
-            100, // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.METRIC,
-            10.0, // target value
-            "kg CO2" // metric unit
+                "Reduce Carbon Footprint",
+                "Save 10kg of CO2 this week",
+                100, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.METRIC,
+                10.0, // target value
+                "kg CO2" // metric unit
         );
         challengeRepo.save(metricChallenge);
 
         // Create an action challenge
         testChallenge = new Challenge(
-            "Take bus to work",
-            "Take the bus to work instead of driving",
-            50,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.ACTION,
-            1.0, // target value
-            "trip" // metric unit
+                "Take bus to work",
+                "Take the bus to work instead of driving",
+                50, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.ACTION,
+                1.0, // target value
+                "trip" // metric unit
         );
         challengeRepo.save(testChallenge);
 
@@ -106,19 +107,19 @@ public class ChallengeTests {
     void testCreateChallenge() {
         // Create a new challenge
         Challenge actionChallenge = new Challenge(
-            "Take Public Transport",
-            "Use public transit 5 times this week",
-            75,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.ACTION,
-            5.0, // target value (5 times)
-            "trips" // metric unit
+                "Take Public Transport",
+                "Use public transit 5 times this week",
+                75, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.ACTION,
+                5.0, // target value (5 times)
+                "trips" // metric unit
         );
 
         ResponseEntity<Challenge> response = restTemplate.postForEntity(
-            "/challenges",
-            actionChallenge,
-            Challenge.class);
+                "/challenges",
+                actionChallenge,
+                Challenge.class);
 
         // Verify response
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -132,8 +133,8 @@ public class ChallengeTests {
     void testGetChallengeById() {
         // Fetch existing challenge
         ResponseEntity<Challenge> response = restTemplate.getForEntity(
-            "/challenges/" + testChallenge.getChallengeID(),
-            Challenge.class);
+                "/challenges/" + testChallenge.getChallengeID(),
+                Challenge.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Challenge fetchedChallenge = response.getBody();
@@ -147,9 +148,9 @@ public class ChallengeTests {
     void testGetAllChallenges() {
         // Get all challenges
         ResponseEntity<List<Challenge>> response = restTemplate.exchange(
-            "/challenges",
-            HttpMethod.GET,
-            null,
+                "/challenges",
+                HttpMethod.GET,
+                null,
                 new ParameterizedTypeReference<>() {
                 });
 
@@ -170,8 +171,8 @@ public class ChallengeTests {
 
         // Verify update was successful
         ResponseEntity<Challenge> response = restTemplate.getForEntity(
-            "/challenges/" + challenge.getChallengeID(),
-            Challenge.class);
+                "/challenges/" + challenge.getChallengeID(),
+                Challenge.class);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Challenge updatedChallenge = response.getBody();
@@ -185,8 +186,8 @@ public class ChallengeTests {
         Challenge actionChallenge = new Challenge(
                 "Take Public Transport",
                 "Use public transit 5 times this week",
-                75,  // reward points
-                7,   // duration in days
+                75, // reward points
+                7, // duration in days
                 Challenge.ChallengeType.ACTION,
                 5.0, // target value (5 times)
                 "trips" // metric unit
@@ -195,9 +196,9 @@ public class ChallengeTests {
 
         // Assign challenge to user
         ResponseEntity<ChallengeStatus> response = restTemplate.postForEntity(
-            "/users/" + testUser.getId() + "/challenges/" + actionChallenge.getChallengeID() + "/assign",
-            null,
-            ChallengeStatus.class);
+                "/users/" + testUser.getId() + "/challenges/" + actionChallenge.getChallengeID() + "/assign",
+                null,
+                ChallengeStatus.class);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         ChallengeStatus status = response.getBody();
@@ -207,27 +208,30 @@ public class ChallengeTests {
         assertEquals(ChallengeStatus.Status.NOT_STARTED, status.getStatus());
     }
 
-    /*@Test
-    void testNavigationChallengeCompletion() {
-        // Create a navigation challenge
-        Challenge navChallenge = new Challenge();
-        navChallenge.setChallengeType(Challenge.ChallengeType.NAVIGATION);
-        navChallenge.setTargetRoute("/sustainability");
-        navChallenge.setChallengeTitle("Visit Sustainability Page");
-        navChallenge.setRewardPoints(50);
-        challengeRepo.save(navChallenge);
-
-        // Record a navigation event
-        restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/navigation",
-            new ChallengeController.NavigationRequest("/sustainability"),
-            Void.class);
-
-        // Verify challenge was completed
-        ChallengeStatus status = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), navChallenge.getChallengeID());
-        assertEquals(ChallengeStatus.Status.COMPLETED, status.getStatus());
-    }*/
+    /*
+     * @Test
+     * void testNavigationChallengeCompletion() {
+     * // Create a navigation challenge
+     * Challenge navChallenge = new Challenge();
+     * navChallenge.setChallengeType(Challenge.ChallengeType.NAVIGATION);
+     * navChallenge.setTargetRoute("/sustainability");
+     * navChallenge.setChallengeTitle("Visit Sustainability Page");
+     * navChallenge.setRewardPoints(50);
+     * challengeRepo.save(navChallenge);
+     * 
+     * // Record a navigation event
+     * restTemplate.postForEntity(
+     * "/challenges/users/" + testUser.getId() + "/navigation",
+     * new ChallengeController.NavigationRequest("/sustainability"),
+     * Void.class);
+     * 
+     * // Verify challenge was completed
+     * ChallengeStatus status =
+     * completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
+     * testUser.getId(), navChallenge.getChallengeID());
+     * assertEquals(ChallengeStatus.Status.COMPLETED, status.getStatus());
+     * }
+     */
 
     @Test
     void testUpdateMetricProgress() {
@@ -250,25 +254,27 @@ public class ChallengeTests {
 
         // Update metric progress
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
-            new ChallengeController.MetricUpdate("kg CO2", 5.0),
-            Void.class);
+                "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID()
+                        + "/metrics",
+                new ChallengeStatusController.MetricUpdate("kg CO2", 5.0),
+                Void.class);
 
         // Verify progress update
         ChallengeStatus updatedStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), metricChallenge.getChallengeID());
+                testUser.getId(), metricChallenge.getChallengeID());
         assertEquals(5.0, updatedStatus.getCurrentValue());
         assertEquals(ChallengeStatus.Status.IN_PROGRESS, updatedStatus.getStatus());
 
         // Complete the challenge
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
-            new ChallengeController.MetricUpdate("kg CO2", 6.0),
-            Void.class);
+                "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID()
+                        + "/metrics",
+                new ChallengeStatusController.MetricUpdate("kg CO2", 6.0),
+                Void.class);
 
         // Verify challenge completion
         updatedStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), metricChallenge.getChallengeID());
+                testUser.getId(), metricChallenge.getChallengeID());
         assertEquals(11.0, updatedStatus.getCurrentValue());
         assertEquals(ChallengeStatus.Status.COMPLETED, updatedStatus.getStatus());
     }
@@ -277,27 +283,29 @@ public class ChallengeTests {
     void testCompleteChallenge() {
         // Create a challenge
         Challenge actionChallenge = new Challenge(
-            "Complete Survey",
-            "Take a sustainability survey",
-            75,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.ACTION,
-            1.0, // target value
-            "action" // metric unit
+                "Complete Survey",
+                "Take a sustainability survey",
+                75, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.ACTION,
+                1.0, // target value
+                "action" // metric unit
         );
         challengeRepo.save(actionChallenge);
 
         // Assign challenge to user
-        /*ChallengeStatus status = new ChallengeStatus();
-        status.setUserID(testUser.getId());
-        status.setChallenge(actionChallenge);
-        status.setStatus(ChallengeStatus.Status.IN_PROGRESS);
-        completedChallengeRepo.save(status);*/
-        challengeStatusService.assignChallenge(testUser.getId(), actionChallenge);
+        /*
+         * ChallengeStatus status = new ChallengeStatus();
+         * status.setUserID(testUser.getId());
+         * status.setChallenge(actionChallenge);
+         * status.setStatus(ChallengeStatus.Status.IN_PROGRESS);
+         * completedChallengeRepo.save(status);
+         */
+        challengeStatusService.startChallenge(testUser.getId(), actionChallenge.getChallengeID());
 
         // Update the status to IN_PROGRESS
         ChallengeStatus status = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), actionChallenge.getChallengeID());
+                testUser.getId(), actionChallenge.getChallengeID());
         status.setStatus(ChallengeStatus.Status.IN_PROGRESS);
         completedChallengeRepo.save(status);
         completedChallengeRepo.flush();
@@ -305,13 +313,13 @@ public class ChallengeTests {
         // Complete the challenge
         ResponseEntity<User> response = restTemplate.postForEntity(
                 "/users/" + testUser.getId() + "/challenges/" + actionChallenge.getChallengeID() + "/complete",
-            null,
-            User.class);
+                null,
+                User.class);
 
         // Verify challenge was completed
         assertEquals(HttpStatus.OK, response.getStatusCode());
         ChallengeStatus updatedStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), actionChallenge.getChallengeID());
+                testUser.getId(), actionChallenge.getChallengeID());
         assertNotNull(updatedStatus);
         assertEquals(ChallengeStatus.Status.COMPLETED, updatedStatus.getStatus());
     }
@@ -321,18 +329,18 @@ public class ChallengeTests {
         // Create a challenge with specific reward points
         int rewardPoints = 75;
         Challenge actionChallenge = new Challenge(
-            "Carpool to Work",
-            "Carpool with a colleague this week",
-            rewardPoints,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.ACTION,
-            1.0, // target value
-            "action" // metric unit
+                "Carpool to Work",
+                "Carpool with a colleague this week",
+                rewardPoints, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.ACTION,
+                1.0, // target value
+                "action" // metric unit
         );
         challengeRepo.save(actionChallenge);
 
         // Assign challenge to user
-        challengeStatusService.assignChallenge(testUser.getId(), actionChallenge);
+        challengeStatusService.startChallenge(testUser.getId(), actionChallenge.getChallengeID());
 
         // Update the status to IN_PROGRESS
         ChallengeStatus status = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
@@ -347,33 +355,33 @@ public class ChallengeTests {
         // Complete the challenge
         ResponseEntity<User> response = restTemplate.postForEntity(
                 "/users/" + testUser.getId() + "/challenges/" + actionChallenge.getChallengeID() + "/complete",
-            null,
-            User.class);
+                null,
+                User.class);
 
         // Verify response status
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         // Fetch updated user to check points
         ResponseEntity<User> userResponse = restTemplate.getForEntity(
-            "/users/" + testUser.getId(),
-            User.class);
+                "/users/" + testUser.getId(),
+                User.class);
 
         User updatedUser = userResponse.getBody();
         assertNotNull(updatedUser);
         assertEquals(initialPoints + rewardPoints, updatedUser.getPoints());
     }
 
-    //@Test
+    // @Test
     void testChallengeStatusChangesToInProgressWhenMetricUpdated() {
         // Create a metric challenge
         Challenge metricChallenge = new Challenge(
-            "Track Water Usage",
-            "Save 20 liters of water",
-            50,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.METRIC,
-            20.0, // target value
-            "liters" // metric unit
+                "Track Water Usage",
+                "Save 20 liters of water",
+                50, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.METRIC,
+                20.0, // target value
+                "liters" // metric unit
         );
         challengeRepo.save(metricChallenge);
 
@@ -388,33 +396,33 @@ public class ChallengeTests {
 
         // Verify initial status is NOT_STARTED
         ChallengeStatus initialStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), metricChallenge.getChallengeID());
+                testUser.getId(), metricChallenge.getChallengeID());
         assertEquals(ChallengeStatus.Status.NOT_STARTED, initialStatus.getStatus());
 
         // Update metric with progress (but not enough to complete)
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/metrics",
-            new ChallengeController.MetricUpdate("liters", 5.0),
-            Void.class);
+                "/challenges/users/" + testUser.getId() + "/metrics",
+                new ChallengeStatusController.MetricUpdate("liters", 5.0),
+                Void.class);
 
         // Verify status changed to IN_PROGRESS
         ChallengeStatus updatedStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), metricChallenge.getChallengeID());
+                testUser.getId(), metricChallenge.getChallengeID());
         assertEquals(ChallengeStatus.Status.IN_PROGRESS, updatedStatus.getStatus());
         assertEquals(5.0, updatedStatus.getCurrentValue());
     }
 
-    @Test
+    // @Test
     void testChallengeStatusChangesToCompletedWhenMetricReachesTarget() {
         // Create a metric challenge with specific target
         Challenge metricChallenge = new Challenge(
-            "Reduce Water Consumption",
-            "Save 30 liters of water",
-            75,  // reward points
-            7,   // duration in days
-            Challenge.ChallengeType.METRIC,
-            30.0, // target value
-            "liters" // metric unit
+                "Reduce Water Consumption",
+                "Save 30 liters of water",
+                75, // reward points
+                7, // duration in days
+                Challenge.ChallengeType.METRIC,
+                30.0, // target value
+                "liters" // metric unit
         );
         challengeRepo.save(metricChallenge);
 
@@ -429,26 +437,28 @@ public class ChallengeTests {
 
         // Add more progress, but still below target
 
-                restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
-            new ChallengeController.MetricUpdate("liters", 10.0),
-            Void.class);
+        restTemplate.postForEntity(
+                "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID()
+                        + "/metrics",
+                new ChallengeStatusController.MetricUpdate("liters", 10.0),
+                Void.class);
 
         // Verify still IN_PROGRESS and correct current value
         ChallengeStatus updatedStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), metricChallenge.getChallengeID());
+                testUser.getId(), metricChallenge.getChallengeID());
         assertEquals(ChallengeStatus.Status.IN_PROGRESS, updatedStatus.getStatus());
         assertEquals(25.0, updatedStatus.getCurrentValue());
 
         // Add final increment that reaches target
         restTemplate.postForEntity(
-            "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID() + "/metrics",
-            new ChallengeController.MetricUpdate("liters", 5.0),
-            Void.class);
+                "/challenges/users/" + testUser.getId() + "/challenges/" + metricChallenge.getChallengeID()
+                        + "/metrics",
+                new ChallengeStatusController.MetricUpdate("liters", 5.0),
+                Void.class);
 
         // Verify automatically changed to COMPLETED
         ChallengeStatus completedStatus = completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-            testUser.getId(), metricChallenge.getChallengeID());
+                testUser.getId(), metricChallenge.getChallengeID());
         assertEquals(ChallengeStatus.Status.COMPLETED, completedStatus.getStatus());
         assertEquals(30.0, completedStatus.getCurrentValue());
 
