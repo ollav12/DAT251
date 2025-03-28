@@ -195,18 +195,37 @@ const renderCharts = () => {
 </script>
 
 <template>
-  <div v-if="!trips || trips.length < 2">
+  <div class="container" >
+  <div class="message" v-if="!trips || trips.length < 2">
     <h1>Please add atleast two trips to see statistics</h1>
   </div>
   <div v-else>
-    <h1>Daily Emission</h1>
-    <div ref="chartContainerDaily" style="width: 100%; height: 360px; margin-bottom: 20px; margin-top: 5px;"></div>
-    <h1>Monthly Emission</h1>
-    <div ref="chartContainerMonthly" style="width: 100%; height: 360px; margin-top: 5px; margin-bottom: 20px;"></div>
-    <h1>Yearly Emission</h1>
-    <div ref="chartContainerYearly" style="width: 100%; height: 360px; margin-top: 5px; margin-bottom: 20px;"></div>
+    <div ref="chartContainerDaily" class="chart"></div>
+    <div ref="chartContainerMonthly" class="chart"></div>
+    <div ref="chartContainerYearly" class="chart"></div>
+  </div>
   </div>
 </template>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+
+
+}
+.chart {
+  width: 80%;
+  height: 70vh;
+  margin: 40px auto;
+}
+
+.message {
+  margin-top: 20px;
+  text-align: center;
+}
+
+
 </style>
