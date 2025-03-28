@@ -1,8 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-import eye from "@/assets/eye.svg";
-import eyeOff from "@/assets/eye-off.svg";
+import { defineComponent } from 'vue'
+import { useRouter } from 'vue-router'
+import eye from '@/assets/eye.svg'
+import eyeOff from '@/assets/eye-off.svg'
 
 export default defineComponent({
   data() {
@@ -18,81 +18,83 @@ export default defineComponent({
       errorUsername: '',
       errorEmail: '',
       errorPassword: '',
-      showPassword : false,
+      showPassword: false,
       eye,
-      eyeOff
+      eyeOff,
     }
   },
 
   setup() {
-    const router = useRouter();
-    return { router };
+    const router = useRouter()
+    return { router }
   },
 
   methods: {
-
     togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
+      this.showPassword = !this.showPassword
     },
 
     validateForm(): boolean {
-      this.validateFirstName(this.firstName);
-      this.validateLastName(this.lastName);
-      this.validateUsername(this.username);
-      this.validateEmail(this.email);
-      this.validatePassword(this.password);
+      this.validateFirstName(this.firstName)
+      this.validateLastName(this.lastName)
+      this.validateUsername(this.username)
+      this.validateEmail(this.email)
+      this.validatePassword(this.password)
 
-      return !(this.errorFirstName ||
+      return !(
+        this.errorFirstName ||
         this.errorLastName ||
         this.errorUsername ||
         this.errorEmail ||
-        this.errorPassword);
+        this.errorPassword
+      )
     },
 
     validateFirstName(val: string) {
       if (!/^[A-Z][a-zA-Z]{1,14}$/.test(val)) {
-        this.errorFirstName = 'First name must be 2-15 letters, starting uppercase.';
+        this.errorFirstName = 'First name must be 2-15 letters, starting uppercase.'
       } else {
-        this.errorFirstName = '';
+        this.errorFirstName = ''
       }
     },
 
     validateLastName(val: string) {
       if (!/^[A-Z][a-zA-Z]{1,14}$/.test(val)) {
-        this.errorLastName = 'Last name must be 2-15 letters, starting uppercase.';
+        this.errorLastName = 'Last name must be 2-15 letters, starting uppercase.'
       } else {
-        this.errorLastName = '';
+        this.errorLastName = ''
       }
     },
 
     validateUsername(val: string) {
       if (!/^[a-zA-Z0-9]{2,15}$/.test(val)) {
-        this.errorUsername = 'Username must be 2-15 alphanumeric characters.';
+        this.errorUsername = 'Username must be 2-15 alphanumeric characters.'
       } else {
-        this.errorUsername = '';
+        this.errorUsername = ''
       }
     },
 
     validateEmail(val: string) {
       if (!/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(val)) {
-        this.errorEmail = 'Please provide a valid email address.';
+        this.errorEmail = 'Please provide a valid email address.'
       } else {
-        this.errorEmail = '';
+        this.errorEmail = ''
       }
     },
 
     validatePassword(val: string) {
       if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/.test(val)) {
-        this.errorPassword = 'Password must be 8+ chars and include uppercase, lowercase, and a digit.';
+        this.errorPassword =
+          'Password must be 8+ chars and include uppercase, lowercase, and a digit.'
       } else {
-        this.errorPassword = '';
+        this.errorPassword = ''
       }
     },
 
     async handleSubmit(e: Event) {
-      e.preventDefault();
+      e.preventDefault()
       if (!this.validateForm()) {
-        return;
+        return
       }
       try {
         const response = await fetch('http://localhost:8080/auth/register', {
@@ -103,43 +105,45 @@ export default defineComponent({
             lastName: this.lastName,
             username: this.username,
             email: this.email,
-            password: this.password
-          })
-        });
-        const data = await response.json();
+            password: this.password,
+          }),
+        })
+        const data = await response.json()
         if (!response.ok) {
           if (Array.isArray(data)) {
-            this.errorMessage = data.join(' ');
+            this.errorMessage = data.join(' ')
           } else {
-            this.errorMessage = data.message || 'An error occurred during signup.';
+            this.errorMessage = data.message || 'An error occurred during signup.'
           }
-          return;
+          return
         }
-        await this.router.push({name: 'login'});
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('userId', data.userId)
+        await this.router.push({ name: 'home' })
       } catch (error) {
-        console.error('Error during signup:', error);
-        this.errorMessage = 'An error occurred during signup';
+        console.error('Error during signup:', error)
+        this.errorMessage = 'An error occurred during signup'
       }
-    }
+    },
   },
 
   watch: {
     firstName(newVal: string) {
-      this.validateFirstName(newVal);
+      this.validateFirstName(newVal)
     },
     lastName(newVal: string) {
-      this.validateLastName(newVal);
+      this.validateLastName(newVal)
     },
     username(newVal: string) {
-      this.validateUsername(newVal);
+      this.validateUsername(newVal)
     },
     email(newVal: string) {
-      this.validateEmail(newVal);
+      this.validateEmail(newVal)
     },
     password(newVal: string) {
-      this.validatePassword(newVal);
-    }
-  }
+      this.validatePassword(newVal)
+    },
+  },
 })
 </script>
 
@@ -149,27 +153,51 @@ export default defineComponent({
     <form @submit="handleSubmit">
       <div class="input-group">
         <label for="firstName">First Name:</label>
-        <input type="text" id="firstName" v-model="firstName" required placeholder="First Name"
-               :class="{'input-valid': !errorFirstName && firstName, 'input-invalid': errorFirstName}"/>
-        <small v-if="errorFirstName" style="color: #dc3545;">{{ errorFirstName }}</small>
+        <input
+          type="text"
+          id="firstName"
+          v-model="firstName"
+          required
+          placeholder="First Name"
+          :class="{ 'input-valid': !errorFirstName && firstName, 'input-invalid': errorFirstName }"
+        />
+        <small v-if="errorFirstName" style="color: #dc3545">{{ errorFirstName }}</small>
       </div>
       <div class="input-group">
         <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName" v-model="lastName" required placeholder="Last Name"
-               :class="{'input-valid': !errorLastName && lastName, 'input-invalid': errorLastName}"/>
-        <small v-if="errorLastName" style="color: #dc3545;">{{ errorLastName }}</small>
+        <input
+          type="text"
+          id="lastName"
+          v-model="lastName"
+          required
+          placeholder="Last Name"
+          :class="{ 'input-valid': !errorLastName && lastName, 'input-invalid': errorLastName }"
+        />
+        <small v-if="errorLastName" style="color: #dc3545">{{ errorLastName }}</small>
       </div>
       <div class="input-group">
         <label for="username">Username:</label>
-        <input type="text" id="username" v-model="username" required placeholder="Username"
-               :class="{'input-valid': !errorUsername && username, 'input-invalid': errorUsername}"/>
-        <small v-if="errorUsername" style="color: #dc3545;">{{ errorUsername }}</small>
+        <input
+          type="text"
+          id="username"
+          v-model="username"
+          required
+          placeholder="Username"
+          :class="{ 'input-valid': !errorUsername && username, 'input-invalid': errorUsername }"
+        />
+        <small v-if="errorUsername" style="color: #dc3545">{{ errorUsername }}</small>
       </div>
       <div class="input-group">
         <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required placeholder="Email"
-               :class="{'input-valid': !errorEmail && email, 'input-invalid': errorEmail}"/>
-        <small v-if="errorEmail" style="color: #dc3545;">{{ errorEmail }}</small>
+        <input
+          type="email"
+          id="email"
+          v-model="email"
+          required
+          placeholder="Email"
+          :class="{ 'input-valid': !errorEmail && email, 'input-invalid': errorEmail }"
+        />
+        <small v-if="errorEmail" style="color: #dc3545">{{ errorEmail }}</small>
       </div>
       <div class="input-group">
         <label for="password">Password:</label>
@@ -178,18 +206,23 @@ export default defineComponent({
             :type="showPassword ? 'text' : 'password'"
             id="password"
             v-model="password"
-            required placeholder="Password"
-            :class="{'input-valid': !errorPassword && password, 'input-invalid': errorPassword}"
+            required
+            placeholder="Password"
+            :class="{ 'input-valid': !errorPassword && password, 'input-invalid': errorPassword }"
           />
           <button type="button" class="toggle-password" @click="togglePasswordVisibility">
-            <img :src="showPassword ? eye : eyeOff" alt="Toggle password visibility" class="eye-icon" />
+            <img
+              :src="showPassword ? eye : eyeOff"
+              alt="Toggle password visibility"
+              class="eye-icon"
+            />
           </button>
         </div>
-        <small v-if="errorPassword" style="color: #dc3545;">{{ errorPassword }}</small>
+        <small v-if="errorPassword" style="color: #dc3545">{{ errorPassword }}</small>
       </div>
 
       <button class="register-button" type="submit">Signup</button>
-      <p v-if="errorMessage" style="color: #dc3545;">{{ errorMessage }}</p>
+      <p v-if="errorMessage" style="color: #dc3545">{{ errorMessage }}</p>
     </form>
   </div>
 </template>
@@ -296,6 +329,4 @@ button {
   height: 20px;
   cursor: pointer;
 }
-
-
 </style>
