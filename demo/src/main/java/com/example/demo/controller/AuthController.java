@@ -25,12 +25,15 @@ public class AuthController {
     ) {}
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(
+    public ResponseEntity<Map<String, Object>> register(
         @RequestBody User user
     ) {
-        userService.registerUser(user);
+        var newUser = userService.registerUser(user);
         return ResponseEntity.ok(
-            Map.of("message", "User registered successfully")
+            Map.of(
+                "message", "User registered successfully",
+                "userId", newUser.getId()
+            )
         );
     }
 
