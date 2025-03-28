@@ -34,14 +34,17 @@ public class ChallengeStatusService {
         return challengeStatus;
     }
 
-    /*public ChallengeStatus completeChallenge(ChallengeStatus challengeStatus) {
-        challengeStatus.setStatus(ChallengeStatus.Status.COMPLETED);
-        challengeStatus.setCompletedAt(LocalDateTime.now());
-        User user = userRepo.findById(challengeStatus.getUserID()).orElseThrow();
-        user.setPoints(user.getPoints() + challengeStatus.getChallenge().getRewardPoints());
-        userRepo.save(user);
-        return challengeStatusRepo.save(challengeStatus);
-    }*/
+    /*
+     * public ChallengeStatus completeChallenge(ChallengeStatus challengeStatus) {
+     * challengeStatus.setStatus(ChallengeStatus.Status.COMPLETED);
+     * challengeStatus.setCompletedAt(LocalDateTime.now());
+     * User user = userRepo.findById(challengeStatus.getUserID()).orElseThrow();
+     * user.setPoints(user.getPoints() +
+     * challengeStatus.getChallenge().getRewardPoints());
+     * userRepo.save(user);
+     * return challengeStatusRepo.save(challengeStatus);
+     * }
+     */
 
     public User completeChallenge(long userId, long challengeId) {
         // Find the challenge status
@@ -67,7 +70,7 @@ public class ChallengeStatusService {
             case ACTION:
                 // For action challenges, check if required actions are performed
                 metricsComplete = status.getCurrentValue() >= challenge.getTargetValue() ||
-                         status.getStatus() == ChallengeStatus.Status.IN_PROGRESS;
+                        status.getStatus() == ChallengeStatus.Status.IN_PROGRESS;
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -117,6 +120,7 @@ public class ChallengeStatusService {
         temp.setCompletedAt(challengeStatus.getCompletedAt());
         temp.setStartedAt(challengeStatus.getStartedAt());
         temp.setStatus(challengeStatus.getStatus());
+        temp.setCurrentValue(challengeStatus.getCurrentValue());
         challengeStatusRepo.save(temp);
     }
 

@@ -349,7 +349,7 @@ onMounted(async () => {
                   ></div>
                   </div>
                   <span class="progress-text">
-                    {{ userChallenge.currentValue }}/{{ userChallenge.challenge.targetValue }}
+                    {{ Math.floor(userChallenge.currentValue) }}/{{ userChallenge.challenge.targetValue }}
                     {{ userChallenge.challenge.metricUnit }}
                   </span>
                 </div>

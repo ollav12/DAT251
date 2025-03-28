@@ -115,7 +115,7 @@ export default defineComponent({
           }
           return;
         }
-        await this.router.push({name: 'login'});
+        await this.router.push({name: 'home'});
       } catch (error) {
         console.error('Error during signup:', error);
         this.errorMessage = 'An error occurred during signup';

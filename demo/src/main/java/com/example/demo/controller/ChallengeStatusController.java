@@ -123,17 +123,20 @@ public class ChallengeStatusController {
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        List<ChallengeStatus> startedChallenges = challengeStatusService.getStartedChallenges(userId);
-        List<Challenge> challenges = challengeService.getAllChallenges();
-        System.out.println(startedChallenges);
-        for (Challenge challenge : challenges) { // Checks if new challenges are created and adds them to the user when
-                                                 // user checks challenges tab
-            boolean isStarted = startedChallenges.stream()
-                    .anyMatch(status -> status.getChallenge().getChallengeID() == challenge.getChallengeID());
-            if (!isStarted) {
-                challengeStatusService.assignChallenge(userId, challenge);
-            }
-        }
+        // List<ChallengeStatus> startedChallenges =
+        // challengeStatusService.getStartedChallenges(userId);
+        // List<Challenge> challenges = challengeService.getAllChallenges();
+        // System.out.println(startedChallenges);
+        // for (Challenge challenge : challenges) { // Checks if new challenges are
+        // created and adds them to the user when
+        // user checks challenges tab
+        // boolean isStarted = startedChallenges.stream()
+        // .anyMatch(status -> status.getChallenge().getChallengeID() ==
+        // challenge.getChallengeID());
+        // if (!isStarted) {
+        // challengeStatusService.assignChallenge(userId, challenge);
+        // }
+        // }
         return ResponseEntity.ok(challengeStatusService.getStartedChallenges(userId));
     }
 
