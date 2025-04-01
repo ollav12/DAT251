@@ -62,7 +62,7 @@ const sortedAllChallenges = computed(() => {
 
   return [...allChallenges.value].sort((a, b) => {
     let aValue, bValue
-    
+
     // Get the correct field values based on field name
     switch (sortField.value) {
       case 'title':
@@ -81,10 +81,10 @@ const sortedAllChallenges = computed(() => {
         aValue = a[sortField.value as keyof Challenge]
         bValue = b[sortField.value as keyof Challenge]
     }
-    
+
     // Compare values based on direction
     if (typeof aValue === 'string') {
-      return sortDirection.value === 'asc' 
+      return sortDirection.value === 'asc'
         ? aValue.localeCompare(bValue as string)
         : (bValue as string).localeCompare(aValue)
     } else {
@@ -100,7 +100,7 @@ const sortedUserChallenges = computed(() => {
 
   return [...userChallenges.value].sort((a, b) => {
     let aValue, bValue
-    
+
     // Get the correct field values based on field name
     switch (sortField.value) {
       case 'title':
@@ -128,10 +128,60 @@ const sortedUserChallenges = computed(() => {
         aValue = a[sortField.value as keyof UserChallenge]
         bValue = b[sortField.value as keyof UserChallenge]
     }
-    
+
     // Compare values based on direction
     if (typeof aValue === 'string') {
-      return sortDirection.value === 'asc' 
+      return sortDirection.value === 'asc'
+        ? aValue.localeCompare(bValue as string)
+        : (bValue as string).localeCompare(aValue)
+    } else {
+      return sortDirection.value === 'asc'
+        ? (aValue as number) - (bValue as number)
+        : (bValue as number) - (aValue as number)
+    }
+  })
+})
+
+// Add this computed property after your existing computed properties
+const sortedInProgressChallenges = computed(() => {
+  // First filter to get only in-progress challenges
+  const inProgress = userChallenges.value.filter(challenge => !isComplete(challenge))
+
+  if (!sortField.value) return inProgress
+
+  // Then sort them using the same logic as other tables
+  return [...inProgress].sort((a, b) => {
+    let aValue, bValue
+
+    switch (sortField.value) {
+      case 'title':
+        aValue = a.challenge.challengeTitle
+        bValue = b.challenge.challengeTitle
+        break
+      case 'description':
+        aValue = a.challenge.description
+        bValue = b.challenge.description
+        break
+      case 'points':
+        aValue = a.challenge.rewardPoints
+        bValue = b.challenge.rewardPoints
+        break
+      case 'status':
+        aValue = a.status
+        bValue = b.status
+        break
+      case 'progress':
+        aValue = a.currentValue / a.challenge.targetValue
+        bValue = b.currentValue / b.challenge.targetValue
+        break
+      default:
+        aValue = a[sortField.value as keyof UserChallenge]
+        bValue = b[sortField.value as keyof UserChallenge]
+    }
+
+    // Compare values based on direction
+    if (typeof aValue === 'string') {
+      return sortDirection.value === 'asc'
         ? aValue.localeCompare(bValue as string)
         : (bValue as string).localeCompare(aValue)
     } else {
@@ -146,7 +196,7 @@ function formatStatus(status: string): string {
   if (status === 'NOT_STARTED' || status === 'IN_PROGRESS') {
     return 'STARTED'
   } else {
-    return "COMPLETED" 
+    return "COMPLETED"
   }
 }
 async function fetchChallenges(): Promise<void> {
@@ -155,23 +205,23 @@ async function fetchChallenges(): Promise<void> {
     // Fetch all challenges
     const responseAllChallenges = await fetch('http://localhost:8080/challenges')
     const challenges = await responseAllChallenges.json()
-    
+
     // Fetch user's challenges
     const userId = localStorage.getItem("userId")
     if (!userId) {
       throw new Error("User ID not found")
     }
-    
+
     const responseAllUserChallenges = await fetch(`http://localhost:8080/users/${userId}/challenges`)
     const userChallengeData = await responseAllUserChallenges.json()
-    
+
     // Set user challenges
     userChallenges.value = userChallengeData
-    
+
     // Filter out challenges that the user has already interacted with
     const userChallengeIds = userChallengeData.map((uc: UserChallenge) => uc.challenge.challengeID)
     allChallenges.value = challenges.filter((c: Challenge) => !userChallengeIds.includes(c.challengeID))
-    
+
   } catch (error) {
     console.error("Error fetching challenges:", error)
   } finally {
@@ -180,41 +230,87 @@ async function fetchChallenges(): Promise<void> {
 }
 
 function isComplete(userChallenge: UserChallenge): boolean {
-  return userChallenge.status === 'COMPLETED' || 
+  return userChallenge.status === 'COMPLETED' ||
          userChallenge.currentValue >= userChallenge.challenge.targetValue;
 }
 
 
 async function startChallenge(challengeID: number): Promise<void> {
   startingChallengeId.value = challengeID
-  
+
   try {
     const userId = localStorage.getItem("userId")
     if (!userId) {
       throw new Error("User ID not found")
     }
-    
+
     const response = await fetch(`http://localhost:8080/users/${userId}/challenges/${challengeID}/start`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       }
     })
-    
+
     if (!response.ok) {
       const errorData = await response.json()
       throw new Error(errorData.error || 'Failed to start challenge')
     }
-    
+
     // Refresh the challenges to update both tables
     await fetchChallenges()
-    
+
   } catch (error) {
     console.error("Error starting challenge:", error)
   } finally {
     startingChallengeId.value = null
   }
 }
+
+// Add this computed property after your other computed properties
+const sortedCompletedChallenges = computed(() => {
+  // First filter to get only completed challenges
+  const completed = userChallenges.value.filter(challenge => isComplete(challenge))
+
+  if (!sortField.value) return completed
+
+  // Then sort them using the same logic as other tables
+  return [...completed].sort((a, b) => {
+    let aValue, bValue
+
+    switch (sortField.value) {
+      case 'title':
+        aValue = a.challenge.challengeTitle
+        bValue = b.challenge.challengeTitle
+        break
+      case 'description':
+        aValue = a.challenge.description
+        bValue = b.challenge.description
+        break
+      case 'points':
+        aValue = a.challenge.rewardPoints
+        bValue = b.challenge.rewardPoints
+        break
+      case 'completedAt':
+        aValue = a.completedAt || ''
+        bValue = b.completedAt || ''
+        break
+      default:
+        aValue = a[sortField.value as keyof UserChallenge]
+        bValue = b[sortField.value as keyof UserChallenge]
+    }
+
+    // Compare values based on direction
+    if (typeof aValue === 'string') {
+      return sortDirection.value === 'asc'
+        ? aValue.localeCompare(bValue as string)
+        : (bValue as string).localeCompare(aValue)
+    } else {
+      return sortDirection.value === 'asc'
+        ? (aValue as number) - (bValue as number)
+        : (bValue as number) - (aValue as number)
+    }
+  })
+})
 
 onMounted(async () => {
   await fetchChallenges()
@@ -225,9 +321,9 @@ onMounted(async () => {
   <main>
     <h1>Challenges</h1>
     <p>Complete challenges to receive points that you can use to unlock cosmetics.</p>
-    
+
     <div v-if="loading" class="loading">Loading challenges...</div>
-    
+
     <div v-else class="tables-container">
       <!-- All Challenges Table -->
       <div class="table-section">
@@ -267,8 +363,8 @@ onMounted(async () => {
               <td>{{ challenge.description }}</td>
               <td>{{ challenge.rewardPoints }} points</td>
               <td>
-                <button 
-                  @click="startChallenge(challenge.challengeID)" 
+                <button
+                  @click="startChallenge(challenge.challengeID)"
                   :disabled="startingChallengeId === challenge.challengeID"
                   class="action-button"
                 >
@@ -279,7 +375,7 @@ onMounted(async () => {
           </tbody>
         </table>
       </div>
-      
+
       <!-- User Challenges Table -->
       <div class="table-section">
         <h2>Your Challenges</h2>
@@ -320,18 +416,18 @@ onMounted(async () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="sortedUserChallenges.length === 0">
+            <tr v-if="sortedInProgressChallenges.length === 0">
               <td colspan="6" class="empty-message">You haven't started any challenges yet</td>
             </tr>
-            <tr v-for="(userChallenge, i) in sortedUserChallenges" :key="`user-${userChallenge.challengeStatusId}`">
+            <tr v-for="(userChallenge, i) in sortedInProgressChallenges" :key="`user-${userChallenge.challengeStatusId}`">
               <td>{{ i + 1 }}</td>
               <td>{{ userChallenge.challenge.challengeTitle }}</td>
               <td>{{ userChallenge.challenge.description }}</td>
               <td>{{ userChallenge.challenge.rewardPoints }} points</td>
               <td>
-                <span 
-                  :class="['status-badge', 
-                    userChallenge.status === 'COMPLETED' ? 'completed' : 
+                <span
+                  :class="['status-badge',
+                    userChallenge.status === 'COMPLETED' ? 'completed' :
                     userChallenge.status === 'STARTED' ? 'started' : 'not-started']"
                 >
                 {{ formatStatus(userChallenge.status) }}
@@ -340,7 +436,7 @@ onMounted(async () => {
               <td>
                 <div class="progress-wrapper">
                   <div class="progress-bar">
-                  <div 
+                  <div
                     class="progress-fill"
                     :style="{
                       width: `${Math.min(100, (userChallenge.currentValue / userChallenge.challenge.targetValue) * 100)}%`,
@@ -358,6 +454,54 @@ onMounted(async () => {
           </tbody>
         </table>
       </div>
+
+    <!-- Completed Challenges Table -->
+    <div class="table-section completed-challenges">
+      <h2>Your Completed Challenges</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nr</th>
+            <th @click="sortBy('title')" class="sortable">
+              Title
+              <span v-if="sortField === 'title'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th @click="sortBy('description')" class="sortable">
+              Description
+              <span v-if="sortField === 'description'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th @click="sortBy('points')" class="sortable">
+              Points Awarded
+              <span v-if="sortField === 'points'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th @click="sortBy('completedAt')" class="sortable">
+              Completed On
+              <span v-if="sortField === 'completedAt'" class="sort-indicator">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="sortedCompletedChallenges.length === 0">
+            <td colspan="5" class="empty-message">You haven't completed any challenges yet</td>
+          </tr>
+          <tr v-for="(userChallenge, i) in sortedCompletedChallenges" :key="`completed-${userChallenge.challengeStatusId}`">
+            <td>{{ i + 1 }}</td>
+            <td>{{ userChallenge.challenge.challengeTitle }}</td>
+            <td>{{ userChallenge.challenge.description }}</td>
+            <td>{{ userChallenge.challenge.rewardPoints }} points</td>
+            <td>{{ userChallenge.completedAt ? new Date(userChallenge.completedAt).toLocaleDateString() : 'Recently' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     </div>
   </main>
 </template>
@@ -369,7 +513,7 @@ main {
   padding: 0 1rem;
 }
 
-h1, h2 {
+h1, h2, p {
   text-align: center;
 }
 
@@ -493,7 +637,6 @@ th, td {
   display: inline-block;
 }
 
-/* Increase column widths for specific columns */
 th:nth-child(2) { /* Title column */
   min-width: 120px;
 }
@@ -514,7 +657,6 @@ th:nth-child(6) { /* Progress column */
   min-width: 150px;
 }
 
-/* Add to your existing styles */
 th {
   position: relative;
   padding: 0.75rem 1rem; /* Increase horizontal padding */
@@ -524,6 +666,32 @@ th {
 @media (max-width: 950px) {
   .tables-container {
     flex-direction: column;
+  }
+}
+
+.tables-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.table-section {
+  width: 100%;
+  min-width: auto;
+}
+
+
+/* Add responsive behavior */
+@media (max-width: 1200px) {
+  .table-section {
+    flex: 1 1 calc(50% - 1rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .table-section {
+    flex: 1 1 100%;
   }
 }
 </style>
