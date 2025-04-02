@@ -15,6 +15,7 @@ import jakarta.websocket.server.PathParam;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -49,12 +50,10 @@ public class TripController {
         return tripService.getTrip(tripid);
     }
 
-
     @PutMapping("/{tripId}")
     public Trip updateTrip(
-        @PathVariable Long tripId,
-        @RequestBody Trip updatedTrip
-    ) {
+            @PathVariable Long tripId,
+            @RequestBody Trip updatedTrip) {
         return tripService.updateTrip(tripId, updatedTrip);
     }
 

@@ -43,7 +43,7 @@ const router = createRouter({
       name: 'challenges',
       component: () => import('../views/ChallengesView.vue')
     },
-
+    {
       path: '/admin',
       name: 'admin',
       component: () => import('../views/AdminView.vue'),
