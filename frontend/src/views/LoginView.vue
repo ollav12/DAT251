@@ -59,7 +59,7 @@ export default {
           }
           // Redirect directly after successful login
           console.log("User id: ", data)
-          localStorage.setItem("userId", data);
+          localStorage.setItem("userId", data.userId);
           await this.router.push({name: 'home'});
         }
         console.log('Login success:', data);
