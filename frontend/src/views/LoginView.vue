@@ -58,9 +58,11 @@ export default {
             this.updateEquippedProfilePicture(data.equippedProfilePicture);
           }
           // Redirect directly after successful login
+          console.log("User id: ", data)
+          localStorage.setItem("userId", data.userId);
           await this.router.push({name: 'home'});
         }
-        console.log('Login success:', data.message);
+        console.log('Login success:', data);
       } catch (error) {
         console.error('Error during login:', error);
       }

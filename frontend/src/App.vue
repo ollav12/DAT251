@@ -40,12 +40,16 @@ onMounted(() => {
     <RouterLink to="/vehicles">Vehicles</RouterLink>
     <RouterLink to="/leaderboard">Leaderboard</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
+
+    <RouterLink to="/challenges">Challenges</RouterLink>
+
     <RouterLink to="/shop">Shop</RouterLink>
     <RouterLink to="/inventory">Inventory</RouterLink>
     <RouterLink to="/statistics">Statistics</RouterLink>
     <RouterLink v-if="user?.admin" to="/admin">Admin</RouterLink>
 
     <UserProfileView />
+
   </nav>
 
   <RouterView />

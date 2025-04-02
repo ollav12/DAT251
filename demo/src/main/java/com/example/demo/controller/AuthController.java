@@ -1,7 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Challenge;
 import com.example.demo.model.User;
+import com.example.demo.service.ChallengeService;
+import com.example.demo.service.ChallengeStatusService;
 import com.example.demo.service.UserServiceImpl;
+
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +17,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserServiceImpl userService;
+    private final ChallengeStatusService challengeStatusService;
+    private final ChallengeService challengeService;
 
-    public AuthController(UserServiceImpl userService) {
+    public AuthController(UserServiceImpl userService, ChallengeService challengeService,
+            ChallengeStatusService challengeStatusService) {
         this.userService = userService;
+        this.challengeService = challengeService;
+        this.challengeStatusService = challengeStatusService;
     }
 
     public record LoginResponse(
@@ -58,8 +68,7 @@ public class AuthController {
             );
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
-                Map.of("error", e.getMessage())
-            );
+                    Map.of("error", e.getMessage()));
         }
     }
 }

@@ -38,10 +38,9 @@ public class TransportService {
     private final VehicleRepository vehicleRepository;
 
     public TransportService(
-        UserRepository userRepository,
-        TripRepository tripRepository,
-        VehicleRepository vehicleRepository
-    ) {
+            UserRepository userRepository,
+            TripRepository tripRepository,
+            VehicleRepository vehicleRepository) {
         this.userRepository = userRepository;
         this.tripRepository = tripRepository;
         this.vehicleRepository = vehicleRepository;
@@ -60,6 +59,7 @@ public class TransportService {
         PAST_YEAR,
         PAST_MONTH,
         PAST_WEEK,
+
     }
 
     public record Leaderboard(
@@ -120,50 +120,47 @@ public class TransportService {
     }
 
     public record Statistics(
-        // Trip
-        int totalTrips,
-        double totalDistanceKm,
-        double totalDurationSeconds,
-        // Emissions
-        double totalEmissionsCO2eKg,
-        double totalEmissionsSavingsCO2eKg,
-        // Financial
-        double totalSavingsNOK,
-        double totalCostNOK
-    ) {}
+            // Trip
+            int totalTrips,
+            double totalDistanceKm,
+            double totalDurationSeconds,
+            // Emissions
+            double totalEmissionsCO2eKg,
+            double totalEmissionsSavingsCO2eKg,
+            // Financial
+            double totalSavingsNOK,
+            double totalCostNOK) {
+    }
 
     public Statistics getStatistics(User user) {
         return new Statistics(
-            // Transport
-            tripRepository.countByUser(user),
-            tripRepository.sumTotalDistanceKmByUser(user),
-            tripRepository.sumTotalDurationSecondsByUser(user),
-            // Emissions
-            tripRepository.sumTotalEmissionsByUser(user),
-            tripRepository.sumSavedEmissionsByUser(user),
-            // Financial
-            // TODO: calculate
-            0.0,
-            0.0
-        );
+                // Transport
+                tripRepository.countByUser(user),
+                tripRepository.sumTotalDistanceKmByUser(user),
+                tripRepository.sumTotalDurationSecondsByUser(user),
+                // Emissions
+                tripRepository.sumTotalEmissionsByUser(user),
+                tripRepository.sumSavedEmissionsByUser(user),
+                // Financial
+                // TODO: calculate
+                0.0,
+                0.0);
     }
 
     public List<String> getAddressAutocomplete(
-        String query,
-        UUID sessionToken
-    ) {
+            String query,
+            UUID sessionToken) {
         var results = this.getAddressAutocompleteResults(query, sessionToken);
         return results;
     }
 
     public void addVehicle(
-        User user,
-        String make,
-        String model,
-        int year,
-        VehicleType type,
-        double emissionsCO2ePerKm
-    ) {
+            User user,
+            String make,
+            String model,
+            int year,
+            VehicleType type,
+            double emissionsCO2ePerKm) {
         var vehicle = new Vehicle(make, model, year, type, emissionsCO2ePerKm);
         vehicle.setOwner(user);
         vehicleRepository.save(vehicle);
@@ -197,29 +194,26 @@ public class TransportService {
         vehicleRepository.delete(vehicle);
     }
 
-    public void addTrip(
-        User user,
-        String origin,
-        String destination,
-        String selectedMode,
-        String selectedVehicleId
-    ) {
+    public Trip addTrip(
+            User user,
+            String origin,
+            String destination,
+            String selectedMode,
+            String selectedVehicleId) {
         String mode = null;
         Vehicle vehicle = null;
         if (selectedMode != null && selectedVehicleId != null) {
             throw new IllegalArgumentException(
-                "Cannot select both mode and vehicle"
-            );
+                    "Cannot select both mode and vehicle");
         } else if (selectedMode == null && selectedVehicleId == null) {
             throw new IllegalArgumentException(
-                "Must select either mode or vehicle"
-            );
+                    "Must select either mode or vehicle");
         } else if (selectedMode != null) {
             mode = selectedMode;
         } else if (selectedVehicleId != null) {
             vehicle = vehicleRepository
-                .findById(Long.parseLong(selectedVehicleId))
-                .orElseThrow();
+                    .findById(Long.parseLong(selectedVehicleId))
+                    .orElseThrow();
             mode = vehicle.getType().toTravelMode().toString().toLowerCase();
         }
 
@@ -240,23 +234,22 @@ public class TransportService {
             throw new IllegalArgumentException("No estimate for driving mode");
         }
 
-        var totalCO2eSaved =
-            carEstimate.getEmissionsCO2eKg() - estimate.getEmissionsCO2eKg();
+        var totalCO2eSaved = carEstimate.getEmissionsCO2eKg() - estimate.getEmissionsCO2eKg();
 
         Trip trip = new Trip(
-            user,
-            origin,
-            destination,
-            mode,
-            vehicle,
-            estimate.getDistanceKm(),
-            estimate.getDuration().getSeconds(),
-            estimate.getEmissionsCO2eKg(),
-            totalCO2eSaved
-        );
+                user,
+                origin,
+                destination,
+                mode,
+                vehicle,
+                estimate.getDistanceKm(),
+                estimate.getDuration().getSeconds(),
+                estimate.getEmissionsCO2eKg(),
+                totalCO2eSaved);
 
         System.out.println("adding trip");
         tripRepository.save(trip);
+        return trip;
     }
 
     public class TripEstimateResults {
@@ -283,10 +276,9 @@ public class TransportService {
         private double emissionsCO2eKg;
 
         public TripEstimate(
-            Duration duration,
-            double distanceKm,
-            double emissionsCO2eKg
-        ) {
+                Duration duration,
+                double distanceKm,
+                double emissionsCO2eKg) {
             this.duration = duration;
             this.distanceKm = distanceKm;
             this.emissionsCO2eKg = emissionsCO2eKg;
@@ -306,16 +298,15 @@ public class TransportService {
     }
 
     public TripEstimateResults getTripEstimate(
-        String origin,
-        String destination,
-        Vehicle vehicle
-    ) {
+            String origin,
+            String destination,
+            Vehicle vehicle) {
         TripEstimateResults results = new TripEstimateResults();
         TravelMode[] modes = {
-            TravelMode.WALKING,
-            TravelMode.BICYCLING,
-            TravelMode.TRANSIT,
-            TravelMode.DRIVING,
+                TravelMode.WALKING,
+                TravelMode.BICYCLING,
+                TravelMode.TRANSIT,
+                TravelMode.DRIVING,
         };
         for (TravelMode mode : modes) {
             DirectionsResult result = getDirections(origin, destination, mode);
@@ -337,14 +328,10 @@ public class TransportService {
                 }
 
                 TripEstimate currentRoute = getRouteEstimate(
-                    route,
-                    estimationVehicle
-                );
-                if (
-                    bestRoute == null ||
-                    currentRoute.getEmissionsCO2eKg() <
-                    bestRoute.getEmissionsCO2eKg()
-                ) {
+                        route,
+                        estimationVehicle);
+                if (bestRoute == null ||
+                        currentRoute.getEmissionsCO2eKg() < bestRoute.getEmissionsCO2eKg()) {
                     bestRoute = currentRoute;
                 }
             }
@@ -372,9 +359,8 @@ public class TransportService {
     private final double emissionsPerPersonKmVyTrain = 0.005; // Source: Claude estimate
 
     private TripEstimate getRouteEstimate(
-        DirectionsRoute route,
-        Vehicle vehicle
-    ) {
+            DirectionsRoute route,
+            Vehicle vehicle) {
         Duration totalDuration = Duration.ZERO;
         double totalDistanceMeters = 0.0;
         double totalEmissions = 0.0;
@@ -386,48 +372,39 @@ public class TransportService {
                 }
                 if (step.duration != null) {
                     totalDuration = totalDuration.plusSeconds(
-                        step.duration.inSeconds
-                    );
+                            step.duration.inSeconds);
                 }
 
                 switch (step.travelMode) {
                     case WALKING:
-                        totalEmissions +=
-                            (step.distance.inMeters / 1000) *
-                            emissionsPerKmWalking;
+                        totalEmissions += (step.distance.inMeters / 1000) *
+                                emissionsPerKmWalking;
                         break;
                     case BICYCLING:
-                        if (
-                            vehicle != null &&
-                            vehicle.getType().toTravelMode() ==
-                            TravelMode.BICYCLING
-                        ) {
-                            totalEmissions +=
-                                (step.distance.inMeters / 1000) *
-                                // TODO: clean up units
-                                (vehicle.getEmissionsCO2ePerKm() / 1000);
+                        if (vehicle != null &&
+                                vehicle.getType().toTravelMode() == TravelMode.BICYCLING) {
+                            totalEmissions += (step.distance.inMeters / 1000) *
+                            // TODO: clean up units
+                                    (vehicle.getEmissionsCO2ePerKm() / 1000);
                             break;
                         }
-                        totalEmissions +=
-                            (step.distance.inMeters / 1000) *
-                            emissionsPerKmBicycling;
+                        totalEmissions += (step.distance.inMeters / 1000) *
+                                emissionsPerKmBicycling;
                         break;
                     case TRANSIT:
                         if (step.transitDetails != null) {
                             switch (step.transitDetails.line.vehicle.type) {
                                 case BUS:
                                     // TODO: check line operator
-                                    totalEmissions +=
-                                        (step.distance.inMeters / 1000) *
-                                        emissionsPerPersonKmSkyssBus;
+                                    totalEmissions += (step.distance.inMeters / 1000) *
+                                            emissionsPerPersonKmSkyssBus;
                                     break;
                                 case CABLE_CAR:
                                     break;
                                 case TRAM:
                                     // E.g. Bybanen
-                                    totalEmissions +=
-                                        (step.distance.inMeters / 1000) *
-                                        emissionsPerPersonKmSkyssBybanen;
+                                    totalEmissions += (step.distance.inMeters / 1000) *
+                                            emissionsPerPersonKmSkyssBybanen;
                                     break;
                                 case SUBWAY:
                                     break;
@@ -435,9 +412,8 @@ public class TransportService {
                                     break;
                                 case HEAVY_RAIL:
                                     // E.g. Vy
-                                    totalEmissions +=
-                                        (step.distance.inMeters / 1000) *
-                                        emissionsPerPersonKmVyTrain;
+                                    totalEmissions += (step.distance.inMeters / 1000) *
+                                            emissionsPerPersonKmVyTrain;
                                     break;
                                 case FERRY:
                                     break;
@@ -468,24 +444,18 @@ public class TransportService {
                             }
                         } else {
                             // Fallback
-                            totalEmissions +=
-                                (step.distance.inMeters / 1000) * 0.0;
+                            totalEmissions += (step.distance.inMeters / 1000) * 0.0;
                         }
                         break;
                     case DRIVING:
-                        if (
-                            vehicle != null &&
-                            vehicle.getType().toTravelMode() ==
-                            TravelMode.DRIVING
-                        ) {
-                            totalEmissions +=
-                                (step.distance.inMeters / 1000) *
-                                // TODO: clean up units
-                                (vehicle.getEmissionsCO2ePerKm() / 1000);
+                        if (vehicle != null &&
+                                vehicle.getType().toTravelMode() == TravelMode.DRIVING) {
+                            totalEmissions += (step.distance.inMeters / 1000) *
+                            // TODO: clean up units
+                                    (vehicle.getEmissionsCO2ePerKm() / 1000);
                             break;
                         }
-                        totalEmissions +=
-                            (step.distance.inMeters / 1000) * emissionsPerKmCar;
+                        totalEmissions += (step.distance.inMeters / 1000) * emissionsPerKmCar;
                         break;
                     case UNKNOWN:
                         break;
@@ -497,41 +467,34 @@ public class TransportService {
         }
 
         return new TripEstimate(
-            totalDuration,
-            totalDistanceMeters / 1000,
-            totalEmissions
-        );
+                totalDuration,
+                totalDistanceMeters / 1000,
+                totalEmissions);
     }
 
     private final String googleMapsApiKey = System.getenv(
-        "GOOGLE_MAPS_API_KEY"
-    );
+            "GOOGLE_MAPS_API_KEY");
 
-    @Cacheable(
-        value = "directions",
-        key = "#origin + '-' + #destination + '-' + #mode"
-    )
+    @Cacheable(value = "directions", key = "#origin + '-' + #destination + '-' + #mode")
     private DirectionsResult getDirections(
-        String origin,
-        String destination,
-        TravelMode mode
-    ) {
+            String origin,
+            String destination,
+            TravelMode mode) {
         GeoApiContext context = new GeoApiContext.Builder()
-            .apiKey(this.googleMapsApiKey)
-            .build();
+                .apiKey(this.googleMapsApiKey)
+                .build();
 
         DirectionsApiRequest request = DirectionsApi.newRequest(context)
-            .origin(origin)
-            .destination(destination)
-            .mode(mode);
+                .origin(origin)
+                .destination(destination)
+                .mode(mode);
         if (mode == TravelMode.TRANSIT) {
             request = request.transitMode(
-                TransitMode.BUS,
-                TransitMode.SUBWAY,
-                TransitMode.TRAM,
-                TransitMode.RAIL,
-                TransitMode.TRAIN
-            );
+                    TransitMode.BUS,
+                    TransitMode.SUBWAY,
+                    TransitMode.TRAM,
+                    TransitMode.RAIL,
+                    TransitMode.TRAIN);
         }
 
         DirectionsResult result = null;
@@ -553,21 +516,18 @@ public class TransportService {
 
     @Cacheable(value = "address", key = "#query")
     private List<String> getAddressAutocompleteResults(
-        String query,
-        UUID sessionToken
-    ) {
+            String query,
+            UUID sessionToken) {
         GeoApiContext context = new GeoApiContext.Builder()
-            .apiKey(this.googleMapsApiKey)
-            .build();
+                .apiKey(this.googleMapsApiKey)
+                .build();
 
-        PlaceAutocompleteRequest.SessionToken token =
-            new PlaceAutocompleteRequest.SessionToken(sessionToken);
+        PlaceAutocompleteRequest.SessionToken token = new PlaceAutocompleteRequest.SessionToken(sessionToken);
 
         PlaceAutocompleteRequest request = PlacesApi.placeAutocomplete(
-            context,
-            query,
-            token
-        );
+                context,
+                query,
+                token);
 
         AutocompletePrediction[] result = null;
         try {
@@ -575,9 +535,8 @@ public class TransportService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(
-                "Failed to fetch address autocomplete",
-                e
-            );
+                    "Failed to fetch address autocomplete",
+                    e);
         } finally {
             context.shutdown();
         }

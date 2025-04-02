@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.Challenge;
 import com.example.demo.model.User;
+import com.example.demo.service.ChallengeService;
+import com.example.demo.service.ChallengeStatusService;
 import com.example.demo.service.UserServiceImpl;
 import java.net.URI;
 import java.util.List;
@@ -22,9 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserServiceImpl userService;
+    private final ChallengeService challengeService;
+    private final ChallengeStatusService challengeStatusService;
 
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserServiceImpl userService, ChallengeService challengeService,
+            ChallengeStatusService challengeStatusService) {
         this.userService = userService;
+        this.challengeService = challengeService;
+        this.challengeStatusService = challengeStatusService;
     }
 
     @GetMapping
@@ -49,31 +57,26 @@ public class UserController {
             return ResponseEntity.ok(result);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                e.getMessage()
-            );
+                    e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                "An error occurred while deleting the user"
-            );
+                    "An error occurred while deleting the user");
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUser(
-        @RequestBody User updatedUser,
-        @PathVariable long id
-    ) {
+            @RequestBody User updatedUser,
+            @PathVariable long id) {
         try {
             String result = userService.updateUser(updatedUser, id);
             return ResponseEntity.ok().body(result);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                e.getMessage()
-            );
+                    e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                "An error occurred while updating the user"
-            );
+                    "An error occurred while updating the user");
         }
     }
 
@@ -81,13 +84,12 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
             User registeredUser = userService.registerUser(user);
+
             return ResponseEntity.created(
-                new URI("/users/" + registeredUser.getId())
-            ).body(registeredUser);
+                    new URI("/users/" + registeredUser.getId())).body(registeredUser);
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

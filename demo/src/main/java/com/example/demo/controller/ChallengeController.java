@@ -5,8 +5,8 @@ import com.example.demo.service.ChallengeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/challenges")
@@ -18,36 +18,67 @@ public class ChallengeController {
         this.challengeService = challengeService;
     }
 
-    @PostMapping
-    public ResponseEntity<Challenge> createChallenge(@RequestBody Challenge challenge) {
-        challengeService.addChallenge(challenge);
-        return new ResponseEntity<>(challenge, HttpStatus.CREATED);
-    }
-
+    /**
+     * Get all challenges
+     * 
+     * @return List of challenges
+     */
     @GetMapping
     public ResponseEntity<List<Challenge>> getAllChallenges() {
         return ResponseEntity.ok(challengeService.getAllChallenges());
     }
 
+    /**
+     * Get a challenge by ID
+     * 
+     * @param id
+     * @return challenge
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Challenge> getChallengeById(@PathVariable long id) {
-        Challenge challenge = challengeService.getChallenge(id);
-        if (challenge != null) {
-            return ResponseEntity.ok(challenge);
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(challengeService.getChallenge(id));
     }
 
+    /**
+     * Store challenge in database
+     * 
+     * @param challenge
+     * @return challenge id
+     */
+    @PostMapping
+    public ResponseEntity<Challenge> createChallenge(@RequestBody Challenge challenge) {
+        /*challengeService.addChallenge(challenge);
+        return new ResponseEntity<>(challenge.getChallengeID(), HttpStatus.CREATED);*/
+        Challenge savedChallenge = challengeService.addChallenge(challenge);
+        return new ResponseEntity<>(savedChallenge, HttpStatus.CREATED);
+    }
+
+    /**
+     * Update a challenge by ID and Challenge
+     * 
+     * @param id
+     * @param challenge
+     * @return Updated Challenge
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Challenge> updateChallenge(@PathVariable long id, @RequestBody Challenge challenge) {
-        challenge.setChallengeID(id);
-        challengeService.updateChallenge(challenge);
-        return ResponseEntity.ok(challenge);
+        Challenge updatedChallenge = challengeService.updateChallenge(id, challenge);
+        return ResponseEntity.ok(updatedChallenge);
     }
 
+    /**
+     * Delete a challenge by ID
+     * 
+     * @param id
+     * @return Response Message
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteChallenge(@PathVariable long id) {
-        challengeService.deleteChallenge(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Map<String, String>> deleteChallenge(@PathVariable long id) {
+        boolean deleted = challengeService.deleteChallenge(id);
+        if (!deleted) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "No challenge with id " + id + " exists"));
+        }
+        return ResponseEntity.ok(Map.of("message", "Challenge deleted successfully"));
     }
 }

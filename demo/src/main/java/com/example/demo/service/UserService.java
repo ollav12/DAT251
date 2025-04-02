@@ -37,4 +37,6 @@ public interface UserService {
     String deleteUser(long id);
 
     String updateUser(User user, long id);
+
+    void updateUserPoints(long userId, int rewardPoints);
 }
