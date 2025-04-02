@@ -1,14 +1,16 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "trips")
@@ -31,6 +33,14 @@ public class Trip {
     private Double totalDurationSeconds;
     private Double totalEmissionsCO2eKg;
     private Double savedEmissionsCO2eKg;
+
+    @Column(
+        name = "created_at",
+        // TODO: not sure if this works in h2
+        columnDefinition = "timestamp default current_timestamp",
+        nullable = false
+    )
+    private LocalDateTime createdAt;
 
     @ManyToOne
     private Vehicle vehicle;
@@ -67,6 +77,15 @@ public class Trip {
         this.totalDurationSeconds = totalDurationSeconds;
         this.totalEmissionsCO2eKg = totalEmissionsCO2eKg;
         this.savedEmissionsCO2eKg = savedEmissionsCO2eKg;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public User getUser() {
@@ -157,4 +176,7 @@ public class Trip {
         this.moneySaved = moneySaved;
     }
 
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
 }

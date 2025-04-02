@@ -1,16 +1,10 @@
 package com.example.demo.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -28,32 +22,59 @@ public class User {
 
     private String email;
     private String password;
+
+    @Column(columnDefinition = "boolean default false")
+    private boolean isAdmin;
+
     private int points;
 
     @OneToOne
     @JoinColumn(name = "default_vehicle_id")
     private Vehicle defaultVehicle;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "owner",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<Vehicle> vehicles;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_cosmetics",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
+    )
+    private Set<Cosmetics> ownedCosmetics = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "equipped_border_id")
+    private Cosmetics equippedBorder;
+
+    @ManyToOne
+    @JoinColumn(name = "equipped_profile_picture_id")
+    private Cosmetics equippedProfilePicture;
+
     public User(
-            String firstName,
-            String lastName,
-            String username,
-            String email,
-            String password,
-            int points) {
+        String firstName,
+        String lastName,
+        String username,
+        String email,
+        String password,
+        int points
+    ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.password = password;
         this.points = points;
+        this.ownedCosmetics = new HashSet<>();
+        this.equippedBorder = null;
+        this.equippedProfilePicture = null;
     }
 
-    public User() {
-    }
+    public User() {}
 
     public String getFirstName() {
         return firstName;
@@ -73,6 +94,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
     }
 
     public int getPoints() {
@@ -127,13 +152,49 @@ public class User {
         this.vehicles = vehicles;
     }
 
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", firstName=" + firstName + ", lastName=" +
-                lastName + ", username=" + username
-                + ", email=" + email + ", password=" + password + ", points=" + points +
-                ", defaultVehicle="
-                + defaultVehicle;
+    public Set<Cosmetics> getOwnedCosmetics() {
+        return ownedCosmetics;
     }
 
+    public void setOwnedCosmetics(Set<Cosmetics> ownedCosmetics) {
+        this.ownedCosmetics = ownedCosmetics;
+    }
+
+    public Cosmetics getEquippedBorder() {
+        return equippedBorder;
+    }
+
+    public void setEquippedBorder(Cosmetics equippedBorder) {
+        this.equippedBorder = equippedBorder;
+    }
+
+    public Cosmetics getEquippedProfilePicture() {
+        return equippedProfilePicture;
+    }
+
+    public void setEquippedProfilePicture(Cosmetics equippedProfilePicture) {
+        this.equippedProfilePicture = equippedProfilePicture;
+    }
+
+    @Override
+    public String toString() {
+        return (
+            "User [id=" +
+            id +
+            ", firstName=" +
+            firstName +
+            ", lastName=" +
+            lastName +
+            ", username=" +
+            username +
+            ", email=" +
+            email +
+            ", password=" +
+            password +
+            ", points=" +
+            points +
+            ", defaultVehicle=" +
+            defaultVehicle
+        );
+    }
 }

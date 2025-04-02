@@ -7,6 +7,7 @@ import com.example.demo.repository.UserRepository;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -55,4 +56,41 @@ public class TripServiceImpl implements TripService {
         // TODO: filter trips by user
         return tripRepository.findAll();
     }
+
+    public List<Trip> getAllTripsByUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+        return tripRepository.findAllTripsByUser(user);
+    }
+
+    public void deleteUserEmissions(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User not found"));
+        tripRepository.deleteUserTrip(user);
+    }
+
+    public Trip updateTrip(Long tripId, Trip updatedTrip
+    ) {
+        Optional<Trip> optExistingTrip = tripRepository.findById(tripId);
+        if (optExistingTrip.isEmpty()) {
+            throw new RuntimeException("Trip not found");
+        }
+        Trip existingTrip = optExistingTrip.get();
+        existingTrip.setTotalDistanceKm(updatedTrip.getTotalDistanceKm());
+        existingTrip.setTotalDurationSeconds(updatedTrip.getTotalDurationSeconds());
+        existingTrip.setTotalEmissionsCO2eKg(updatedTrip.getTotalEmissionsCO2eKg());
+        existingTrip.setSavedEmissionsCO2eKg(updatedTrip.getSavedEmissionsCO2eKg());
+        existingTrip.setOrigin(updatedTrip.getOrigin());
+        existingTrip.setDestination(updatedTrip.getDestination());
+        existingTrip.setTravelMode(updatedTrip.getTravelMode());
+        existingTrip.setVehicle(updatedTrip.getVehicle());
+        existingTrip.setTransportationMode(updatedTrip.getTransportationMode());
+        existingTrip.setUser(updatedTrip.getUser());
+        existingTrip.setMoneySaved(updatedTrip.getMoneySaved());
+        return tripRepository.save(existingTrip);
+    }
+
+
 }
+
+
+
+

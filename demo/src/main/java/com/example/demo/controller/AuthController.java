@@ -27,21 +27,45 @@ public class AuthController {
         this.challengeStatusService = challengeStatusService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(
-            @RequestBody User user) {
-        userService.registerUser(user);
+    public record LoginResponse(
+        Long userId,
+        String message,
+        String equippedBorder,
+        String equippedProfilePicture
+    ) {}
 
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, Object>> register(
+        @RequestBody User user
+    ) {
+        var newUser = userService.registerUser(user);
         return ResponseEntity.ok(
-                Map.of("message", "User registered successfully"));
+            Map.of(
+                "message", "User registered successfully",
+                "userId", newUser.getId()
+            )
+        );
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         try {
-            userService.loginUser(user.getUsername(), user.getPassword());
-            long userId = userService.getUserId(user.getUsername());
-            return ResponseEntity.ok(userId);
+            User loggedInUser = userService.loginUser(
+                user.getUsername(),
+                user.getPassword()
+            );
+            return ResponseEntity.ok(
+                new LoginResponse(
+                    loggedInUser.getId(),
+                    "User logged in successfully",
+                    loggedInUser.getEquippedBorder() != null
+                        ? loggedInUser.getEquippedBorder().getImage()
+                        : "",
+                    loggedInUser.getEquippedProfilePicture() != null
+                        ? loggedInUser.getEquippedProfilePicture().getImage()
+                        : ""
+                )
+            );
         } catch (Exception e) {
             return ResponseEntity.status(401).body(
                     Map.of("error", e.getMessage()));

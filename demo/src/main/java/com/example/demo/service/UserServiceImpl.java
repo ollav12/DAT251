@@ -1,7 +1,11 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Cosmetics;
 import com.example.demo.model.User;
+import com.example.demo.repository.CosmeticsRepository;
 import com.example.demo.repository.UserRepository;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,13 +15,19 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CosmeticsRepository cosmeticsRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserServiceImpl(
-            UserRepository userRepository,
-            BCryptPasswordEncoder bCryptPasswordEncoder) {
+
+        UserRepository userRepository,
+        CosmeticsRepository cosmeticsRepository,
+        BCryptPasswordEncoder bCryptPasswordEncoder
+    ) {
+
         this.userRepository = userRepository;
+        this.cosmeticsRepository = cosmeticsRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -26,7 +36,22 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new IllegalStateException("User already exists");
         }
+        Cosmetics defaultBorder = cosmeticsRepository.findByName("Default Fire border");
+        Cosmetics defaultPlantBorder = cosmeticsRepository.findByName("Default Plant border");
+        Cosmetics defaultProfilePicture = cosmeticsRepository.findByName("Default Profile Picture");
+
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
+        if(user.getOwnedCosmetics() == null) {
+            user.setOwnedCosmetics(new HashSet<>());
+        }
+
+        user.getOwnedCosmetics().add(defaultBorder);
+        user.getOwnedCosmetics().add(defaultPlantBorder);
+        user.getOwnedCosmetics().add(defaultProfilePicture);
+
+        user.setEquippedBorder(defaultBorder);
+        user.setEquippedProfilePicture(defaultProfilePicture);
         return userRepository.save(user);
     }
 

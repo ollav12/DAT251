@@ -11,7 +11,7 @@ import java.util.NoSuchElementException;
 
 public interface UserService {
     /**
-     * Registers a new user in the system.
+     * Registers a new user in the system and adds default cosmetics.
      *
      * @param user the user entity to be registered
      * @return the registered user entity

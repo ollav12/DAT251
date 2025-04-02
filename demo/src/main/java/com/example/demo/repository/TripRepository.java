@@ -3,8 +3,12 @@ package com.example.demo.repository;
 import com.example.demo.model.Trip;
 import com.example.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
@@ -14,9 +18,27 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     int countByUser(User user);
 
-    Trip findByUserAndOriginAndDestination(User user, String origin, String desitnation);
 
+    Trip findByUserAndOriginAndDestination(User user, String origin, String desitnation);
     @Query("SELECT COALESCE(SUM(t.totalDistanceKm), 0) FROM Trip t WHERE t.user = :user")
+
+    List<Trip> findAllTripsByUser(User user);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Trip t WHERE t.user = :user")
+    void deleteUserTrip(User user);
+
+    @Query("SELECT SUM(t.totalDistanceKm) FROM Trip t")
+    double sumTotalDistanceKm();
+
+    @Query("SELECT SUM(t.totalEmissionsCO2eKg) FROM Trip t")
+    double sumTotalEmissionsCO2eKg();
+
+    @Query(
+        "SELECT COALESCE(SUM(t.totalDistanceKm), 0) FROM Trip t WHERE t.user = :user"
+    )
+
     double sumTotalDistanceKmByUser(User user);
 
     @Query("SELECT COALESCE(SUM(t.totalDurationSeconds), 0) FROM Trip t WHERE t.user = :user")

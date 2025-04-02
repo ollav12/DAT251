@@ -21,6 +21,7 @@ import com.google.maps.model.DirectionsStep;
 import com.google.maps.model.TransitMode;
 import com.google.maps.model.TravelMode;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,12 +46,77 @@ public class TransportService {
         this.vehicleRepository = vehicleRepository;
     }
 
-    public record Leaderboard(List<UserRepository.LeaderboardRow> rows) {
+    public enum LeaderboardMetric {
+        TOTAL_EMISSIONS,
+        TOTAL_SAVED_EMISSIONS,
+        TOTAL_DURATION_SECONDS,
+        TOTAL_DISTANCE_KILOMETERS,
+        AVERAGE_CO2E_PER_KILOMETER,
     }
 
-    public Leaderboard getLeaderboard() {
-        var rows = userRepository.getLeaderboard();
-        return new Leaderboard(rows);
+    public enum LeaderboardPeriod {
+        LIFETIME,
+        PAST_YEAR,
+        PAST_MONTH,
+        PAST_WEEK,
+
+    }
+
+    public record Leaderboard(
+        LeaderboardMetric metric,
+        LeaderboardPeriod period,
+        List<UserRepository.LeaderboardRow> rows
+    ) {}
+
+    public Leaderboard getLeaderboard(
+        LeaderboardMetric metric,
+        LeaderboardPeriod period
+    ) {
+        if (metric == null) {
+            metric = LeaderboardMetric.TOTAL_EMISSIONS;
+        }
+        if (period == null) {
+            period = LeaderboardPeriod.LIFETIME;
+        }
+        LocalDateTime since = LocalDateTime.now();
+        switch (period) {
+            case LIFETIME:
+                // TODO: ugly
+                since = since.minusYears(100);
+                break;
+            case PAST_YEAR:
+                since = since.minusYears(1);
+                break;
+            case PAST_MONTH:
+                since = since.minusMonths(1);
+                break;
+            case PAST_WEEK:
+                since = since.minusWeeks(1);
+                break;
+        }
+        // Date since = Date.valueOf(periodAgo);
+
+        List<UserRepository.LeaderboardRow> rows = null;
+        switch (metric) {
+            case TOTAL_EMISSIONS:
+                rows = userRepository.getLeaderboardTotalEmissions(since);
+                break;
+            case TOTAL_DISTANCE_KILOMETERS:
+                rows = userRepository.getLeaderboardTotalDistance(since);
+                break;
+            case TOTAL_DURATION_SECONDS:
+                rows = userRepository.getLeaderboardTotalDuration(since);
+                break;
+            case AVERAGE_CO2E_PER_KILOMETER:
+                rows = userRepository.getLeaderboardAverageEmissionsPerKm(
+                    since
+                );
+                break;
+            case TOTAL_SAVED_EMISSIONS:
+                rows = userRepository.getLeaderboardTotalSavedEmissions(since);
+                break;
+        }
+        return new Leaderboard(metric, period, rows);
     }
 
     public record Statistics(
