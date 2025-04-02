@@ -329,7 +329,7 @@ public class ChallengeTests {
                 assertEquals(ChallengeStatus.Status.COMPLETED, updatedStatus.getStatus());
         }
 
-        // @Test
+        @Test
         void testUserReceivesPointsWhenCompletingChallenge() {
                 // Create a challenge with specific reward points
                 int rewardPoints = 75;

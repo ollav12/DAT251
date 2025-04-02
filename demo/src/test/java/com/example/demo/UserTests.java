@@ -304,7 +304,7 @@ class UserTests {
 
         }
 
-        // @Test
+        @Test
         void testDeleteUserEmission() {
 
                 User user = createTestUser();
