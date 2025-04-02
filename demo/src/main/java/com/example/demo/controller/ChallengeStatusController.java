@@ -57,10 +57,10 @@ public class ChallengeStatusController {
      * @return Challenge id
      */
     @PostMapping("/{userId}/challenges/{challengeId}/start")
-    public ResponseEntity<Long> startChallenge(@PathVariable long userId,
+    public ResponseEntity<ChallengeStatus> startChallenge(@PathVariable long userId,
             @PathVariable long challengeId) {
         ChallengeStatus challengeStatus = challengeStatusService.startChallenge(userId, challengeId);
-        return new ResponseEntity<>(challengeStatus.getChallengeStatusId(), HttpStatus.CREATED);
+        return new ResponseEntity<>(challengeStatus, HttpStatus.CREATED);
     }
 
     /**

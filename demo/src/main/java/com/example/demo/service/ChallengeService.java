@@ -37,11 +37,13 @@ public class ChallengeService {
 
     /**
      * Store a challenge in database
-     * 
+     *
      * @param challenge
+     * @return
      */
-    public void addChallenge(Challenge challenge) {
+    public Challenge addChallenge(Challenge challenge) {
         challengeRepository.save(challenge);
+        return challenge;
     }
 
     /**

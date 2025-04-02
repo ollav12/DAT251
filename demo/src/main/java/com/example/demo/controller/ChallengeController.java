@@ -46,9 +46,11 @@ public class ChallengeController {
      * @return challenge id
      */
     @PostMapping
-    public ResponseEntity<Long> createChallenge(@RequestBody Challenge challenge) {
-        challengeService.addChallenge(challenge);
-        return new ResponseEntity<>(challenge.getChallengeID(), HttpStatus.CREATED);
+    public ResponseEntity<Challenge> createChallenge(@RequestBody Challenge challenge) {
+        /*challengeService.addChallenge(challenge);
+        return new ResponseEntity<>(challenge.getChallengeID(), HttpStatus.CREATED);*/
+        Challenge savedChallenge = challengeService.addChallenge(challenge);
+        return new ResponseEntity<>(savedChallenge, HttpStatus.CREATED);
     }
 
     /**
