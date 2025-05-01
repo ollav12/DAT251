@@ -238,12 +238,12 @@ main {
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 16px;
-  background-color: #3d3d3d;
+  background-color: var(--color-background-soft);
   transition: all 0.2s ease;
 }
 
 .radio-label:hover {
-  background-color: #4e4e4e;
+  background-color: var(--color-background-mute);
 }
 
 .radio-label input[type='radio'] {
