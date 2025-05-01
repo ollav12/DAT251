@@ -51,6 +51,4 @@ public class CO2TrackerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
-
 }

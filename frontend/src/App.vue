@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import {onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { onMounted } from 'vue'
-import { getMe, type User } from './services/user'
+import {getMe, logout, type User} from './services/user'
 import UserProfileView from "@/views/UserProfileView.vue";
 
 
@@ -16,7 +15,7 @@ const showLayout = computed(() => {
 const user = ref<User>()
 
 onMounted(() => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'false'
   if (!isLoggedIn) {
     router.push('/login')
   }
@@ -27,6 +26,12 @@ onMounted(() => {
     user.value = data
   })
 })
+
+function performLogout() {
+  logout()
+  window.location.href = '/login'
+}
+
 </script>
 
 <template>
@@ -48,9 +53,12 @@ onMounted(() => {
     <RouterLink to="/statistics">Statistics</RouterLink>
     <RouterLink v-if="user?.admin" to="/admin">Admin</RouterLink>
 
-    <UserProfileView />
-
   </nav>
+
+    <section class="profile-container">
+      <UserProfileView />
+      <button @click="performLogout">Log out</button>
+    </section>
 
   <RouterView />
 </template>
@@ -102,10 +110,11 @@ header {
   text-align: center;
 }
 
-.wrapper {
+.profile-container {
   display: flex;
-  justify-content: center;
-  width: 100%;
-  padding: 0 1rem;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1rem;
 }
+
 </style>

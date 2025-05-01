@@ -26,3 +26,11 @@ export async function getMe() {
   // TODO: use correct user id
   return getUser(getUserIdFromLocalStorage() || '')
 }
+
+export function setUserIdInLocalStorage(id: number) {
+  localStorage.setItem('userId', id.toString())
+}
+
+export function logout() {
+  localStorage.removeItem('userId')
+}

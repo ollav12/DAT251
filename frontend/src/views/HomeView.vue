@@ -4,10 +4,31 @@ import { debounce } from 'lodash-es'
 import { formatDuration } from '../util/format'
 import Transport from '../services/transport'
 import type { Statistics, Vehicle, Trip } from '../services/transport'
+import {getUserIdFromLocalStorage, logout, getMe} from "@/services/user.ts";
 
 const statistics = ref<Statistics | null>(null)
 const statisticsLoading = ref(false)
 const statisticsError = ref<Error | null>(null)
+
+const visibleTripsCount = ref(5)
+
+const userChallenges = ref([])
+
+async function fetchUserChallenges(): Promise<void> {
+  try {
+    const userId = localStorage.getItem("userId")
+    if (!userId) {
+      throw new Error("User ID not found")
+    }
+    const response = await fetch(`http://localhost:8080/users/${userId}/challenges`)
+    userChallenges.value = await response.json()
+  } catch (error) {
+    console.error("Error fetching user challenges:", error)
+  }
+}
+function showMoreTrips() {
+  visibleTripsCount.value += 5
+}
 
 async function fetchStatistics() {
   try {
@@ -22,6 +43,7 @@ async function fetchStatistics() {
     statisticsLoading.value = false
   }
 }
+
 
 const hideAddTrip = ref(true)
 
@@ -62,6 +84,7 @@ async function submitTrip(e: Event) {
     })
     console.log(data)
     await fetchTrips()
+    await fetchStatistics()
   } catch (e) {
     error.value = e as Error
   }
@@ -70,7 +93,16 @@ async function submitTrip(e: Event) {
 async function fetchTrips() {
   try {
     loading.value = true
-    const trips = await Transport.listTrips()
+
+    const userId = getUserIdFromLocalStorage()
+    if(!userId) {
+      console.error("No user ID found in local storage")
+      error.value = new Error("User ID not found")
+      loading.value = false
+      return
+    }
+    const userIdNumber = parseInt(userId, 10)
+    const trips = await Transport.listUserTrips(userIdNumber)
     data.value = trips
     console.log(data.value)
   } catch (e) {
@@ -108,11 +140,15 @@ async function fetchDestinationSuggestions() {
 }
 const debouncedFetchDestinationSuggestions = debounce(fetchDestinationSuggestions, 300)
 
+
+
 onMounted(() => {
   fetchStatistics()
   fetchTrips()
   fetchVehicles()
+  fetchUserChallenges()
 })
+
 </script>
 
 <template>
@@ -125,10 +161,14 @@ onMounted(() => {
         >{{ ' ' }}
         <span class="unit"> kg CO2e</span>
       </p>
+
       <p>Total emitted</p>
-      <!-- money saved -->
-      <!-- emissions saved -->
-      <!-- trend -->
+      <p class="emissions-display">
+      <span class="value">{{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) }}</span
+      >{{ ' ' }}
+      <span class="unit"> kg CO2e</span>
+      </p>
+      <p>Total saved</p>
     </section>
 
     <section v-if="hideAddTrip">
@@ -196,7 +236,7 @@ onMounted(() => {
       <!-- TODO: make it possible to estimate before adding -->
     </section>
 
-    <section class="recent-trips">
+<!--    <section class="recent-trips">
       <h3>Recent trips</h3>
       <p>Total trips: {{ statistics?.totalTrips || 0 }}</p>
       <ul v-if="data" class="trip-list">
@@ -224,7 +264,51 @@ onMounted(() => {
         </li>
       </ul>
       <div v-else>No trips found.</div>
+    </section>-->
+    <section class="recent-trips">
+      <h3>Recent trips</h3>
+      <p>Total trips: {{ data.length }}</p>
+      <ul v-if="data" class="trip-list">
+        <li
+          v-for="trip in data.slice(0, visibleTripsCount)"
+          :key="trip.id"
+          class="trip-item"
+        >
+          <div>
+            <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
+            <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
+            <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
+            <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
+            <h4 v-else>Trip</h4>
+            <p>{{ trip.origin }} to {{ trip.destination }}</p>
+            <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
+            <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
+            <p v-if="trip.vehicle">
+              {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
+            </p>
+          </div>
+          <div>
+            <p>
+              <span class="value">{{ trip.totalEmissionsCO2eKg.toFixed(2) }}</span>
+              <span class="unit">kg CO2e</span>
+            </p>
+            <p>Saved {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg CO2e</p>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Vis mer knapp -->
+      <button
+        v-if="data && visibleTripsCount < data.length"
+        @click="showMoreTrips"
+        class="show-more-btn"
+      >
+        Vis flere turer
+      </button>
+
+      <div v-if="data && data.length === 0">No trips found.</div>
     </section>
+
   </main>
 </template>
 
@@ -346,4 +430,19 @@ li.trip-item .unit {
   font-size: 1em;
   font-weight: bold;
 }
+
+.show-more-btn {
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.show-more-btn:hover {
+  background-color: #45a049;
+}
+
 </style>
