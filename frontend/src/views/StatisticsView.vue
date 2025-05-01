@@ -197,7 +197,7 @@ const renderCharts = () => {
 <template>
   <div class="container" >
   <div class="message" v-if="!trips || trips.length < 2">
-    <h1>Please add atleast two trips to see statistics</h1>
+    <h1>Please add at least two trips to see statistics</h1>
   </div>
   <div v-else>
     <div ref="chartContainerDaily" class="chart"></div>
