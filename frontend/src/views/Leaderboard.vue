@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { onMounted, ref, watch, inject, computed } from 'vue'
 import { formatDuration } from '../util/format'
@@ -31,7 +32,7 @@ type Leaderboard = {
 
 // Props for customization
 const props = defineProps<{
-  limit?: number
+  limit: number
   showViewMore?: boolean
 }>()
 
