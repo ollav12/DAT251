@@ -41,13 +41,11 @@ function performLogout() {
   </header>
 
   <nav v-if="showLayout">
+    <button class="logoutButton" @click="performLogout">Log out</button>
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/vehicles">Vehicles</RouterLink>
-    <RouterLink to="/leaderboard">Leaderboard</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
-
     <RouterLink to="/challenges">Challenges</RouterLink>
-
     <RouterLink to="/shop">Shop</RouterLink>
     <RouterLink to="/inventory">Inventory</RouterLink>
     <RouterLink to="/statistics">Statistics</RouterLink>
@@ -55,9 +53,8 @@ function performLogout() {
 
   </nav>
 
-    <section class="profile-container">
+    <section class="profile-container" v-if="showLayout">
       <UserProfileView />
-      <button @click="performLogout">Log out</button>
     </section>
 
   <RouterView />
@@ -115,6 +112,37 @@ header {
   flex-direction: column;
   align-items: center;
   margin-top: 1rem;
+}
+
+button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #1abc9c;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.logoutButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  width: auto;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  background-color: #1abc9c;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.logoutButton:hover {
+  background-color: #47a365;
 }
 
 </style>

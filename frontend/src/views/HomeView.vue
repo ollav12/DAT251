@@ -5,12 +5,13 @@ import { formatDuration } from '../util/format'
 import Transport from '../services/transport'
 import type { Statistics, Vehicle, Trip } from '../services/transport'
 import {getUserIdFromLocalStorage, logout, getMe} from "@/services/user.ts";
+import Leaderboard from "@/views/Leaderboard.vue"
 
 const statistics = ref<Statistics | null>(null)
 const statisticsLoading = ref(false)
 const statisticsError = ref<Error | null>(null)
 
-const visibleTripsCount = ref(5)
+const visibleTripsCount = ref(2)
 
 const userChallenges = ref([])
 
@@ -155,170 +156,171 @@ onMounted(() => {
   <main v-if="loading">Loading...</main>
   <main v-else-if="error">Error: {{ error.message }}</main>
   <main>
-    <section class="stats">
-      <p class="emissions-display">
-        <span class="value">{{ statistics?.totalEmissionsCO2eKg?.toFixed(2) }}</span
-        >{{ ' ' }}
-        <span class="unit"> kg CO2e</span>
-      </p>
-
-      <p>Total emitted</p>
-      <p class="emissions-display">
-      <span class="value">{{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) }}</span
-      >{{ ' ' }}
-      <span class="unit"> kg CO2e</span>
-      </p>
-      <p>Total saved</p>
-    </section>
-
-    <section v-if="hideAddTrip">
-      <button @click="toggleAddTrip">Add new trip</button>
-    </section>
-    <section v-else class="add-trip">
-      <h3>Add new trip</h3>
-      <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
-        <label for="origin">Origin</label>
-        <input
-          name="origin"
-          placeholder="Origin"
-          list="origin-autocomplete"
-          v-model="originQuery"
-          @input="debouncedFetchOriginSuggestions"
-          required
-        />
-        <datalist id="origin-autocomplete">
-          <option
-            v-for="suggestion in originOptions"
-            :key="suggestion"
-            :value="suggestion"
-          ></option>
-        </datalist>
-        <label for="destination">Destination</label>
-        <input
-          name="destination"
-          placeholder="Destination"
-          list="destination-autocomplete"
-          v-model="destinationQuery"
-          @input="debouncedFetchDestinationSuggestions"
-          required
-        />
-        <datalist id="destination-autocomplete">
-          <option
-            v-for="suggestion in destinationOptions"
-            :key="suggestion"
-            :value="suggestion"
-          ></option>
-        </datalist>
-
-        <div style="display: flex; align-items: center; gap: 10px">
-          <input type="checkbox" id="useVehicle" v-model="useVehicle" />
-          <label for="useVehicle">Use personal vehicle</label>
+    <div class="main-content">
+      <section class="stats">
+        <div class="stat-item">
+          <p class="emissions-display">
+            <span class="value">{{ statistics?.totalEmissionsCO2eKg?.toFixed(2) }}</span>
+            <span class="unit"> kg CO2e</span>
+          </p>
+          <p>Total emitted</p>
         </div>
-        <select v-if="!useVehicle" name="mode" id="mode">
-          <option value="walking" selected>Walking</option>
-          <option value="bicycling">Bicycling</option>
-          <option value="transit">Transit</option>
-          <option value="driving">Driving</option>
-        </select>
-        <div v-else>
-          <a href="/vehicles">Manage Vehicles</a>
-          <select name="vehicleId" id="vehicleId" v-model="selectedVehicle">
-            <option value="" disabled>Select a vehicle</option>
-            <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
-              {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }})
-            </option>
+        <div class="stat-item">
+          <p class="emissions-display">
+            <span class="value">{{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) }}</span>
+            <span class="unit"> kg CO2e</span>
+          </p>
+          <p>Total saved</p>
+        </div>
+      </section>
+
+      <section v-if="hideAddTrip">
+        <button @click="toggleAddTrip">Add new trip</button>
+      </section>
+      <section v-else class="add-trip">
+        <h3>Add new trip</h3>
+        <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
+          <label for="origin">Origin</label>
+          <input
+            name="origin"
+            placeholder="Origin"
+            list="origin-autocomplete"
+            v-model="originQuery"
+            @input="debouncedFetchOriginSuggestions"
+            required
+          />
+          <datalist id="origin-autocomplete">
+            <option
+              v-for="suggestion in originOptions"
+              :key="suggestion"
+              :value="suggestion"
+            ></option>
+          </datalist>
+          <label for="destination">Destination</label>
+          <input
+            name="destination"
+            placeholder="Destination"
+            list="destination-autocomplete"
+            v-model="destinationQuery"
+            @input="debouncedFetchDestinationSuggestions"
+            required
+          />
+          <datalist id="destination-autocomplete">
+            <option
+              v-for="suggestion in destinationOptions"
+              :key="suggestion"
+              :value="suggestion"
+            ></option>
+          </datalist>
+
+          <div style="display: flex; align-items: center; gap: 10px">
+            <input type="checkbox" id="useVehicle" v-model="useVehicle" />
+            <label for="useVehicle">Use personal vehicle</label>
+          </div>
+          <select v-if="!useVehicle" name="mode" id="mode">
+            <option value="walking" selected>Walking</option>
+            <option value="bicycling">Bicycling</option>
+            <option value="transit">Transit</option>
+            <option value="driving">Driving</option>
           </select>
-        </div>
-
-        <button type="submit">Add trip</button>
-        <button @click="toggleAddTrip" class="secondary">Cancel</button>
-      </form>
-      <!-- TODO: make it possible to estimate before adding -->
-    </section>
-
-<!--    <section class="recent-trips">
-      <h3>Recent trips</h3>
-      <p>Total trips: {{ statistics?.totalTrips || 0 }}</p>
-      <ul v-if="data" class="trip-list">
-        <li v-for="trip in data" :key="trip.id" class="trip-item">
-          <div>
-            <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
-            <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
-            <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
-            <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
-            <h4 v-else>Trip</h4>
-            <p>{{ trip.origin }} to {{ trip.destination }}</p>
-            <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
-            <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
-            <p v-if="trip.vehicle">
-              {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
-            </p>
+          <div v-else>
+            <a href="/vehicles">Manage Vehicles</a>
+            <select name="vehicleId" id="vehicleId" v-model="selectedVehicle">
+              <option value="" disabled>Select a vehicle</option>
+              <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
+                {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }})
+              </option>
+            </select>
           </div>
-          <div>
-            <p>
-              <span class="value">{{ trip.totalEmissionsCO2eKg.toFixed(2) }}</span>
-              <span class="unit">kg CO2e</span>
-            </p>
-            <p>Saved {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg CO2e</p>
-          </div>
-        </li>
-      </ul>
-      <div v-else>No trips found.</div>
-    </section>-->
-    <section class="recent-trips">
-      <h3>Recent trips</h3>
-      <p>Total trips: {{ data.length }}</p>
-      <ul v-if="data" class="trip-list">
-        <li
-          v-for="trip in data.slice(0, visibleTripsCount)"
-          :key="trip.id"
-          class="trip-item"
+
+          <button type="submit">Add trip</button>
+          <button @click="toggleAddTrip" class="secondary">Cancel</button>
+        </form>
+        <!-- TODO: make it possible to estimate before adding -->
+      </section>
+
+      <section class="recent-trips">
+        <h3>Recent trips</h3>
+        <p>Total trips: {{ data.length }}</p>
+        <ul v-if="data" class="trip-list">
+          <li v-for="trip in data.slice(0, visibleTripsCount)" :key="trip.id" class="trip-item">
+            <div>
+              <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
+              <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
+              <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
+              <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
+              <h4 v-else>Trip</h4>
+              <p>{{ trip.origin }} to {{ trip.destination }}</p>
+              <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
+              <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
+              <p v-if="trip.vehicle">
+                {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
+              </p>
+            </div>
+            <div>
+              <p>
+                <span class="value">{{ trip.totalEmissionsCO2eKg.toFixed(2) }}</span>
+                <span class="unit">kg CO2e</span>
+              </p>
+              <p>Saved {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg CO2e</p>
+            </div>
+          </li>
+        </ul>
+
+        <!-- Vis mer knapp -->
+        <button
+          v-if="data && visibleTripsCount < data.length"
+          @click="showMoreTrips"
+          class="show-more-btn"
         >
-          <div>
-            <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
-            <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
-            <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
-            <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
-            <h4 v-else>Trip</h4>
-            <p>{{ trip.origin }} to {{ trip.destination }}</p>
-            <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
-            <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
-            <p v-if="trip.vehicle">
-              {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
-            </p>
-          </div>
-          <div>
-            <p>
-              <span class="value">{{ trip.totalEmissionsCO2eKg.toFixed(2) }}</span>
-              <span class="unit">kg CO2e</span>
-            </p>
-            <p>Saved {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg CO2e</p>
-          </div>
-        </li>
-      </ul>
-
-      <!-- Vis mer knapp -->
-      <button
-        v-if="data && visibleTripsCount < data.length"
-        @click="showMoreTrips"
-        class="show-more-btn"
-      >
-        Vis flere turer
-      </button>
-
-      <div v-if="data && data.length === 0">No trips found.</div>
-    </section>
-
+          Show more
+        </button>
+        <div v-if="data && data.length === 0">No trips found.</div>
+      </section>
+    </div>
+    <div class="leaderboard-sidebar">
+      <Leaderboard :limit="5" :show-view-more="true" />
+    </div>
   </main>
 </template>
 
 <style scoped>
 main {
-  display: grid;
-  /* grid-template-rows: auto; */
-  max-width: 480px;
+  position: relative;
+  max-width: 100%;
   margin: 0 auto;
+  padding: 16px;
+}
+
+.main-content {
+  width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
+}
+
+.leaderboard-sidebar {
+  position: absolute;
+  width: 350px;
+  top: 16px;
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  main {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .leaderboard-sidebar {
+    position: static;
+    width: 100%;
+    max-width: 480px;
+    margin-top: 20px;
+  }
 }
 
 form {
@@ -364,16 +366,23 @@ select:hover {
 section {
   display: flex;
   flex-direction: column;
-
   gap: 16px;
 }
 
 .stats {
   display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 60px;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.stat-item {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  text-align: center;
 }
 
 .stats .value {
