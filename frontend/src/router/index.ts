@@ -28,6 +28,11 @@ const router = createRouter({
       component: () => import('../views/TripEstimatorView.vue'),
     },
     {
+      path: '/leaderboard',
+      name: 'leaderboard',
+        component: () => import('../views/LeaderboardView.vue'),
+    },
+    {
       path: '/vehicles',
       name: 'vehicles',
       component: () => import('../views/VehiclesView.vue'),

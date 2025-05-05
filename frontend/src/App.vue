@@ -45,6 +45,7 @@ function performLogout() {
     <RouterLink to="/">Home</RouterLink>
     <RouterLink to="/vehicles">Vehicles</RouterLink>
     <RouterLink to="/tripestimator">Trip estimator</RouterLink>
+    <RouterLink to="/leaderboard">Leaderboard</RouterLink>
     <RouterLink to="/challenges">Challenges</RouterLink>
     <RouterLink to="/shop">Shop</RouterLink>
     <RouterLink to="/inventory">Inventory</RouterLink>

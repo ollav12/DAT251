@@ -32,7 +32,7 @@ type Leaderboard = {
 
 // Props for customization
 const props = defineProps<{
-  limit: number
+  limit?: number
   showViewMore?: boolean
 }>()
 
@@ -50,7 +50,7 @@ async function fetchLeaderboard(): Promise<void> {
   loading.value = true
   try {
     const response = await fetch(
-      `http://localhost:8080/transport/leaderboard?metric=${selectedMetric.value}&period=${selectedPeriod.value}`
+        `http://localhost:8080/transport/leaderboard?metric=${selectedMetric.value}&period=${selectedPeriod.value}`
     )
     const leaderboard = await response.json()
     data.value = leaderboard
@@ -107,7 +107,7 @@ function getMetricLabel(metric: LeaderboardMetric): string {
 
 // Compute displayed rows based on limit prop
 const displayedRows = computed(() =>
-  props.limit ? data.value.rows.slice(0, props.limit) : data.value.rows
+    props.limit ? data.value.rows.slice(0, props.limit) : data.value.rows
 )
 </script>
 
@@ -142,9 +142,9 @@ const displayedRows = computed(() =>
       </thead>
       <tbody>
       <tr
-        v-for="(row, i) in displayedRows"
-        :key="i"
-        :class="{ 'current-user': user && row.username === user.username }"
+          v-for="(row, i) in displayedRows"
+          :key="i"
+          :class="{ 'current-user': user && row.username === user.username }"
       >
         <td>{{ i + 1 }}</td>
         <td>{{ row.firstName }} {{ row.lastName }}</td>
@@ -153,7 +153,7 @@ const displayedRows = computed(() =>
       </tbody>
     </table>
     <p v-else>Loading...</p>
-    <div v-if="props.showViewMore && data.rows.length > props.limit" class="view-more">
+    <div v-if="props.showViewMore && typeof props.limit === 'number' && data.rows.length > props.limit" class="view-more">
       <RouterLink to="/leaderboard">View more</RouterLink>
     </div>
   </div>
