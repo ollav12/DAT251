@@ -161,48 +161,49 @@ const displayedRows = computed(() =>
 
 <style scoped>
 .leaderboard-card {
-  background-color: #1e2525;
-  border: 1px solid #3d3d3d;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  color: white;
+  background-color: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
 }
 
 h3 {
-  margin: 0 0 12px 0;
-  font-size: 1.5em;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
 }
 
 .leaderboard-controls {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-md);
 }
 
 .select-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--spacing-xs);
   width: 48%;
 }
 
 .select-group label {
-  font-size: 0.9em;
-  color: #b0b0b0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 select {
-  background-color: #3d3d3d;
-  color: white;
-  border: 1px solid #555;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 1em;
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color var(--transition-base);
   appearance: none;
-  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBvbHlsaW5lIHBvaW50cz0iNiA5IDEyIDE1IDE4IDkiPjwvcG9seWxpbmU+PC9zdmc+');
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5bGluZSBwb2ludHM9IjYgOSAxMiAxNSAxOCA5Ij48L3BvbHlsaW5lPjwvc3ZnPg==');
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 16px;
@@ -210,50 +211,53 @@ select {
 
 select:hover,
 select:focus {
-  border-color: #2b5797;
+  border-color: var(--primary-color);
   outline: none;
 }
 
 select option {
-  background-color: #3d3d3d;
-  color: white;
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: var(--spacing-sm);
 }
 
 th,
 td {
-  padding: 10px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
   text-align: left;
-  font-size: 0.95em;
+  font-size: var(--font-size-sm);
 }
 
 th {
-  background-color: #2a2a2a;
-  color: #b0b0b0;
-  font-weight: bold;
+  background-color: var(--background-tertiary);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  font-size: 0.85em;
+  font-size: var(--font-size-xs);
+  border-bottom: 1px solid var(--border-color);
 }
 
 tr:nth-child(even) {
-  background-color: #252b2b;
+  background-color: var(--background-secondary);
 }
 
 tr.current-user {
-  background-color: #1e3a5f;
+  background-color: var(--primary-color-light);
+  color: var(--text-primary);
 }
 
 .view-more {
-  margin-top: 10px;
+  margin-top: var(--spacing-sm);
   text-align: right;
 }
 
 .view-more a {
-  color: #007bff;
+  color: var(--primary-color);
   text-decoration: none;
 }
 

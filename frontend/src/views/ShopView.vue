@@ -172,44 +172,46 @@ onMounted(async () => {
 
 <style scoped>
 h1 {
-  color: #ffffff;
+  color: var(--text-primary);
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-  font-size: 2.5rem;
+  font-size: var(--font-size-display);
   text-align: center;
 }
 
 h2 {
-  color: #b7b9bc;
+  color: var(--text-secondary);
   margin-left: 1rem;
   margin-bottom: 1.5rem;
-  font-size: xx-large;
+  font-size: var(--font-size-xl);
   text-align: left;
 }
 
 .shopbox {
-  background-color: #555555;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--background-primary);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
   width: 1000px;
   margin: 2rem auto;
+  border: 1px solid var(--border-color);
 }
 
 .cosmetic-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: var(--spacing-md);
   justify-content: center;
 }
 
 .cosmetic-group {
-  background-color: #444;
-  padding: 1rem;
-  border-radius: 10px;
+  background-color: var(--background-secondary);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
   text-align: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+  border: 1px solid var(--border-color);
 }
 
 .cosmetic-group:hover {
@@ -220,20 +222,20 @@ h2 {
   width: 100px;
   height: 100px;
   object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 0.5rem;
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 label {
   display: block;
-  color: #ecf0f1;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
 }
 
 .cosmetic-description {
-  color: #ddd;
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   word-wrap: break-word;
   overflow-wrap: break-word;
   text-align: center;
@@ -242,36 +244,36 @@ label {
 }
 
 .cosmetic-price {
-  color: #ffcc00;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+  color: var(--warning-color);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
 }
 
 button {
   width: 80%;
-  padding: 0.5rem;
+  padding: var(--spacing-sm);
   border: none;
-  border-radius: 5px;
-  background-color: #1abc9c;
-  color: white;
-  font-size: 1rem;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  font-size: var(--font-size-base);
   cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background-color 0.2s;
+  margin-top: var(--spacing-sm);
+  transition: background-color var(--transition-fast);
 }
 
 button:hover {
-  background-color: #16a085;
+  background-color: var(--primary-color-dark);
 }
 
 .error-message {
-  background-color: #e74c3c;
-  color: white;
+  background-color: var(--danger-color);
+  color: var(--text-light);
   padding: 0.75rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-md);
   animation: fadeIn 0.3s;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   text-align: center;
 }
 
@@ -299,20 +301,20 @@ button:hover {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  border-radius: var(--border-radius-md);
 }
 
 .price-unaffordable {
-  color: #e74c3c !important;
+  color: var(--danger-color) !important;
 }
 
 .button-unaffordable {
-  background-color: #7f8c8d !important;
+  background-color: var(--medium-color) !important;
   cursor: not-allowed;
-  font-size: 0.8rem !important;
+  font-size: var(--font-size-sm) !important;
 }
 
 .button-unaffordable:hover {
-  background-color: #7f8c8d !important;
+  background-color: var(--medium-color) !important;
 }
 </style>
