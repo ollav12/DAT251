@@ -1,5 +1,7 @@
 @import './base.css';
 @import './design-system.css';
+@import './enhanced-styles.css';
+@import './animations.css';
 
 /* Main layout */
 body {
@@ -177,19 +179,27 @@ ul {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--background-tertiary);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--medium-color);
-  border-radius: 4px;
+  background: linear-gradient(to bottom, var(--primary-color-light), var(--primary-color));
+  border-radius: 5px;
+  border: 2px solid var(--background-primary);
+  transition: all var(--transition-base);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  background: linear-gradient(to bottom, var(--primary-color), var(--primary-color-dark));
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--background-tertiary);
 }

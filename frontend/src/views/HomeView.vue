@@ -11,9 +11,9 @@ const statistics = ref<Statistics | null>(null)
 const statisticsLoading = ref(false)
 const statisticsError = ref<Error | null>(null)
 
-const visibleTripsCount = ref(2)
-
-const userChallenges = ref([])
+const visibleTripsCount = ref(10)
+  
+const userChallenges = ref<{id: string; icon: string; name: string; progress: number}[]>([])
 
 async function fetchUserChallenges(): Promise<void> {
   try {
@@ -102,7 +102,7 @@ async function fetchTrips() {
       loading.value = false
       return
     }
-    const userIdNumber = parseInt(userId, 10)
+    const userIdNumber = Number.parseInt(userId, 10)
     const trips = await Transport.listUserTrips(userIdNumber)
     data.value = trips
     console.log(data.value)
@@ -154,14 +154,15 @@ onMounted(() => {
 
 <template>
   <main v-if="loading" class="loading-container">
-    <div class="loader">Loading...</div>
+    <div class="loader" aria-label="Loading content"></div>
+    <p class="text-center text-muted mt-3">Loading your dashboard...</p>
   </main>
   <main v-else-if="error" class="error-container">
     <div class="alert alert-danger">
       <strong>Error:</strong> {{ error.message }}
     </div>
   </main>
-  <main>
+  <main v-else>
     <div class="dashboard-container">
       <section class="stats-section">
         <div class="stat-card">
@@ -170,8 +171,11 @@ onMounted(() => {
             <span class="stat-title">Total CO₂ Emitted</span>
           </div>
           <div class="stat-value">
-            {{ statistics?.totalEmissionsCO2eKg?.toFixed(2) }}
+            {{ statistics?.totalEmissionsCO2eKg?.toFixed(2) || '0.00' }}
             <span class="stat-unit">kg CO₂e</span>
+          </div>
+          <div class="stat-info text-muted">
+            <i class="icon">📊</i> Based on your travel history
           </div>
         </div>
         <div class="stat-card">
@@ -180,8 +184,11 @@ onMounted(() => {
             <span class="stat-title">Total CO₂ Saved</span>
           </div>
           <div class="stat-value">
-            {{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) }}
+            {{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) || '0.00' }}
             <span class="stat-unit">kg CO₂e</span>
+          </div>
+          <div class="stat-info text-muted">
+            <i class="icon">🌍</i> Your positive environmental impact
           </div>
         </div>
       </section>
@@ -190,6 +197,24 @@ onMounted(() => {
         <button class="btn btn-primary" @click="toggleAddTrip">
           <i class="icon">➕</i> Add new trip
         </button>
+        
+        <div v-if="userChallenges && userChallenges.length > 0" class="active-challenges mt-4">
+          <h3 class="section-title"><i class="icon">🏆</i> Active Challenges</h3>
+          <div class="challenges-container">
+            <div v-for="challenge in userChallenges.slice(0, 2)" :key="challenge.id" class="challenge-card">
+              <div class="challenge-icon">{{ challenge.icon || '🚲' }}</div>
+              <div class="challenge-details">
+                <h4 class="challenge-title">{{ challenge.name }}</h4>
+                <div class="challenge-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" :style="{width: `${challenge.progress || 0}%`}"></div>
+                  </div>
+                  <span class="progress-text">{{ challenge.progress || 0 }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       <section v-else class="add-trip-section card">
         <div class="card-header">
@@ -267,15 +292,19 @@ onMounted(() => {
           </div>
 
           <div class="form-buttons">
-            <button type="submit" class="btn btn-primary">Add trip</button>
-            <button @click="toggleAddTrip" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="icon">✓</i> Add trip
+            </button>
+            <button @click="toggleAddTrip" type="button" class="btn btn-secondary">
+              <i class="icon">✕</i> Cancel
+            </button>
           </div>
         </form>
       </section>
 
       <section class="trips-section">
         <div class="section-header">
-          <h3>Recent Trips</h3>
+          <h3><i class="icon">🧭</i> Recent Trips</h3>
           <span class="badge badge-primary">{{ data.length }} Total</span>
         </div>
         
@@ -289,11 +318,11 @@ onMounted(() => {
                 <span class="mode-icon" v-else-if="trip.travelMode === 'transit'">🚌</span>
                 <span class="mode-icon" v-else>🧭</span>
                 
-                <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
-                <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
-                <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
-                <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
-                <h4 v-else>Trip</h4>
+                <h4 v-if="trip.travelMode === 'driving'" class="mode-title">Drive</h4>
+                <h4 v-else-if="trip.travelMode === 'walking'" class="mode-title">Walk</h4>
+                <h4 v-else-if="trip.travelMode === 'bicycling'" class="mode-title">Bike</h4>
+                <h4 v-else-if="trip.travelMode === 'transit'" class="mode-title">Transit</h4>
+                <h4 v-else class="mode-title">Trip</h4>
               </div>
               
               <div class="trip-emissions">
@@ -421,19 +450,39 @@ main {
 }
 
 .stat-card {
-  flex: 1;
   background-color: var(--background-primary);
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  transition: all var(--animation-medium);
+  position: relative;
+  overflow: hidden;
+  border: var(--card-border);
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: var(--primary-gradient);
+}
+
+.stat-info {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .stat-header {
@@ -475,6 +524,7 @@ main {
 
 .add-trip-section {
   margin-bottom: var(--spacing-lg);
+  grid-column: 1 / -1;
 }
 
 .card-header {
@@ -511,13 +561,21 @@ main {
 
 .form-buttons {
   display: flex;
+  justify-content: flex-end;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 /* Trips Section */
 .trips-section {
-  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  grid-column: 1 / -1;
 }
 
 .section-header {
@@ -525,6 +583,8 @@ main {
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .trips-container {
@@ -543,8 +603,8 @@ main {
 }
 
 .trip-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .trip-header {
@@ -566,10 +626,11 @@ main {
   font-size: var(--font-size-xl);
 }
 
-.trip-mode h4 {
+.mode-title {
   margin: 0;
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
 }
 
 .trip-emissions {

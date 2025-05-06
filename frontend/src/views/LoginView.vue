@@ -1,8 +1,8 @@
 <script lang="ts">
-import { useRouter } from "vue-router";
-import eye from "@/assets/eye.svg";
-import eyeOff from "@/assets/eye-off.svg";
-import { useCosmeticsStore } from '@/composables/useCosmeticsStore';
+import { useRouter } from 'vue-router'
+import eye from '@/assets/eye.svg'
+import eyeOff from '@/assets/eye-off.svg'
+import { useCosmeticsStore } from '@/composables/useCosmeticsStore'
 
 export default {
   data() {
@@ -17,19 +17,19 @@ export default {
   },
 
   setup() {
-    const router = useRouter();
-    const { updateEquippedBorder, updateEquippedProfilePicture } = useCosmeticsStore();
-    return { router, updateEquippedBorder, updateEquippedProfilePicture };
+    const router = useRouter()
+    const { updateEquippedBorder, updateEquippedProfilePicture } = useCosmeticsStore()
+    return { router, updateEquippedBorder, updateEquippedProfilePicture }
   },
 
   methods: {
     togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
+      this.showPassword = !this.showPassword
     },
 
     async handleSubmit(event: Event) {
-      event.preventDefault();
-      this.error = '';
+      event.preventDefault()
+      this.error = ''
       try {
         const response = await fetch('http://localhost:8080/auth/login', {
           method: 'POST',
@@ -38,38 +38,38 @@ export default {
             username: this.username,
             password: this.password,
           }),
-        });
+        })
 
-        const data = await response.json();
+        const data = await response.json()
 
         if (!response.ok) {
-          this.error = data.error;
-          throw new Error(data.error);
-        } else {
-          localStorage.setItem('isLoggedIn', 'true');
-          localStorage.setItem('userId', data.userId);
-
-          // Save equipped cosmetics
-          if (data.equippedBorder) {
-            this.updateEquippedBorder(data.equippedBorder);
-          }
-
-          if (data.equippedProfilePicture) {
-            this.updateEquippedProfilePicture(data.equippedProfilePicture);
-          }
-          // Redirect directly after successful login
-          console.log("User id: ", data)
-          localStorage.setItem("userId", data.userId);
-          await this.router.push({name: 'home'});
+          this.error = data.error
+          throw new Error(data.error)
         }
-        console.log('Login success:', data);
+        // Login successful
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('userId', data.userId)
+
+        // Save equipped cosmetics
+        if (data.equippedBorder) {
+          this.updateEquippedBorder(data.equippedBorder)
+        }
+
+        if (data.equippedProfilePicture) {
+          this.updateEquippedProfilePicture(data.equippedProfilePicture)
+        }
+        // Redirect directly after successful login
+        console.log('User id: ', data)
+        localStorage.setItem('userId', data.userId)
+        await this.router.push({ name: 'home' })
+        console.log('Login success:', data)
       } catch (error) {
-        console.error('Error during login:', error);
+        console.error('Error during login:', error)
       }
     },
     navigateToSignup() {
-      this.router.push({ name: 'signup' });
-    }
+      this.router.push({ name: 'signup' })
+    },
   },
 }
 </script>
@@ -79,21 +79,21 @@ export default {
     <div class="login-card card">
       <div class="card-header text-center">
         <h1>Login</h1>
-        <p class="text-muted">Sign in to your account</p>
+        <p class="text-muted">Welcome to CO₂mpass</p>
       </div>
-      
+
       <form @submit.prevent="handleSubmit" class="login-form">
         <div v-if="error" class="alert alert-danger">{{ error }}</div>
-        
+
         <div class="form-group">
           <label for="username" class="form-label">Username</label>
-          <input 
-            type="username" 
+          <input
+            type="username"
             id="username"
-            class="form-control" 
-            v-model="username" 
-            placeholder="Enter your username" 
-            required 
+            class="form-control"
+            v-model="username"
+            placeholder="Enter your username"
+            required
           />
         </div>
 
@@ -109,14 +109,22 @@ export default {
               required
             />
             <button type="button" class="toggle-password" @click="togglePasswordVisibility">
-              <img :src="showPassword ? eye : eyeOff" alt="Toggle password visibility" class="eye-icon" />
+              <img
+                :src="showPassword ? eye : eyeOff"
+                alt="Toggle password visibility"
+                class="eye-icon"
+              />
             </button>
           </div>
         </div>
-        
+
         <div class="form-buttons">
-          <button class="btn btn-primary btn-block" type="submit">Login</button>
-          <button class="btn btn-outline btn-block" type="button" @click="navigateToSignup">Create Account</button>
+          <button class="btn btn-primary btn-block" type="submit">
+            <i class="icon">🔒</i> Login
+          </button>
+          <button class="btn btn-outline btn-block" type="button" @click="navigateToSignup">
+            <i class="icon">👤</i> Create Account
+          </button>
         </div>
       </form>
     </div>
@@ -130,47 +138,95 @@ export default {
   align-items: center;
   min-height: 80vh;
   padding: var(--spacing-lg);
+  background: var(--bg-gradient-light);
 }
 
 .login-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   padding: var(--spacing-xl);
   background-color: var(--background-primary);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  overflow: hidden;
+  border: var(--card-border);
+  transition:
+    transform var(--animation-medium),
+    box-shadow var(--animation-medium);
+}
+
+.login-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-shadow-hover);
 }
 
 .card-header {
   margin-bottom: var(--spacing-lg);
+  position: relative;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: var(--primary-gradient);
+  border-radius: 3px;
 }
 
 .card-header h1 {
-  color: var(--primary-color);
+  font-size: calc(var(--font-size-xl) * 1.2);
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: var(--spacing-xs);
-  font-weight: var(--font-weight-bold);
+  font-weight: 800;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: var(--spacing-md);
+}
+
+.form-control {
+  transition: all var(--animation-fast);
+  border-width: 1px;
+  padding: var(--spacing-md) var(--spacing-md);
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2);
 }
 
 .form-buttons {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
 .alert-danger {
   background-color: var(--accent-color-light);
   color: var(--danger-color);
   border-radius: var(--border-radius-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
   font-size: var(--font-size-sm);
+  border-left: 4px solid var(--danger-color);
+  box-shadow: 0 2px 5px rgba(231, 76, 60, 0.1);
 }
 
 .password-wrapper {
@@ -178,7 +234,7 @@ export default {
 }
 
 .password-wrapper input {
-  padding-right: 40px;
+  padding-right: 44px;
 }
 
 .toggle-password {
@@ -189,7 +245,7 @@ export default {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0;
+  padding: 4px;
   margin: 0;
   width: auto;
   height: auto;
@@ -197,11 +253,14 @@ export default {
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
+  border-radius: 50%;
+  transition: all var(--animation-fast);
 }
 
 .toggle-password:hover {
-  background-color: transparent;
+  background-color: var(--background-tertiary);
   color: var(--primary-color);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .eye-icon {
@@ -209,16 +268,72 @@ export default {
   height: 20px;
   cursor: pointer;
   opacity: 0.7;
-  transition: opacity var(--transition-base);
+  transition: all var(--animation-fast);
 }
 
 .eye-icon:hover {
   opacity: 1;
 }
 
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--animation-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(-100%);
+  transition: transform var(--animation-medium);
+}
+
+.btn:hover::after {
+  transform: translateX(0);
+}
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: var(--text-light);
+  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 15px rgba(26, 188, 156, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  transform: translateY(-2px);
+}
+
 @media (max-width: 480px) {
   .login-card {
     padding: var(--spacing-lg);
+    max-width: 90%;
+  }
+
+  .card-header h1 {
+    font-size: var(--font-size-xl);
   }
 }
 </style>
