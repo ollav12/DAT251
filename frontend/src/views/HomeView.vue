@@ -167,6 +167,7 @@ onMounted(() => {
       <section class="stats-section">
         <div class="stat-card">
           <div class="stat-header">
+            <div class="stat-icon">🏭</div>
             <span class="stat-title">Total CO₂ Emitted</span>
           </div>
           <div class="stat-value">
@@ -176,11 +177,22 @@ onMounted(() => {
         </div>
         <div class="stat-card">
           <div class="stat-header">
+            <div class="stat-icon">🌱</div>
             <span class="stat-title">Total CO₂ Saved</span>
           </div>
           <div class="stat-value">
             {{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) || '0.00' }}
             <span class="stat-unit">kg CO₂e</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">🚶</div>
+            <span class="stat-title">Total Trips</span>
+          </div>
+          <div class="stat-value">
+            {{ data.length || '0' }}
+            <span class="stat-unit">trips</span>
           </div>
         </div>
       </section>
@@ -190,26 +202,33 @@ onMounted(() => {
           Add new trip
         </button>
         
-        <div v-if="userChallenges && userChallenges.length > 0" class="active-challenges mt-4">
-          <h3 class="section-title">Active Challenges</h3>
+        <div v-if="userChallenges && userChallenges.length > 0" class="active-challenges">
+          <div class="section-header">
+            <h3>Active Challenges</h3>
+            <RouterLink to="/challenges" class="view-all-link">View all</RouterLink>
+          </div>
           <div class="challenges-container">
-            <div v-for="challenge in userChallenges.slice(0, 2)" :key="challenge.id" class="challenge-card">
+            <div v-for="challenge in userChallenges.slice(0, 3)" :key="challenge.id" class="challenge-card">
               <div class="challenge-details">
-                <h4 class="challenge-title">{{ challenge.name }}</h4>
+                <div class="challenge-header">
+                  <h4 class="challenge-title">{{ challenge.name }}</h4>
+                  <span class="challenge-badge">{{ challenge.progress || 0 }}%</span>
+                </div>
                 <div class="challenge-progress">
                   <div class="progress-bar">
                     <div class="progress-fill" :style="{width: `${challenge.progress || 0}%`}"></div>
                   </div>
-                  <span class="progress-text">{{ challenge.progress || 0 }}%</span>
                 </div>
+                <p class="challenge-description">{{ challenge.description }}</p>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <section v-else class="add-trip-section card">
-        <div class="card-header">
+      <section v-else class="add-trip-section">
+        <div class="section-header">
           <h3>Add new trip</h3>
+          <button @click="toggleAddTrip" type="button" class="close-btn">&times;</button>
         </div>
         <form @submit.prevent="submitTrip" class="trip-form">
           <div class="form-group">
@@ -296,7 +315,7 @@ onMounted(() => {
       <section class="trips-section">
         <div class="section-header">
           <h3>Recent Trips</h3>
-          <span class="badge badge-primary">{{ data.length }} Total</span>
+          <RouterLink to="/statistics" class="view-stats-link">View statistics</RouterLink>
         </div>
         
         <div v-if="data && data.length > 0" class="trips-container">
@@ -375,22 +394,38 @@ onMounted(() => {
 <style scoped>
 main {
   position: relative;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
 }
 
 .dashboard-container {
   flex: 1;
   min-width: 480px;
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
+}
+
+.action-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.add-trip-section {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border-color);
 }
 
 .loading-container,
@@ -434,20 +469,21 @@ main {
 
 /* Stats Section */
 .stats-section {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .stat-card {
   background-color: var(--background-primary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-medium);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   transition: all var(--transition-base);
+  border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
   border: var(--border-width) solid var(--border-color);
@@ -473,12 +509,12 @@ main {
 .stat-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
 }
 
 .stat-icon {
-  font-size: var(--font-size-lg);
+  margin-right: var(--spacing-sm);
+  font-size: 1.5rem;
 }
 
 .stat-title {
@@ -554,7 +590,9 @@ main {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--spacing-md);
 }
 
 .btn {
@@ -573,25 +611,35 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: var(--border-width) solid var(--border-color);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-header h3 {
+  font-size: var(--font-size-lg);
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
 }
 
 .trips-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: var(--spacing-md);
 }
 
 .trip-card {
   background-color: var(--background-primary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-medium);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  transition: transform var(--transition-base);
-  border: var(--border-width) solid var(--border-color);
 }
 
 .trip-card:hover {
@@ -695,8 +743,98 @@ main {
 }
 
 .load-more-btn {
-  align-self: center;
+  margin: var(--spacing-lg) auto 0;
+  display: block;
+  width: fit-content;
+}
+
+/* Challenge cards styling */
+.active-challenges {
   margin-top: var(--spacing-md);
+}
+
+.challenges-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+.challenge-card {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  padding: var(--spacing-md);
+  transition: transform var(--transition-fast);
+}
+
+.challenge-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.challenge-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.challenge-title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+}
+
+.challenge-badge {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.challenge-description {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  margin: var(--spacing-xs) 0 0;
+}
+
+.view-all-link, .view-stats-link {
+  color: var(--primary-color);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.view-all-link:hover, .view-stats-link:hover {
+  text-decoration: underline;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.close-btn:hover {
+  opacity: 1;
+  color: var(--danger-color);
 }
 
 .empty-state {
@@ -717,23 +855,42 @@ main {
 
 /* Leaderboard sidebar */
 .leaderboard-sidebar {
-  width: 350px;
+  width: 380px;
+  position: sticky;
+  top: var(--spacing-lg);
+  align-self: flex-start;
+  height: fit-content;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
   .dashboard-container {
     max-width: 100%;
   }
   
   .leaderboard-sidebar {
+    width: 350px;
+  }
+}
+
+@media (max-width: 1100px) {
+  main {
+    flex-direction: column;
+  }
+  
+  .leaderboard-sidebar {
     width: 100%;
     margin-top: var(--spacing-lg);
+    position: static;
+  }
+  
+  .trips-container {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   main {
-    flex-direction: column;
+    padding: var(--spacing-md);
   }
   
   .dashboard-container {
@@ -741,7 +898,7 @@ main {
   }
   
   .stats-section {
-    flex-direction: column;
+    grid-template-columns: repeat(1, 1fr);
     gap: var(--spacing-md);
   }
   
