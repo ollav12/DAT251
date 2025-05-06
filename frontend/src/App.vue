@@ -34,18 +34,17 @@ function performLogout() {
 
 <template>
   <div class="app-container">
-    <header class="app-header bg-light">
+    <header class="app-header">
       <div class="header-content">
         <h1 class="app-title">CO₂mpass</h1>
         <p class="app-tagline">Understand your carbon footprint</p>
-        <div class="header-decoration"></div>
       </div>
     </header>
 
     <div class="app-body container" v-if="showLayout">
       <div class="top-bar">
-        <button class="btn btn-outline btn-sm logout-btn" @click="performLogout">
-          <i class="icon">↪</i> Log out
+        <button class="btn btn-outline logout-btn" @click="performLogout">
+          Log out
         </button>
 
         <div class="user-profile">
@@ -74,17 +73,12 @@ function performLogout() {
     </div>
 
     <main class="app-content">
-      <RouterView v-slot="{ Component }">
-        <transition name="section-fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </RouterView>
+      <RouterView />
     </main>
     
     <footer class="app-footer">
       <div class="container">
-        <p>© 2023 CO₂mpass. All rights reserved.</p>
-        <p class="text-muted">Making a greener future, one trip at a time.</p>
+        <p class="text-muted">© 2023 CO₂mpass</p>
       </div>
     </footer>
   </div>
@@ -98,10 +92,9 @@ function performLogout() {
 }
 
 .app-header {
-  padding: var(--spacing-lg) 0;
-  background: var(--bg-gradient-light);
-  border-bottom: var(--card-border);
-  position: relative;
+  padding: 1.5rem 0;
+  background-color: var(--background-primary);
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
 .header-content {
@@ -112,32 +105,21 @@ function performLogout() {
 }
 
 .app-title {
-  font-size: calc(var(--font-size-display) * 1.2);
-  font-weight: 800;
+  font-size: 2.5rem;
+  font-weight: 700;
   letter-spacing: -0.5px;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: var(--spacing-xs);
-  text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+  color: var(--primary-color);
+  margin-bottom: 0.25rem;
 }
 
 .app-tagline {
-  font-size: var(--font-size-md);
-  color: var(--text-secondary);
+  font-size: 1rem;
+  color: var(--medium-gray);
   margin: 0;
-  font-weight: var(--font-weight-medium);
+  font-weight: 400;
 }
 
-.header-decoration {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--primary-gradient);
-}
+
 
 .app-body {
   position: relative;
@@ -158,10 +140,7 @@ function performLogout() {
   transition: all var(--animation-fast);
 }
 
-.logout-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+
 
 .user-profile {
   display: flex;
@@ -177,9 +156,8 @@ function performLogout() {
   background-color: var(--background-primary);
   border-radius: var(--card-border-radius);
   margin-bottom: var(--spacing-lg);
-  box-shadow: var(--card-shadow);
-  border: var(--card-border);
-  position: relative;
+  box-shadow: var(--shadow-small);
+  border: var(--border-width) solid var(--border-color);
 }
 
 .nav-link {
@@ -196,40 +174,21 @@ function performLogout() {
   overflow: hidden;
 }
 
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--primary-gradient);
-  transition: all var(--transition-base);
-  transform: translateX(-50%);
-}
+
 
 .nav-link:hover {
   color: var(--primary-color);
-  transform: translateY(-2px);
+  background-color: var(--background-tertiary);
 }
 
-.nav-link:hover::after {
-  width: 80%;
-}
+
 
 .nav-link.router-link-exact-active {
-  color: var(--text-light);
-  background: var(--primary-gradient);
-  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+  color: white;
+  background-color: var(--primary-color);
 }
 
-.nav-link.router-link-exact-active:hover {
-  background: var(--primary-gradient);
-}
 
-.nav-link.router-link-exact-active::after {
-  width: 0;
-}
 
 .icon {
   font-style: normal;
@@ -246,12 +205,11 @@ function performLogout() {
 
 .app-footer {
   margin-top: auto;
-  padding: var(--spacing-lg) 0;
-  background: var(--bg-gradient-light);
-  border-top: var(--card-border);
+  padding: 1.5rem 0;
+  border-top: var(--border-width) solid var(--border-color);
   text-align: center;
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+  color: var(--medium-gray);
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

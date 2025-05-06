@@ -4,7 +4,7 @@ import { debounce } from 'lodash-es'
 import { formatDuration } from '../util/format'
 import Transport from '../services/transport'
 import type { Statistics, Vehicle, Trip } from '../services/transport'
-import {getUserIdFromLocalStorage, logout, getMe} from "@/services/user.ts";
+import {getUserIdFromLocalStorage} from "@/services/user.ts";
 import Leaderboard from "@/views/Leaderboard.vue"
 
 const statistics = ref<Statistics | null>(null)
@@ -167,42 +167,33 @@ onMounted(() => {
       <section class="stats-section">
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-icon">🏭</span>
             <span class="stat-title">Total CO₂ Emitted</span>
           </div>
           <div class="stat-value">
             {{ statistics?.totalEmissionsCO2eKg?.toFixed(2) || '0.00' }}
             <span class="stat-unit">kg CO₂e</span>
           </div>
-          <div class="stat-info text-muted">
-            <i class="icon">📊</i> Based on your travel history
-          </div>
         </div>
         <div class="stat-card">
           <div class="stat-header">
-            <span class="stat-icon">🌱</span>
             <span class="stat-title">Total CO₂ Saved</span>
           </div>
           <div class="stat-value">
             {{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) || '0.00' }}
             <span class="stat-unit">kg CO₂e</span>
           </div>
-          <div class="stat-info text-muted">
-            <i class="icon">🌍</i> Your positive environmental impact
-          </div>
         </div>
       </section>
 
       <section v-if="hideAddTrip" class="action-section">
         <button class="btn btn-primary" @click="toggleAddTrip">
-          <i class="icon">➕</i> Add new trip
+          Add new trip
         </button>
         
         <div v-if="userChallenges && userChallenges.length > 0" class="active-challenges mt-4">
-          <h3 class="section-title"><i class="icon">🏆</i> Active Challenges</h3>
+          <h3 class="section-title">Active Challenges</h3>
           <div class="challenges-container">
             <div v-for="challenge in userChallenges.slice(0, 2)" :key="challenge.id" class="challenge-card">
-              <div class="challenge-icon">{{ challenge.icon || '🚲' }}</div>
               <div class="challenge-details">
                 <h4 class="challenge-title">{{ challenge.name }}</h4>
                 <div class="challenge-progress">
@@ -293,10 +284,10 @@ onMounted(() => {
 
           <div class="form-buttons">
             <button type="submit" class="btn btn-primary">
-              <i class="icon">✓</i> Add trip
+              Add trip
             </button>
             <button @click="toggleAddTrip" type="button" class="btn btn-secondary">
-              <i class="icon">✕</i> Cancel
+              Cancel
             </button>
           </div>
         </form>
@@ -304,7 +295,7 @@ onMounted(() => {
 
       <section class="trips-section">
         <div class="section-header">
-          <h3><i class="icon">🧭</i> Recent Trips</h3>
+          <h3>Recent Trips</h3>
           <span class="badge badge-primary">{{ data.length }} Total</span>
         </div>
         
@@ -451,30 +442,24 @@ main {
 
 .stat-card {
   background-color: var(--background-primary);
-  border-radius: var(--card-border-radius);
-  box-shadow: var(--card-shadow);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
-  transition: all var(--animation-medium);
+  transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
-  border: var(--card-border);
+  border: var(--border-width) solid var(--border-color);
 }
 
 .stat-card:hover {
   transform: translateY(-5px);
-  box-shadow: var(--card-shadow-hover);
+  box-shadow: var(--shadow-large);
 }
 
-.stat-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 100%;
-  background: var(--primary-gradient);
+.stat-card {
+  border-left: 3px solid var(--primary-color);
 }
 
 .stat-info {
@@ -502,10 +487,16 @@ main {
 }
 
 .stat-value {
-  font-size: var(--font-size-display);
-  font-weight: var(--font-weight-bold);
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--primary-color);
   text-align: center;
+}
+
+.trip-co2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
 }
 
 .stat-unit {
@@ -582,9 +573,9 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
 .trips-container {
@@ -595,35 +586,37 @@ main {
 
 .trip-card {
   background-color: var(--background-primary);
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
   padding: var(--spacing-md);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
-  border: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-md);
+  transition: transform var(--transition-base);
+  border: var(--border-width) solid var(--border-color);
 }
 
 .trip-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--card-shadow-hover);
+  box-shadow: var(--shadow-large);
 }
 
 .trip-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  border-bottom: var(--border-width) solid var(--border-color);
+  padding-bottom: 1rem;
 }
 
 .trip-mode {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 0.5rem;
 }
 
 .mode-icon {
-  font-size: var(--font-size-xl);
+  font-size: 1.25rem;
+  color: var(--primary-color);
 }
 
 .mode-title {

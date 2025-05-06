@@ -1,7 +1,6 @@
 @import './base.css';
 @import './design-system.css';
-@import './enhanced-styles.css';
-@import './animations.css';
+@import './clean-styles.css';
 
 /* Main layout */
 body {

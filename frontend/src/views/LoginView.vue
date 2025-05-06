@@ -78,7 +78,7 @@ export default {
   <div class="auth-container">
     <div class="login-card card">
       <div class="card-header text-center">
-        <h1>Login</h1>
+        <h1 class="card-title">Login</h1>
         <p class="text-muted">Welcome to CO₂mpass</p>
       </div>
 
@@ -120,10 +120,10 @@ export default {
 
         <div class="form-buttons">
           <button class="btn btn-primary btn-block" type="submit">
-            <i class="icon">🔒</i> Login
+            Login
           </button>
           <button class="btn btn-outline btn-block" type="button" @click="navigateToSignup">
-            <i class="icon">👤</i> Create Account
+            Create Account
           </button>
         </div>
       </form>
@@ -137,96 +137,76 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  padding: var(--spacing-lg);
-  background: var(--bg-gradient-light);
+  padding: 2rem;
+  background: var(--background-secondary);
 }
 
 .login-card {
   width: 100%;
-  max-width: 420px;
-  padding: var(--spacing-xl);
+  max-width: 400px;
+  padding: 2rem;
   background-color: var(--background-primary);
-  border-radius: var(--card-border-radius);
-  box-shadow: var(--card-shadow);
-  position: relative;
-  overflow: hidden;
-  border: var(--card-border);
-  transition:
-    transform var(--animation-medium),
-    box-shadow var(--animation-medium);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
+  border: var(--border-width) solid var(--border-color);
+  transition: all var(--transition-base);
 }
 
 .login-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--card-shadow-hover);
+  box-shadow: var(--shadow-large);
 }
 
 .card-header {
-  margin-bottom: var(--spacing-lg);
-  position: relative;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
-.card-header::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: var(--primary-gradient);
-  border-radius: 3px;
-}
-
-.card-header h1 {
-  font-size: calc(var(--font-size-xl) * 1.2);
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: var(--spacing-xs);
-  font-weight: 800;
+.card-title {
+  color: var(--primary-color);
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: var(--font-weight-bold);
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  gap: 1rem;
 }
 
 .form-group {
   position: relative;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 1rem;
 }
 
 .form-control {
-  transition: all var(--animation-fast);
-  border-width: 1px;
-  padding: var(--spacing-md) var(--spacing-md);
+  transition: all var(--transition-fast);
+  border: var(--border-width) solid var(--border-color);
+  padding: 0.75rem;
 }
 
 .form-control:focus {
+  outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2);
+  box-shadow: 0 0 0 3px rgba(43, 138, 116, 0.1);
 }
 
 .form-buttons {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 .alert-danger {
-  background-color: var(--accent-color-light);
-  color: var(--danger-color);
-  border-radius: var(--border-radius-sm);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
-  font-size: var(--font-size-sm);
-  border-left: 4px solid var(--danger-color);
-  box-shadow: 0 2px 5px rgba(231, 76, 60, 0.1);
+  background-color: #f8d7da;
+  color: #842029;
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  border-left: 3px solid #842029;
 }
 
 .password-wrapper {
@@ -260,7 +240,6 @@ export default {
 .toggle-password:hover {
   background-color: var(--background-tertiary);
   color: var(--primary-color);
-  transform: translateY(-50%) scale(1.05);
 }
 
 .eye-icon {
@@ -279,61 +258,43 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-md);
+  gap: 0.5rem;
+  padding: 0.75rem;
   font-weight: var(--font-weight-medium);
-  transition: all var(--animation-fast);
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(-100%);
-  transition: transform var(--animation-medium);
-}
-
-.btn:hover::after {
-  transform: translateX(0);
+  transition: all var(--transition-fast);
+  border-radius: var(--border-radius);
+  cursor: pointer;
 }
 
 .btn-primary {
-  background: var(--primary-gradient);
-  color: var(--text-light);
-  box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 15px rgba(26, 188, 156, 0.4);
-  transform: translateY(-2px);
+  background-color: var(--primary-color-dark);
 }
 
 .btn-outline {
-  border: 1px solid var(--primary-color);
+  border: var(--border-width) solid var(--primary-color);
   color: var(--primary-color);
-  background: transparent;
+  background-color: transparent;
 }
 
 .btn-outline:hover {
   background-color: var(--primary-color);
-  color: var(--text-light);
-  transform: translateY(-2px);
+  color: white;
 }
 
 @media (max-width: 480px) {
   .login-card {
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
     max-width: 90%;
   }
 
-  .card-header h1 {
-    font-size: var(--font-size-xl);
+  .card-title {
+    font-size: 1.5rem;
   }
 }
 </style>

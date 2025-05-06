@@ -1,0 +1,266 @@
+/* Clean styles for CO₂mpass application
+ * Modern, minimal design with clean aesthetics
+ */
+
+:root {
+  /* Clean color palette */
+  --primary-color: #2b8a74; /* Refined green */
+  --primary-color-dark: #1f6553;
+  --primary-color-light: #3ba68d;
+  --secondary-color: #4a6fa4; /* Refined blue */
+  --accent-color: #c75143;    /* Refined red */
+  
+  /* Monochromatic neutrals */
+  --dark-gray: #333333;
+  --medium-gray: #6c757d;
+  --light-gray: #e9ecef;
+  --off-white: #f8f9fa;
+  
+  /* Clean backgrounds */
+  --background-primary: #ffffff;
+  --background-secondary: #f8f9fa;
+  --background-tertiary: #e9ecef;
+  
+  /* Shadows */
+  --shadow-small: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-large: 0 4px 12px rgba(0, 0, 0, 0.06);
+  
+  /* Typography */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  
+  /* Borders */
+  --border-radius: 4px;
+  --border-width: 1px;
+  --border-color: #e9ecef;
+}
+
+/* Clean header */
+.app-header {
+  padding: 1.5rem 0;
+  background-color: var(--background-primary);
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+.app-title {
+  color: var(--primary-color);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.app-tagline {
+  color: var(--medium-gray);
+  font-weight: var(--font-weight-normal);
+}
+
+/* Clean navigation */
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-small);
+  border: var(--border-width) solid var(--border-color);
+}
+
+.nav-link {
+  color: var(--medium-gray);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+  background-color: var(--background-tertiary);
+}
+
+.nav-link.router-link-exact-active {
+  color: var(--background-primary);
+  background-color: var(--primary-color);
+}
+
+/* Clean cards */
+.card {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
+  border: var(--border-width) solid var(--border-color);
+  padding: 1.5rem;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-large);
+}
+
+.card-header {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: var(--border-width) solid var(--border-color);
+}
+
+/* Clean buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: var(--font-weight-medium);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: var(--border-width) solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Clean form elements */
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  color: var(--dark-gray);
+  background-color: var(--background-primary);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
+  transition: border-color var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(43, 138, 116, 0.1);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--medium-gray);
+  font-size: 0.875rem;
+}
+
+/* Clean stat cards */
+.stat-card {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-small);
+  padding: 1.25rem;
+  border-left: 3px solid var(--primary-color);
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--dark-gray);
+}
+
+.stat-unit {
+  font-size: 0.875rem;
+  color: var(--medium-gray);
+}
+
+/* Clean alerts */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #842029;
+  border-left: 3px solid #842029;
+}
+
+/* Clean utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: var(--medium-gray);
+}
+
+.shadow {
+  box-shadow: var(--shadow-medium);
+}
+
+/* Clean scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--medium-gray);
+  border-radius: var(--border-radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Page transitions */
+.section-fade-enter-active,
+.section-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.section-fade-enter-from,
+.section-fade-leave-to {
+  opacity: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .main-nav {
+    flex-direction: column;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+}
