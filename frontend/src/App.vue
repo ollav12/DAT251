@@ -51,21 +51,21 @@ function performLogout() {
       </div>
 
       <nav class="main-nav shadow">
-        <RouterLink to="/" class="nav-link"> <i class="icon">🏠</i> Home </RouterLink>
-        <RouterLink to="/vehicles" class="nav-link"> <i class="icon">🚗</i> Vehicles </RouterLink>
+        <RouterLink to="/" class="nav-link">Home</RouterLink>
+        <RouterLink to="/vehicles" class="nav-link">Vehicles</RouterLink>
         <RouterLink to="/tripestimator" class="nav-link">
-          <i class="icon">🗺️</i> Trip estimator
+          Trip estimator
         </RouterLink>
         <RouterLink to="/challenges" class="nav-link">
-          <i class="icon">🏆</i> Challenges
+          Challenges
         </RouterLink>
-        <RouterLink to="/shop" class="nav-link"> <i class="icon">🛒</i> Shop </RouterLink>
-        <RouterLink to="/inventory" class="nav-link"> <i class="icon">📦</i> Inventory </RouterLink>
+        <RouterLink to="/shop" class="nav-link">Shop</RouterLink>
+        <RouterLink to="/inventory" class="nav-link">Inventory</RouterLink>
         <RouterLink to="/statistics" class="nav-link">
-          <i class="icon">📊</i> Statistics
+          Statistics
         </RouterLink>
         <RouterLink v-if="user?.admin" to="/admin" class="nav-link">
-          <i class="icon">⚙️</i> Admin
+          Admin
         </RouterLink>
       </nav>
     </div>
@@ -157,9 +157,9 @@ function performLogout() {
 .nav-link {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  justify-content: center;
   color: var(--text-secondary);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--border-radius-sm);
   transition: all var(--transition-base);
   text-decoration: none;
@@ -178,9 +178,7 @@ function performLogout() {
   background-color: var(--primary-color);
 }
 
-.icon {
-  font-style: normal;
-}
+/* Icon styles removed */
 
 .app-content {
   flex: 1;
