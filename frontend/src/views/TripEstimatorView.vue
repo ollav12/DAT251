@@ -51,16 +51,33 @@ async function estimateTrip() {
       </fieldset>
     </form>
   </main>
-  <div v-if="Object.keys(alternatives).length > 0">
-    <h2>Alternatives</h2>
-    <ul>
-      <li v-for="(alternative, index) in alternatives" :key="index">
-        <p>Mode: {{ index }}</p>
-        <p>Distance: {{ alternative.distance }} km</p>
-        <p>Duration: {{ alternative.duration }}</p>
-        <p>Carbon Footprint: {{ alternative.emissionsCO2eKg }} kg CO2</p>
-      </li>
-    </ul>
+  <div v-if="Object.keys(alternatives).length > 0" class="results-container">
+    <h2>Trip Alternatives</h2>
+    <div class="alternatives-grid">
+      <div 
+        v-for="(alternative, index) in alternatives" 
+        :key="index"
+        class="alternative-card"
+      >
+        <div class="alternative-header">
+          <h3>{{ index.charAt(0).toUpperCase() + index.slice(1) }}</h3>
+        </div>
+        <div class="alternative-content">
+          <div class="alternative-metric">
+            <span class="metric-label">Distance:</span>
+            <span class="metric-value">{{ (alternative.distance / 1000).toFixed(1) }} km</span>
+          </div>
+          <div class="alternative-metric">
+            <span class="metric-label">Duration:</span>
+            <span class="metric-value">{{ alternative.duration.replace('PT', '').replace('H', 'h ').replace('M', 'm ').replace('S', 's') }}</span>
+          </div>
+          <div class="alternative-metric">
+            <span class="metric-label">Carbon Footprint:</span>
+            <span class="metric-value">{{ alternative.emissionsCO2eKg.toFixed(2) }} kg CO₂</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -69,21 +86,21 @@ main {
   display: grid;
   max-width: 480px;
   margin: 0 auto;
-  gap: 16px;
-  padding: 16px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
 }
 
 h1 {
-  font-size: 24px;
-  font-weight: bold;
-  color: #fff;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
   margin: 0;
   text-align: left;
 }
 
 p {
-  font-size: 16px;
-  color: #ddd;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
   margin: 0;
   text-align: left;
 }
@@ -91,57 +108,149 @@ p {
 
 form {
   display: grid;
-  gap: 16px;
+  gap: var(--spacing-md);
   padding: 0px;
 }
 
 fieldset {
-  border: 1px solid darkgrey;
-  border-radius: 8px;
-  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  background-color: var(--background-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 legend {
-  font-weight: bold;
-  padding: 0 8px;
+  font-weight: var(--font-weight-bold);
+  padding: 0 var(--spacing-sm);
+  color: var(--text-primary);
 }
 
 label {
-  font-weight: bold;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
 }
 
 input[type="text"] {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid darkgrey;
-  border-radius: 8px;
-  transition: all 0.2s ease;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-base);
   box-sizing: border-box;
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
 }
 
 input[type="text"]:hover {
-  background-color: #ddd;
+  background-color: var(--background-tertiary);
+  border-color: var(--border-color-dark);
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.25);
 }
 
 button[type="submit"] {
-  padding: 8px 12px;
-  border: 1px solid darkgrey;
-  border-radius: 16px;
-  background-color: #2b5797;
-  color: white;
-  font-weight: bold;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-md);
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 10px;
+  transition: background-color var(--transition-base);
+  margin-top: var(--spacing-sm);
 }
 
 button[type="submit"]:hover {
-  background-color: #ddd;
+  background-color: var(--primary-color-dark);
 }
 
 button[type="submit"]:active {
-  background-color: #2b5797;
-  color: white;
+  background-color: var(--primary-color-dark);
+  transform: translateY(1px);
 }
 
+/* Results styling */
+.results-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: var(--spacing-md);
+}
+
+.results-container h2 {
+  font-size: var(--font-size-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.alternatives-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.alternative-card {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.alternative-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.alternative-header {
+  background-color: var(--primary-color);
+  color: var(--text-light);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+}
+
+.alternative-header h3 {
+  margin: 0;
+  font-size: var(--font-size-md);
+}
+
+.alternative-content {
+  padding: var(--spacing-md);
+}
+
+.alternative-metric {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.alternative-metric:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.metric-label {
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.metric-value {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+@media (max-width: 600px) {
+  .alternatives-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

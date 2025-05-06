@@ -519,100 +519,108 @@ h1, h2, p {
 
 .loading {
   text-align: center;
-  padding: 2rem;
+  padding: var(--spacing-xl);
   font-style: italic;
+  color: var(--text-secondary);
 }
 
 .tables-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
 }
 
 .table-section {
   flex: 1;
   min-width: 450px;
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-md);
   text-align: left;
+  color: var(--text-primary);
 }
 
 th, td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #ddd;
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .action-button {
-  padding: 0.25rem 0.75rem;
-  background-color: #4CAF50;
-  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--primary-color);
+  color: var(--text-light);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   cursor: pointer;
+  transition: background-color var(--transition-fast);
 }
 
 .action-button:disabled {
-  background-color: #cccccc;
+  background-color: var(--medium-color);
   cursor: not-allowed;
 }
 
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .completed {
-  background-color: #4CAF50;
-  color: white;
+  background-color: var(--success-color);
+  color: var(--text-light);
 }
 
 .started {
-  background-color: #2196F3;
-  color: white;
+  background-color: var(--secondary-color);
+  color: var(--text-light);
 }
 
 .not-started {
-  background-color: #2196F3;
-  color: white;
+  background-color: var(--secondary-color);
+  color: var(--text-light);
 }
 
 .empty-message {
   text-align: center;
   font-style: italic;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .progress-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--spacing-xs);
 }
 
 .progress-bar {
   height: 8px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
+  background-color: var(--background-tertiary);
+  border-radius: var(--border-radius-sm);
   overflow: hidden;
   width: 100%;
 }
 
 .progress-fill {
   height: 100%;
-  background-color: #4CAF50;
-  transition: width 0.3s ease;
+  background-color: var(--success-color);
+  transition: width var(--transition-base);
 }
 
 .progress-text {
-  font-size: 0.85rem;
-  color: #555;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 /* Add these new styles for sorting */
@@ -622,10 +630,11 @@ th, td {
   white-space: nowrap; /* Prevent text wrapping */
   position: relative;
   padding-right: 25px; /* Make space for the arrow */
+  color: var(--text-primary);
 }
 
 .sortable:hover {
-  background-color: #f5f5f5;
+  background-color: var(--background-tertiary);
 }
 
 .sort-indicator {
@@ -672,8 +681,8 @@ th {
 .tables-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
 }
 
 .table-section {
