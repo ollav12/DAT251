@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import {onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {getMe, logout, type User} from './services/user'
-import UserProfileView from "@/views/UserProfileView.vue";
-
+import { getMe, logout, type User } from './services/user'
+import UserProfileView from '@/views/UserProfileView.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -31,119 +30,179 @@ function performLogout() {
   logout()
   window.location.href = '/login'
 }
-
 </script>
 
 <template>
-  <header>
-    <h1>CO₂mpass</h1>
-    <p>Understand your carbon footprint</p>
-  </header>
+  <div class="app-container">
+    <header class="app-header bg-light">
+      <div class="header-content">
+        <h1 class="app-title">CO₂mpass</h1>
+        <p class="app-tagline">Understand your carbon footprint</p>
+      </div>
+    </header>
 
-  <nav v-if="showLayout">
-    <button class="logoutButton" @click="performLogout">Log out</button>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/vehicles">Vehicles</RouterLink>
-    <RouterLink to="/tripestimator">Trip estimator</RouterLink>
-    <RouterLink to="/leaderboard">Leaderboard</RouterLink>
-    <RouterLink to="/challenges">Challenges</RouterLink>
-    <RouterLink to="/shop">Shop</RouterLink>
-    <RouterLink to="/inventory">Inventory</RouterLink>
-    <RouterLink to="/statistics">Statistics</RouterLink>
-    <RouterLink v-if="user?.admin" to="/admin">Admin</RouterLink>
+    <div class="app-body container" v-if="showLayout">
+      <div class="top-bar">
+        <button class="btn btn-outline btn-sm logout-btn" @click="performLogout">
+          <i class="icon">↪</i> Log out
+        </button>
 
-  </nav>
+        <div class="user-profile">
+          <UserProfileView />
+        </div>
+      </div>
+      >>>>>>> 54ec6ea (claude changes)
 
-    <section class="profile-container" v-if="showLayout">
-      <UserProfileView />
-    </section>
+      <nav class="main-nav shadow">
+        <RouterLink to="/" class="nav-link"> <i class="icon">🏠</i> Home </RouterLink>
+        <RouterLink to="/vehicles" class="nav-link"> <i class="icon">🚗</i> Vehicles </RouterLink>
+        <RouterLink to="/tripestimator" class="nav-link">
+          <i class="icon">🗺️</i> Trip estimator
+        </RouterLink>
+        <RouterLink to="/challenges" class="nav-link">
+          <i class="icon">🏆</i> Challenges
+        </RouterLink>
+        <RouterLink to="/shop" class="nav-link"> <i class="icon">🛒</i> Shop </RouterLink>
+        <RouterLink to="/inventory" class="nav-link"> <i class="icon">📦</i> Inventory </RouterLink>
+        <RouterLink to="/statistics" class="nav-link">
+          <i class="icon">📊</i> Statistics
+        </RouterLink>
+        <RouterLink v-if="user?.admin" to="/admin" class="nav-link">
+          <i class="icon">⚙️</i> Admin
+        </RouterLink>
+      </nav>
+    </div>
 
-  <RouterView />
+    <main class="app-content">
+      <RouterView />
+    </main>
+  </div>
 </template>
 
 <style scoped>
-header {
-  text-align: center;
-  margin-top: 0.1rem;
-  font-size: large;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  font-size: 12px;
-  width: 100%;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  nav {
-    font-size: 1rem;
-    padding: 1rem 0;
-    margin-top: 1rem;
-    text-align: left;
-    margin-left: 0;
-  }
-}
-
-header {
-  text-align: center;
-}
-
-.profile-container {
+.app-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 1rem;
+  min-height: 100vh;
 }
 
-button {
+.app-header {
+  padding: var(--spacing-lg) 0;
+  background-color: var(--background-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 var(--spacing-md);
+}
+
+.app-title {
+  font-size: var(--font-size-display);
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.app-tagline {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.app-body {
+  position: relative;
   width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #1abc9c;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
 }
 
-.logoutButton {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 100;
-  width: auto;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  background-color: #1abc9c;
-  color: white;
-  font-size: 0.9rem;
-  cursor: pointer;
-  margin-top: 0;
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--spacing-md) 0;
 }
 
-.logoutButton:hover {
-  background-color: #47a365;
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
+.user-profile {
+  display: flex;
+  align-items: center;
+}
+
+.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-secondary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  transition: all var(--transition-base);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+
+.nav-link:hover {
+  background-color: var(--background-tertiary);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.nav-link.router-link-exact-active {
+  color: var(--text-light);
+  background-color: var(--primary-color);
+}
+
+.nav-link.router-link-exact-active:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.icon {
+  font-style: normal;
+}
+
+.app-content {
+  flex: 1;
+  padding: 0 var(--spacing-md);
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .main-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-xs);
+  }
+
+  .nav-link {
+    padding: var(--spacing-md);
+  }
+
+  .top-bar {
+    flex-direction: column-reverse;
+    gap: var(--spacing-md);
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
+}
 </style>

@@ -75,85 +75,102 @@ export default {
 </script>
 
 <template>
-  <div class="login-box">
-    <h1>Login</h1>
-    <form @submit.prevent="handleSubmit">
-      <div v-if="error" style="color: red">{{ error }}</div>
-      <div class="input-group">
-        <label for="username">Username</label>
-        <input type="username" v-model="username" placeholder="Username" required />
+  <div class="auth-container">
+    <div class="login-card card">
+      <div class="card-header text-center">
+        <h1>Login</h1>
+        <p class="text-muted">Sign in to your account</p>
       </div>
-
-      <div class="input-group">
-        <label for="password">Password:</label>
-        <div class="password-wrapper">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            id="password"
-            v-model="password"
-            placeholder="Password"
-            required
+      
+      <form @submit.prevent="handleSubmit" class="login-form">
+        <div v-if="error" class="alert alert-danger">{{ error }}</div>
+        
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <input 
+            type="username" 
+            id="username"
+            class="form-control" 
+            v-model="username" 
+            placeholder="Enter your username" 
+            required 
           />
-          <button type="button" class="toggle-password" @click="togglePasswordVisibility">
-            <img :src="showPassword ? eye : eyeOff" alt="Toggle password visibility" class="eye-icon" />
-          </button>
         </div>
-      </div>
-      <button class="register-button" type="submit">Login</button>
-      <button class="register-button" type="button" @click="navigateToSignup">Register</button>
-    </form>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="password-wrapper">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              id="password"
+              class="form-control"
+              v-model="password"
+              placeholder="Enter your password"
+              required
+            />
+            <button type="button" class="toggle-password" @click="togglePasswordVisibility">
+              <img :src="showPassword ? eye : eyeOff" alt="Toggle password visibility" class="eye-icon" />
+            </button>
+          </div>
+        </div>
+        
+        <div class="form-buttons">
+          <button class="btn btn-primary btn-block" type="submit">Login</button>
+          <button class="btn btn-outline btn-block" type="button" @click="navigateToSignup">Create Account</button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
-h1 {
-  color: #c6cacc;
-  margin-bottom: 1.5rem;
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: var(--spacing-lg);
 }
 
-.login-box {
-  background-color: #555555;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  margin: 2rem auto 0;
-}
-
-.input-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  color: #ecf0f1;
-  margin-bottom: 0.5rem;
-  text-align: left;
-}
-
-input {
+.login-card {
   width: 100%;
-  padding: 0.5rem;
-  border-radius: 5px;
-  border: none;
-  background-color: #ecf0f1;
-  color: #1a1a1a;
+  max-width: 400px;
+  padding: var(--spacing-xl);
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
-button {
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 5px;
-  background-color: #1abc9c;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
+.card-header {
+  margin-bottom: var(--spacing-lg);
 }
 
-.register-button:hover {
-  background-color: #47a365;
+.card-header h1 {
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.form-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.alert-danger {
+  background-color: var(--accent-color-light);
+  color: var(--danger-color);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
 }
 
 .password-wrapper {
@@ -166,27 +183,42 @@ button {
 
 .toggle-password {
   position: absolute;
-  left: 200px;
+  right: var(--spacing-md);
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
-  width: 2rem;
-  height: 2rem;
-  padding: 0 10px;
+  padding: 0;
   margin: 0;
+  width: auto;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
 }
 
 .toggle-password:hover {
   background-color: transparent;
+  color: var(--primary-color);
 }
 
 .eye-icon {
   width: 20px;
   height: 20px;
   cursor: pointer;
+  opacity: 0.7;
+  transition: opacity var(--transition-base);
 }
 
+.eye-icon:hover {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: var(--spacing-lg);
+  }
+}
 </style>

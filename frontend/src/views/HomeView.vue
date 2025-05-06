@@ -153,79 +153,112 @@ onMounted(() => {
 </script>
 
 <template>
-  <main v-if="loading">Loading...</main>
-  <main v-else-if="error">Error: {{ error.message }}</main>
+  <main v-if="loading" class="loading-container">
+    <div class="loader">Loading...</div>
+  </main>
+  <main v-else-if="error" class="error-container">
+    <div class="alert alert-danger">
+      <strong>Error:</strong> {{ error.message }}
+    </div>
+  </main>
   <main>
-    <div class="main-content">
-      <section class="stats">
-        <div class="stat-item">
-          <p class="emissions-display">
-            <span class="value">{{ statistics?.totalEmissionsCO2eKg?.toFixed(2) }}</span>
-            <span class="unit"> kg CO2e</span>
-          </p>
-          <p>Total emitted</p>
-        </div>
-        <div class="stat-item">
-          <p class="emissions-display">
-            <span class="value">{{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) }}</span>
-            <span class="unit"> kg CO2e</span>
-          </p>
-          <p>Total saved</p>
-        </div>
-      </section>
-
-      <section v-if="hideAddTrip">
-        <button @click="toggleAddTrip">Add new trip</button>
-      </section>
-      <section v-else class="add-trip">
-        <h3>Add new trip</h3>
-        <form @submit.prevent="submitTrip" style="display: flex; flex-direction: column; gap: 10px">
-          <label for="origin">Origin</label>
-          <input
-            name="origin"
-            placeholder="Origin"
-            list="origin-autocomplete"
-            v-model="originQuery"
-            @input="debouncedFetchOriginSuggestions"
-            required
-          />
-          <datalist id="origin-autocomplete">
-            <option
-              v-for="suggestion in originOptions"
-              :key="suggestion"
-              :value="suggestion"
-            ></option>
-          </datalist>
-          <label for="destination">Destination</label>
-          <input
-            name="destination"
-            placeholder="Destination"
-            list="destination-autocomplete"
-            v-model="destinationQuery"
-            @input="debouncedFetchDestinationSuggestions"
-            required
-          />
-          <datalist id="destination-autocomplete">
-            <option
-              v-for="suggestion in destinationOptions"
-              :key="suggestion"
-              :value="suggestion"
-            ></option>
-          </datalist>
-
-          <div style="display: flex; align-items: center; gap: 10px">
-            <input type="checkbox" id="useVehicle" v-model="useVehicle" />
-            <label for="useVehicle">Use personal vehicle</label>
+    <div class="dashboard-container">
+      <section class="stats-section">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-icon">🏭</span>
+            <span class="stat-title">Total CO₂ Emitted</span>
           </div>
-          <select v-if="!useVehicle" name="mode" id="mode">
-            <option value="walking" selected>Walking</option>
-            <option value="bicycling">Bicycling</option>
-            <option value="transit">Transit</option>
-            <option value="driving">Driving</option>
-          </select>
-          <div v-else>
-            <a href="/vehicles">Manage Vehicles</a>
-            <select name="vehicleId" id="vehicleId" v-model="selectedVehicle">
+          <div class="stat-value">
+            {{ statistics?.totalEmissionsCO2eKg?.toFixed(2) }}
+            <span class="stat-unit">kg CO₂e</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-icon">🌱</span>
+            <span class="stat-title">Total CO₂ Saved</span>
+          </div>
+          <div class="stat-value">
+            {{ statistics?.totalEmissionsSavingsCO2eKg?.toFixed(2) }}
+            <span class="stat-unit">kg CO₂e</span>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="hideAddTrip" class="action-section">
+        <button class="btn btn-primary" @click="toggleAddTrip">
+          <i class="icon">➕</i> Add new trip
+        </button>
+      </section>
+      <section v-else class="add-trip-section card">
+        <div class="card-header">
+          <h3>Add new trip</h3>
+        </div>
+        <form @submit.prevent="submitTrip" class="trip-form">
+          <div class="form-group">
+            <label for="origin" class="form-label">Origin</label>
+            <input
+              class="form-control"
+              name="origin"
+              placeholder="Enter starting point"
+              list="origin-autocomplete"
+              v-model="originQuery"
+              @input="debouncedFetchOriginSuggestions"
+              required
+            />
+            <datalist id="origin-autocomplete">
+              <option
+                v-for="suggestion in originOptions"
+                :key="suggestion"
+                :value="suggestion"
+              ></option>
+            </datalist>
+          </div>
+          
+          <div class="form-group">
+            <label for="destination" class="form-label">Destination</label>
+            <input
+              class="form-control"
+              name="destination"
+              placeholder="Enter destination"
+              list="destination-autocomplete"
+              v-model="destinationQuery"
+              @input="debouncedFetchDestinationSuggestions"
+              required
+            />
+            <datalist id="destination-autocomplete">
+              <option
+                v-for="suggestion in destinationOptions"
+                :key="suggestion"
+                :value="suggestion"
+              ></option>
+            </datalist>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="useVehicle" v-model="useVehicle" class="checkbox-input" />
+              <label for="useVehicle" class="checkbox-label">Use personal vehicle</label>
+            </div>
+          </div>
+          
+          <div class="form-group" v-if="!useVehicle">
+            <label for="mode" class="form-label">Transport Mode</label>
+            <select name="mode" id="mode" class="form-control">
+              <option value="walking" selected>Walking</option>
+              <option value="bicycling">Bicycling</option>
+              <option value="transit">Transit</option>
+              <option value="driving">Driving</option>
+            </select>
+          </div>
+          
+          <div class="form-group" v-else>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label for="vehicleId" class="form-label mb-0">Select Vehicle</label>
+              <a href="/vehicles" class="btn-link">Manage Vehicles</a>
+            </div>
+            <select name="vehicleId" id="vehicleId" v-model="selectedVehicle" class="form-control">
               <option value="" disabled>Select a vehicle</option>
               <option v-for="vehicle in vehicles" :key="vehicle.id" :value="vehicle.id">
                 {{ vehicle.make }} {{ vehicle.model }} ({{ vehicle.year }})
@@ -233,54 +266,89 @@ onMounted(() => {
             </select>
           </div>
 
-          <button type="submit">Add trip</button>
-          <button @click="toggleAddTrip" class="secondary">Cancel</button>
+          <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Add trip</button>
+            <button @click="toggleAddTrip" class="btn btn-secondary">Cancel</button>
+          </div>
         </form>
-        <!-- TODO: make it possible to estimate before adding -->
       </section>
 
-      <section class="recent-trips">
-        <h3>Recent trips</h3>
-        <p>Total trips: {{ data.length }}</p>
-        <ul v-if="data" class="trip-list">
-          <li v-for="trip in data.slice(0, visibleTripsCount)" :key="trip.id" class="trip-item">
-            <div>
-              <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
-              <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
-              <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
-              <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
-              <h4 v-else>Trip</h4>
-              <p>{{ trip.origin }} to {{ trip.destination }}</p>
-              <p>{{ trip.totalDistanceKm.toFixed(2) }} kilometers</p>
-              <p>{{ formatDuration(trip.totalDurationSeconds) }}</p>
-              <p v-if="trip.vehicle">
+      <section class="trips-section">
+        <div class="section-header">
+          <h3>Recent Trips</h3>
+          <span class="badge badge-primary">{{ data.length }} Total</span>
+        </div>
+        
+        <div v-if="data && data.length > 0" class="trips-container">
+          <div v-for="trip in data.slice(0, visibleTripsCount)" :key="trip.id" class="trip-card">
+            <div class="trip-header">
+              <div class="trip-mode">
+                <span class="mode-icon" v-if="trip.travelMode === 'driving'">🚗</span>
+                <span class="mode-icon" v-else-if="trip.travelMode === 'walking'">🚶</span>
+                <span class="mode-icon" v-else-if="trip.travelMode === 'bicycling'">🚲</span>
+                <span class="mode-icon" v-else-if="trip.travelMode === 'transit'">🚌</span>
+                <span class="mode-icon" v-else>🧭</span>
+                
+                <h4 v-if="trip.travelMode === 'driving'">Drive</h4>
+                <h4 v-else-if="trip.travelMode === 'walking'">Walk</h4>
+                <h4 v-else-if="trip.travelMode === 'bicycling'">Bike</h4>
+                <h4 v-else-if="trip.travelMode === 'transit'">Transit</h4>
+                <h4 v-else>Trip</h4>
+              </div>
+              
+              <div class="trip-emissions">
+                <div class="trip-co2">
+                  {{ trip.totalEmissionsCO2eKg.toFixed(2) }}
+                  <span class="trip-unit">kg CO₂e</span>
+                </div>
+                <div class="trip-savings text-success">
+                  <span class="savings-icon">↓</span> {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg saved
+                </div>
+              </div>
+            </div>
+            
+            <div class="trip-details">
+              <div class="trip-route">
+                <div class="origin-dest">{{ trip.origin }} → {{ trip.destination }}</div>
+              </div>
+              
+              <div class="trip-stats">
+                <div class="stat-item">
+                  <span class="stat-icon">📏</span>
+                  <span class="stat-value">{{ trip.totalDistanceKm.toFixed(2) }} km</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon">⏱️</span>
+                  <span class="stat-value">{{ formatDuration(trip.totalDurationSeconds) }}</span>
+                </div>
+              </div>
+              
+              <div v-if="trip.vehicle" class="trip-vehicle">
+                <span class="vehicle-icon">🚘</span>
                 {{ trip.vehicle.make }} {{ trip.vehicle.model }} ({{ trip.vehicle.year }})
-              </p>
+              </div>
             </div>
-            <div>
-              <p>
-                <span class="value">{{ trip.totalEmissionsCO2eKg.toFixed(2) }}</span>
-                <span class="unit">kg CO2e</span>
-              </p>
-              <p>Saved {{ trip.savedEmissionsCO2eKg.toFixed(2) }} kg CO2e</p>
-            </div>
-          </li>
-        </ul>
-
-        <!-- Vis mer knapp -->
-        <button
-          v-if="data && visibleTripsCount < data.length"
-          @click="showMoreTrips"
-          class="show-more-btn"
-        >
-          Show more
-        </button>
-        <div v-if="data && data.length === 0">No trips found.</div>
+          </div>
+          
+          <button
+            v-if="data && visibleTripsCount < data.length"
+            @click="showMoreTrips"
+            class="btn btn-outline load-more-btn"
+          >
+            <i class="icon">⤵️</i> Show more trips
+          </button>
+        </div>
+        
+        <div v-else-if="data && data.length === 0" class="empty-state">
+          <div class="empty-icon">🔎</div>
+          <p>No trips found. Add your first trip to start tracking your carbon footprint.</p>
+        </div>
       </section>
     </div>
-    <div class="leaderboard-sidebar">
+    
+    <aside class="leaderboard-sidebar">
       <Leaderboard :limit="5" :show-view-more="true" />
-    </div>
+    </aside>
   </main>
 </template>
 
@@ -289,169 +357,360 @@ main {
   position: relative;
   max-width: 100%;
   margin: 0 auto;
-  padding: 16px;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
 }
 
-.main-content {
-  width: 480px;
+.dashboard-container {
+  flex: 1;
+  min-width: 480px;
+  max-width: 800px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--spacing-lg);
 }
 
-.leaderboard-sidebar {
-  position: absolute;
-  width: 350px;
-  top: 16px;
-  right: 0;
-}
-
-@media (max-width: 768px) {
-  main {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .leaderboard-sidebar {
-    position: static;
-    width: 100%;
-    max-width: 480px;
-    margin-top: 20px;
-  }
-}
-
-form {
+.loading-container,
+.error-container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  min-height: 200px;
+  width: 100%;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 1em;
-  border: none;
-  border-radius: 5px;
-  background-color: #007bff;
-  color: #fff;
-  cursor: pointer;
-}
-button.secondary {
-  background-color: #6c757d;
-  color: #fff;
+.loader {
+  font-size: var(--font-size-lg);
+  color: var(--primary-color);
+  position: relative;
 }
 
-button:hover {
-  background-color: #0056b3;
+.loader::after {
+  content: '';
+  animation: loading 1.5s infinite linear;
+  display: inline-block;
 }
 
-select {
-  padding: 10px 20px;
-  font-size: 1em;
-  border: none;
-  border-radius: 2px;
-  background-color: #fff;
-  color: #000;
-  cursor: pointer;
+@keyframes loading {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
 }
 
-select:hover {
-  background-color: #f0f0f0;
+.alert {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  width: 100%;
 }
 
-section {
+.alert-danger {
+  background-color: var(--accent-color-light);
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+/* Stats Section */
+.stats-section {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-card {
+  flex: 1;
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-.stats {
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-header {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-icon {
+  font-size: var(--font-size-lg);
+}
+
+.stat-title {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.stat-value {
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.stat-unit {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  margin-left: var(--spacing-xs);
+}
+
+/* Add Trip Section */
+.action-section {
+  display: flex;
   justify-content: center;
-  gap: 60px;
-  margin-bottom: 20px;
-  margin-top: 10px;
+  margin: var(--spacing-md) 0;
+}
+
+.add-trip-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.card-header {
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-md);
+}
+
+.trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.checkbox-input {
+  width: auto;
+  margin-right: var(--spacing-xs);
+}
+
+.checkbox-label {
+  margin: 0;
+}
+
+.form-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+/* Trips Section */
+.trips-section {
+  margin-top: var(--spacing-lg);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.trips-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.trip-card {
+  background-color: var(--background-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  border: 1px solid var(--border-color);
+}
+
+.trip-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.trip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.trip-mode {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.mode-icon {
+  font-size: var(--font-size-xl);
+}
+
+.trip-mode h4 {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.trip-emissions {
+  text-align: right;
+}
+
+.trip-co2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.trip-unit {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.trip-savings {
+  font-size: var(--font-size-sm);
+  color: var(--success-color);
+}
+
+.savings-icon {
+  font-size: var(--font-size-sm);
+}
+
+.trip-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.trip-route {
+  margin-bottom: var(--spacing-sm);
+}
+
+.origin-dest {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+}
+
+.trip-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
 }
 
 .stat-item {
   display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.stat-icon {
+  font-size: var(--font-size-base);
+}
+
+.trip-vehicle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.vehicle-icon {
+  font-size: var(--font-size-base);
+}
+
+.load-more-btn {
+  align-self: center;
+  margin-top: var(--spacing-md);
+}
+
+.empty-state {
+  display: flex;
   flex-direction: column;
   align-items: center;
+  padding: var(--spacing-xl);
+  background-color: var(--background-tertiary);
+  border-radius: var(--border-radius-md);
   text-align: center;
 }
 
-.stats .value {
-  font-size: 3em;
+.empty-icon {
+  font-size: var(--font-size-display);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
 }
 
-.stats .unit {
-  font-size: 1em;
-  font-weight: bold;
+/* Leaderboard sidebar */
+.leaderboard-sidebar {
+  width: 350px;
 }
 
-ul.trip-list {
-  list-style-type: none;
-  padding: 0;
-  max-width: 100%;
+@media (max-width: 1200px) {
+  .dashboard-container {
+    max-width: 100%;
+  }
+  
+  .leaderboard-sidebar {
+    width: 100%;
+    margin-top: var(--spacing-lg);
+  }
 }
 
-li.trip-item {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: start;
-  flex-wrap: nowrap;
-  background-color: var(--color-background-soft);
-  filter: brightness(1.3);
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+  
+  .dashboard-container {
+    min-width: 100%;
+  }
+  
+  .stats-section {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .trip-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .trip-emissions {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
 }
 
-li.trip-item :nth-child(1) {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: start;
+@media (max-width: 480px) {
+  .trip-stats {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
 }
-
-li.trip-item :nth-child(2) {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: end;
-}
-
-li.trip-item .value {
-  font-size: 2em;
-}
-
-li.trip-item .unit {
-  font-size: 1em;
-  font-weight: bold;
-}
-
-.show-more-btn {
-  margin-top: 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.show-more-btn:hover {
-  background-color: #45a049;
-}
-
 </style>
