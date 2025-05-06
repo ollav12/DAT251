@@ -43,9 +43,7 @@ function performLogout() {
 
     <div class="app-body container" v-if="showLayout">
       <div class="top-bar">
-        <button class="btn btn-outline logout-btn" @click="performLogout">
-          Log out
-        </button>
+        <button class="btn btn-outline logout-btn" @click="performLogout">Log out</button>
 
         <div class="user-profile">
           <UserProfileView />
@@ -75,10 +73,10 @@ function performLogout() {
     <main class="app-content">
       <RouterView />
     </main>
-    
+
     <footer class="app-footer">
       <div class="container">
-        <p class="text-muted">© 2023 CO₂mpass</p>
+        <p class="text-muted">© 2025 CO₂mpass</p>
       </div>
     </footer>
   </div>
@@ -119,8 +117,6 @@ function performLogout() {
   font-weight: 400;
 }
 
-
-
 .app-body {
   position: relative;
   width: 100%;
@@ -139,8 +135,6 @@ function performLogout() {
   gap: var(--spacing-xs);
   transition: all var(--animation-fast);
 }
-
-
 
 .user-profile {
   display: flex;
@@ -174,21 +168,15 @@ function performLogout() {
   overflow: hidden;
 }
 
-
-
 .nav-link:hover {
   color: var(--primary-color);
   background-color: var(--background-tertiary);
 }
 
-
-
 .nav-link.router-link-exact-active {
   color: white;
   background-color: var(--primary-color);
 }
-
-
 
 .icon {
   font-style: normal;
