@@ -142,14 +142,13 @@ const sortedUserChallenges = computed(() => {
   })
 })
 
-// Add this computed property after your existing computed properties
 const sortedInProgressChallenges = computed(() => {
-  // First filter to get only in-progress challenges
+  // Filter to get only in-progress challenges
   const inProgress = userChallenges.value.filter(challenge => !isComplete(challenge))
 
   if (!sortField.value) return inProgress
 
-  // Then sort them using the same logic as other tables
+  // Sort them using the same logic as other tables
   return [...inProgress].sort((a, b) => {
     let aValue, bValue
 
@@ -266,14 +265,14 @@ async function startChallenge(challengeID: number): Promise<void> {
   }
 }
 
-// Add this computed property after your other computed properties
+// Add this computed property after our other computed properties
 const sortedCompletedChallenges = computed(() => {
-  // First filter to get only completed challenges
+  // Filter to get only completed challenges
   const completed = userChallenges.value.filter(challenge => isComplete(challenge))
 
   if (!sortField.value) return completed
 
-  // Then sort them using the same logic as other tables
+  // Sort them using the same logic as other tables
   return [...completed].sort((a, b) => {
     let aValue, bValue
 
@@ -615,13 +614,12 @@ th, td {
   color: #555;
 }
 
-/* Add these new styles for sorting */
 .sortable {
   cursor: pointer;
   user-select: none;
-  white-space: nowrap; /* Prevent text wrapping */
+  white-space: nowrap;
   position: relative;
-  padding-right: 25px; /* Make space for the arrow */
+  padding-right: 25px;
 }
 
 .sortable:hover {
@@ -630,39 +628,38 @@ th, td {
 
 .sort-indicator {
   position: absolute;
-  right: 8px; /* Position arrow on the right side */
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.8em;
   display: inline-block;
 }
 
-th:nth-child(2) { /* Title column */
+th:nth-child(2) {
   min-width: 120px;
 }
 
-th:nth-child(3) { /* Description column */
+th:nth-child(3) {
   min-width: 180px;
 }
 
-th:nth-child(4) { /* Points column */
+th:nth-child(4) {
   min-width: 90px;
 }
 
-th:nth-child(5) { /* Status column */
+th:nth-child(5) {
   min-width: 100px;
 }
 
-th:nth-child(6) { /* Progress column */
+th:nth-child(6) {
   min-width: 150px;
 }
 
 th {
   position: relative;
-  padding: 0.75rem 1rem; /* Increase horizontal padding */
+  padding: 0.75rem 1rem;
 }
 
-/* Rest of your styles remain unchanged */
 @media (max-width: 950px) {
   .tables-container {
     flex-direction: column;
@@ -681,8 +678,6 @@ th {
   min-width: auto;
 }
 
-
-/* Add responsive behavior */
 @media (max-width: 1200px) {
   .table-section {
     flex: 1 1 calc(50% - 1rem);

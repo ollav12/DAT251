@@ -109,7 +109,6 @@ onMounted(async () => {
 <template>
   <h1>Shop</h1>
 
-  <!-- Add error message display -->
   <div v-if="showError" class="error-message">
     {{ errorMessage }}
   </div>
@@ -141,7 +140,6 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- Update the Profile Icons section similarly -->
   <div class="shopbox">
     <h2>Profile Icons</h2>
     <div class="cosmetic-container">

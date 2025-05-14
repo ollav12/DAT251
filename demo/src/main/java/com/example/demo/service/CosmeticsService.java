@@ -57,7 +57,7 @@ public class CosmeticsService {
                 // Clear existing border relationship if exists
                 if (user.getEquippedBorder() != null) {
                     user.setEquippedBorder(null);
-                    userRepository.save(user); // Save changes to avoid constraint issues
+                    userRepository.save(user);
                 }
                 user.setEquippedBorder(cosmetics);
             }
@@ -65,7 +65,7 @@ public class CosmeticsService {
                 // Clear existing profile picture relationship if exists
                 if (user.getEquippedProfilePicture() != null) {
                     user.setEquippedProfilePicture(null);
-                    userRepository.save(user); // Save changes to avoid constraint issues
+                    userRepository.save(user);
                 }
                 user.setEquippedProfilePicture(cosmetics);
             }

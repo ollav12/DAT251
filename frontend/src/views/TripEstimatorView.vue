@@ -26,16 +26,6 @@ async function estimateTrip() {
 }
 </script>
 
-<!-- {
-    "estimates": {
-        "driving": {
-            "duration": "PT4H9M25S",
-            "distance": 267172,
-            "emissionsCO2eKg": 30.679999999999996
-        }
-    }
-} -->
-
 <template>
   <main>
     <h1>Trip Estimator</h1>

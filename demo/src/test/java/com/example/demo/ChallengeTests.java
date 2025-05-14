@@ -212,31 +212,6 @@ public class ChallengeTests {
                 assertEquals(ChallengeStatus.Status.NOT_STARTED, status.getStatus());
         }
 
-        /*
-         * @Test
-         * void testNavigationChallengeCompletion() {
-         * // Create a navigation challenge
-         * Challenge navChallenge = new Challenge();
-         * navChallenge.setChallengeType(Challenge.ChallengeType.NAVIGATION);
-         * navChallenge.setTargetRoute("/sustainability");
-         * navChallenge.setChallengeTitle("Visit Sustainability Page");
-         * navChallenge.setRewardPoints(50);
-         * challengeRepo.save(navChallenge);
-         * 
-         * // Record a navigation event
-         * restTemplate.postForEntity(
-         * "/challenges/users/" + testUser.getId() + "/navigation",
-         * new ChallengeController.NavigationRequest("/sustainability"),
-         * Void.class);
-         * 
-         * // Verify challenge was completed
-         * ChallengeStatus status =
-         * completedChallengeRepo.findByUserIDAndChallenge_ChallengeID(
-         * testUser.getId(), navChallenge.getChallengeID());
-         * assertEquals(ChallengeStatus.Status.COMPLETED, status.getStatus());
-         * }
-         */
-
         // @Test
         void testUpdateMetricProgress() {
                 // Create a metric challenge
@@ -297,14 +272,6 @@ public class ChallengeTests {
                 );
                 challengeRepo.save(actionChallenge);
 
-                // Assign challenge to user
-                /*
-                 * ChallengeStatus status = new ChallengeStatus();
-                 * status.setUserID(testUser.getId());
-                 * status.setChallenge(actionChallenge);
-                 * status.setStatus(ChallengeStatus.Status.IN_PROGRESS);
-                 * completedChallengeRepo.save(status);
-                 */
                 challengeStatusService.startChallenge(testUser.getId(), actionChallenge.getChallengeID());
 
                 // Update the status to IN_PROGRESS

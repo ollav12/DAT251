@@ -3,7 +3,6 @@
 import { onMounted, ref, watch, inject, computed } from 'vue'
 import { formatDuration } from '../util/format'
 
-// Define enums
 enum LeaderboardMetric {
   TOTAL_EMISSIONS = 'TOTAL_EMISSIONS',
   TOTAL_SAVED_EMISSIONS = 'TOTAL_SAVED_EMISSIONS',
@@ -30,22 +29,18 @@ type Leaderboard = {
   }[]
 }
 
-// Props for customization
 const props = defineProps<{
   limit?: number
   showViewMore?: boolean
 }>()
 
-// Reactive state
 const selectedMetric = ref<LeaderboardMetric>(LeaderboardMetric.TOTAL_EMISSIONS)
 const selectedPeriod = ref<LeaderboardPeriod>(LeaderboardPeriod.LIFETIME)
 const data = ref<Leaderboard>({ rows: [] })
 const loading = ref(false)
 
-// Inject user data from App.vue (assuming User type has a username property)
 const user = inject<{ username: string }>('user')
 
-// Fetch leaderboard data
 async function fetchLeaderboard(): Promise<void> {
   loading.value = true
   try {
@@ -61,12 +56,10 @@ async function fetchLeaderboard(): Promise<void> {
   }
 }
 
-// Watch for changes in metric or period
 watch(selectedMetric, fetchLeaderboard)
 watch(selectedPeriod, fetchLeaderboard)
 onMounted(fetchLeaderboard)
 
-// Options for dropdowns
 const metricOptions = [
   { value: LeaderboardMetric.TOTAL_EMISSIONS, label: 'Total emissions' },
   { value: LeaderboardMetric.TOTAL_SAVED_EMISSIONS, label: 'Total saved emissions' },
@@ -82,7 +75,6 @@ const periodOptions = [
   { value: LeaderboardPeriod.PAST_WEEK, label: 'Last week' },
 ]
 
-// Format value based on metric
 function formatValue(value: number, metric: LeaderboardMetric): string {
   switch (metric) {
     case LeaderboardMetric.TOTAL_EMISSIONS:
@@ -100,12 +92,10 @@ function formatValue(value: number, metric: LeaderboardMetric): string {
   }
 }
 
-// Get metric label for table header
 function getMetricLabel(metric: LeaderboardMetric): string {
   return metricOptions.find((opt) => opt.value === metric)?.label || 'Value'
 }
 
-// Compute displayed rows based on limit prop
 const displayedRows = computed(() =>
     props.limit ? data.value.rows.slice(0, props.limit) : data.value.rows
 )

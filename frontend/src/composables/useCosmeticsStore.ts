@@ -15,7 +15,6 @@ if (localStorage.getItem('equippedProfilePicture')) {
 }
 
 export function useCosmeticsStore() {
-  // Update both localStorage and reactive state
   const updateEquippedBorder = (image: string) => {
     localStorage.setItem('equippedBorder', image)
     equippedBorder.value = image

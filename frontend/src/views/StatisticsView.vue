@@ -190,8 +190,6 @@ const renderCharts = () => {
   }
 }
 
-//TODO Don't display graphs if trips are empty
-
 </script>
 
 <template>

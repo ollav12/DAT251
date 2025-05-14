@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Leaderboard from '@/views/Leaderboard.vue' // Adjust path as needed
+import Leaderboard from '@/views/Leaderboard.vue'
 </script>
 
 <template>
